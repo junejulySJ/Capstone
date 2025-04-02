@@ -1,0 +1,17 @@
+### React
+node_modules/
+.env
+build/
+
+### Spring Boot
+/target/
+*.log
+*.iml
+.idea/
+
+### Android
+.gradle/
+local.properties
+/.idea/
+*.iml
+/build/

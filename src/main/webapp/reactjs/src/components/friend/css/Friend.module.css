@@ -1,0 +1,62 @@
+/* Board styles */
+.friend {
+  width: 80%;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Post List styles */
+.board {
+  border-collapse: collapse;
+  width: 100%;
+  border: 1px solid #ddd;
+  margin-bottom: 20px;
+}
+
+.friend th,
+.friend td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.friend td a {
+  text-decoration: none;
+}
+
+.friend td a:hover {
+  text-decoration: underline;
+}
+
+.friend th {
+  background-color: #f2f2f2;
+}
+
+/* Page Navigation styles */
+.page-nav {
+  text-align: center;
+}
+
+.page-nav a {
+  display: inline-block;
+  margin: 0 5px;
+  padding: 5px 10px;
+  text-decoration: none;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  color: #333;
+}
+
+.page-nav .page {
+  background-color: #f2f2f2;
+}
+
+.page-nav a:hover {
+  background-color: #ddd;
+}
+
+.page-nav .prev,
+.page-nav .next {
+  font-weight: bold;
+}

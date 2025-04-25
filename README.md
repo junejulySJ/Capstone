@@ -8,5 +8,5 @@
 프론트엔드: `http://localhost:3000`
 
 ## 📚 목차
-- [User API](docs/api.md) <span style="color: red;">★</span>
+- [User API](docs/UserAPI.md) <span style="color: red;">★</span>
 - Board API

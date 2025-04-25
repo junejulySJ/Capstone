@@ -23,7 +23,7 @@ public class User {
     private String userImg;
     private String userAddress;
 
-    @ManyToOne(fetch= FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_type")
     private UserRole userRole;
 

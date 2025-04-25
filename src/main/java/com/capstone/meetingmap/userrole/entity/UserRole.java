@@ -2,6 +2,7 @@ package com.capstone.meetingmap.userrole.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,4 +14,10 @@ public class UserRole {
     private Integer userType;
 
     private String userTypeName;
+
+    @Builder
+    public UserRole(Integer userType, String userTypeName) {
+        this.userType = userType;
+        this.userTypeName = userTypeName;
+    }
 }

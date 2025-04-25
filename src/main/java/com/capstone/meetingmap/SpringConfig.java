@@ -10,17 +10,11 @@ import com.capstone.meetingmap.schedule.repository.ScheduleDetailRepository;
 import com.capstone.meetingmap.schedule.repository.ScheduleDetailRepositoryImpl;
 import com.capstone.meetingmap.schedule.repository.ScheduleRepository;
 import com.capstone.meetingmap.schedule.repository.ScheduleRepositoryImpl;
-import com.capstone.meetingmap.user.repository.UserRepository;
-import com.capstone.meetingmap.user.repository.UserRepositoryImpl;
-import com.capstone.meetingmap.userrole.repository.UserRoleRepository;
-import com.capstone.meetingmap.userrole.repository.UserRoleRepositoryImpl;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.DefaultUriBuilderFactory;
 
 @Configuration
 public class SpringConfig {
@@ -60,15 +54,5 @@ public class SpringConfig {
     @Bean
     public ScheduleDetailRepository scheduleDetailRepository() {
         return new ScheduleDetailRepositoryImpl(em);
-    }
-
-    @Bean
-    public UserRepository userRepository() {
-        return new UserRepositoryImpl(em);
-    }
-
-    @Bean
-    public UserRoleRepository userRoleRepository() {
-        return new UserRoleRepositoryImpl(em);
     }
 }

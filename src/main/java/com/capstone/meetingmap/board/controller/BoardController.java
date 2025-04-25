@@ -4,8 +4,9 @@ import com.capstone.meetingmap.board.dto.BoardCreateRequestDto;
 import com.capstone.meetingmap.board.dto.BoardCreateResponseDto;
 import com.capstone.meetingmap.board.dto.BoardResponseDto;
 import com.capstone.meetingmap.board.service.BoardService;
-import com.capstone.meetingmap.category.service.CategoryService;
 import com.capstone.meetingmap.util.SessionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +18,10 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class BoardController {
 
+    private static final Logger log = LoggerFactory.getLogger(BoardController.class);
     private final BoardService boardService;
 
-    public BoardController(BoardService boardService, CategoryService categoryService) {
+    public BoardController(BoardService boardService) {
         this.boardService = boardService;
     }
 
@@ -46,17 +48,20 @@ public class BoardController {
     @PostMapping("/boards/create")
     public ResponseEntity<BoardCreateResponseDto> apiCreate(@RequestBody BoardCreateRequestDto boardCreateRequestDto) {
 
-        if (SessionUtil.getLoggedInUserId() == null) {
+        String userId = SessionUtil.getLoggedInUserId();
+        if (userId == null) {
+            log.warn("Unauthorized access attempt to create board.");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // 로그인 안 된 경우 접근 거부
         }
 
         try {
-            BoardCreateResponseDto boardCreateResponseDto = boardService.create(boardCreateRequestDto, SessionUtil.getLoggedInUserId());
+            BoardCreateResponseDto boardCreateResponseDto = boardService.create(boardCreateRequestDto, userId);
 
-            System.out.println("post added: " + boardCreateRequestDto.getBoardTitle());
+            log.info("post added: {}", boardCreateRequestDto.getBoardTitle());
 
             return ResponseEntity.status(HttpStatus.CREATED).body(boardCreateResponseDto);
         } catch(RuntimeException e) {
+            log.error("Failed to create post: {} by userId: {}", boardCreateRequestDto.getBoardTitle(), userId, e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // 존재하지 않는 카테고리나 회원 정보가 없으면 404 NOT FOUND
         }
     }

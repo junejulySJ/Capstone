@@ -6,7 +6,7 @@
 주요 기능:
 - 아이디 중복 검사
 - 회원가입
-- 로그인 <span style="color: red;">★</span>
+- 로그인 ✏️
 - 회원 정보 조회 (회원 본인의 정보만 접근 가능)
 - 전체 회원 조회 (관리자만 접근 가능)
 ---
@@ -15,7 +15,7 @@
 
 ### 1. 아이디 중복 검사
 
-**POST** `/user/check-id` <span style="color: red;">★</span>
+**POST** `/user/check-id` ✏️
 
 > 사용자가 입력한 아이디가 이미 존재하는지 검사합니다.
 
@@ -38,7 +38,7 @@
 ---
 
 ### 2. 회원가입
-**POST** `/user/register` <span style="color: red;">★</span>
+**POST** `/user/register` ✏️
 
 > 신규 회원을 등록합니다.
 
@@ -55,7 +55,7 @@
 #### 성공 응답
 - **HTTP 201 Created**
 - Location 헤더: `/users/{userId}`  
-  [<span style="color: red;">★</span> 응답 내용 변경]
+  [✏️ 응답 내용 변경]
 ```json
 {
   "userId": "exampleUser",
@@ -75,7 +75,7 @@
 
 ---
 
-### 3. 로그인 <span style="color: red;">★</span>
+### 3. 로그인 ✏️
 **POST** `/login`
 
 > 로그인을 진행합니다.
@@ -99,14 +99,14 @@
 ---
 
 ### 4. 회원 정보 조회
-**GET** `/user/{userId}` <span style="color: red;">★</span>
+**GET** `/user/{userId}` ✏️
 
 > 특정 회원 정보를 조회합니다.  
 > 관리자는 모든 사용자 정보를 조회 가능합니다.  
 > 일반 사용자는 **로그인된 사용자 본인만** 조회할 수 있습니다.
 
 #### 요청 코드
-- JWT 토큰을 헤더에 실어 보낼 것 <span style="color: red;">★</span>
+- JWT 토큰을 헤더에 실어 보낼 것 ✏️
 ```javascript
 axios
     .get(`${API_BASE_URL}/user/${userId}`, {
@@ -133,13 +133,13 @@ axios
 - **404 Not Found** : 관리자로 로그인 중에 존재하지 않는 사용자 ID를 요청 시
 
 ### 5. 전체 회원 조회
-**GET** `/user` <span style="color: red;">★</span>
+**GET** `/user` ✏️
 
 > 모든 회원 정보를 조회합니다.  
 관리자 계정으로 로그인된 경우만 접근할 수 있습니다.
 
 #### 요청 코드
-- JWT 토큰을 헤더에 실어 보낼 것 <span style="color: red;">★</span>
+- JWT 토큰을 헤더에 실어 보낼 것 ✏️
 ```javascript
 axios
     .get(`${API_BASE_URL}/user`, {
@@ -172,4 +172,4 @@ axios
 ```
 
 #### 실패 응답
-- **403 Forbidden** : 로그인 중이 아니거나 관리자가 아닌 경우 <span style="color: red;">★</span>
+- **403 Forbidden** : 로그인 중이 아니거나 관리자가 아닌 경우 ✏️

@@ -1,5 +1,6 @@
 package com.capstone.meetingmap.user.service;
 
+import com.capstone.meetingmap.auth.dto.KakaoUserInfo;
 import com.capstone.meetingmap.user.dto.UserCheckIdRequestDto;
 import com.capstone.meetingmap.user.dto.UserCheckIdResponseDto;
 import com.capstone.meetingmap.user.dto.UserRegisterRequestDto;
@@ -37,7 +38,7 @@ public class UserService {
         return new UserCheckIdResponseDto(!isExists);
     }
 
-    //회원가입
+    //일반 회원가입
     @Transactional
     public UserResponseDto join(UserRegisterRequestDto userRegisterRequestDto) {
         String userId = userRegisterRequestDto.getUserId();
@@ -56,6 +57,26 @@ public class UserService {
         userRepository.save(user);
 
         return UserResponseDto.fromEntity(user); //User 엔티티를 UserResponseDto로 변환해 반환
+    }
+
+    //일반 회원가입
+    @Transactional
+    public User kakaoJoin(KakaoUserInfo kakaoUser) {
+        String userId = "kakao_" + kakaoUser.getId();
+
+        UserRole userRole = userRoleRepository.findByUserType(1).get(); //회원 유형을 1(일반사용자)로 고정
+
+        User user = User.builder()
+                .userId(userId)
+                .userPasswd("")
+                .userEmail(kakaoUser.getKakaoAccount().getEmail())
+                .userNick(kakaoUser.getKakaoAccount().getProfile().getNickname())
+                .userImg(kakaoUser.getKakaoAccount().getProfile().getProfileImageUrl())
+                .userRole(userRole)
+                .build();
+        userRepository.save(user);
+
+        return user;
     }
 
     //특정 유저 조회

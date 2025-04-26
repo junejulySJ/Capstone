@@ -9,4 +9,4 @@
 
 ## 📚 목차
 - [User API](docs/UserAPI.md) ✏️
-- Board API
+- [Auth API](docs/AuthAPI.md) ✏️

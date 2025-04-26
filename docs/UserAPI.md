@@ -1,12 +1,11 @@
 ## 📚 목차
-- User API
-- Board API
+- **User API**
+- [Auth API](AuthAPI.md)
 
 # User API
 주요 기능:
 - 아이디 중복 검사
 - 회원가입
-- 로그인 ✏️
 - 회원 정보 조회 (회원 본인의 정보만 접근 가능)
 - 전체 회원 조회 (관리자만 접근 가능)
 ---
@@ -32,9 +31,6 @@
 }
 ```
 
-#### 상태 코드
-- 200 OK : 성공적으로 검사 완료
-
 ---
 
 ### 2. 회원가입
@@ -42,6 +38,7 @@
 
 > 신규 회원을 등록합니다.
 
+#### 요청 바디
 ```json
 {
   "userId": "exampleUser",
@@ -54,8 +51,8 @@
 
 #### 성공 응답
 - **HTTP 201 Created**
-- Location 헤더: `/users/{userId}`  
-  [✏️ 응답 내용 변경]
+- Location 헤더: `/user/{userId}`
+#### 응답 바디 ✏️
 ```json
 {
   "userId": "exampleUser",
@@ -69,36 +66,10 @@
 
 #### 실패 응답
 - **409 Conflict** : 이미 존재하는 사용자 ID
-```json
-"이미 존재하는 회원입니다."
-```
 
 ---
 
-### 3. 로그인 ✏️
-**POST** `/login`
-
-> 로그인을 진행합니다.
-
-```json
-{
-  "userId": "exampleUser",
-  "userPasswd": "password123"
-}
-```
-
-#### 성공 응답
-- **HTTP 201 Created**
-- Location 헤더: `/user/{userId}`
-- Authorization 헤더: `Bearer eyJhbGciOiJIUzI1Ni...`  
-**※ JWT 토큰을 저장할 때 `Bearer ` 부분은 제외하고 저장할 것**
-
-#### 실패 응답
-- **401 Unauthorized** : 아이디 또는 패스워드 불일치
-
----
-
-### 4. 회원 정보 조회
+### 3. 회원 정보 조회
 **GET** `/user/{userId}` ✏️
 
 > 특정 회원 정보를 조회합니다.  
@@ -129,10 +100,10 @@ axios
 ```
 
 #### 실패 응답
-- **403 Forbidden** : 로그인 중이 아니거나 본인이 아닌 다른 사용자의 정보 요청 시 <span style="color: red;">★</span>
+- **403 Forbidden** : 로그인 중이 아니거나 본인이 아닌 다른 사용자의 정보 요청 시 ✏️
 - **404 Not Found** : 관리자로 로그인 중에 존재하지 않는 사용자 ID를 요청 시
 
-### 5. 전체 회원 조회
+### 4. 전체 회원 조회
 **GET** `/user` ✏️
 
 > 모든 회원 정보를 조회합니다.  

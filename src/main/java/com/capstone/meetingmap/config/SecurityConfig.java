@@ -79,7 +79,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/", "/api/login", "/api/user/check-id", "/api/user/register", "/api/boards", "/api/map").permitAll()
-                        .requestMatchers("/api/user").hasRole("Admin")
+                        .requestMatchers("/api/user").hasAuthority("Admin")
                         .anyRequest().authenticated());
 
         // 필터 추가

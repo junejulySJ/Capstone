@@ -5,6 +5,7 @@ import com.capstone.meetingmap.user.dto.LoginRequestDto;
 import com.capstone.meetingmap.util.JWTUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,7 +27,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     public LoginFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
-        setFilterProcessesUrl("/auth/login");
+        setFilterProcessesUrl("/api/auth/login");
     }
 
     @Override
@@ -60,10 +61,16 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         GrantedAuthority auth = iterator.next();
 
         String role = auth.getAuthority();
-        System.out.println(role);
+
         String token = jwtUtil.createJwt(username, role, 60 * 60 * 1000L);
 
-        response.addHeader("Authorization", "Bearer " + token);
+        Cookie cookie = new Cookie("accessToken", token);
+        cookie.setHttpOnly(true); // JavaScript 접근 불가
+        cookie.setSecure(true); // HTTPS에서만 전송
+        cookie.setPath("/");
+        cookie.setMaxAge(60 * 60); // 1시간
+
+        response.addCookie(cookie);
     }
 
     @Override

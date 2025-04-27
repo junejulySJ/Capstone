@@ -4,6 +4,7 @@ import com.capstone.meetingmap.jwt.JWTFilter;
 import com.capstone.meetingmap.jwt.LoginFilter;
 import com.capstone.meetingmap.util.JWTUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -48,7 +49,7 @@ public class SecurityConfig {
                 .cors((cors) -> cors
                         .configurationSource(new CorsConfigurationSource() {
                             @Override
-                            public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                            public CorsConfiguration getCorsConfiguration(@NonNull HttpServletRequest request) {
                                 CorsConfiguration config = new CorsConfiguration();
 
                                 config.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
@@ -75,11 +76,15 @@ public class SecurityConfig {
         http
                 .httpBasic((auth) -> auth.disable());
 
+        //세션 logout 방식 disable
+        http
+                 .logout((auth) -> auth.disable());
+
         //경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/", "/api/auth/**", "/api/user/check-id", "/api/user/register", "/api/boards", "/api/map").permitAll()
-                        .requestMatchers("/api/user").hasAuthority("Admin")
+                        .requestMatchers("/", "/api/auth/**", "/api/user/check-id", "/api/user/register", "/api/boards", "/api/map/**").permitAll()
+                        .requestMatchers("/api/user/list").hasAuthority("Admin")
                         .anyRequest().authenticated());
 
         // 필터 추가

@@ -96,16 +96,12 @@ public class AuthService {
         return jwtUtil.createJwt(user.getUserId(), user.getUserRole().getUserTypeName(), 60 * 60 * 1000L);
     }
 
-    public void kakaoLogout(String authorization) {
-        String token = authorization.replace("Bearer ", "");
-        String userId = jwtUtil.getUsername(token);
+    public void kakaoLogout(String userId) {
 
         // 'kakao_' 접두사 제거
         if (userId.startsWith("kakao_")) {
             userId = userId.substring(6); // 'kakao_' 길이만큼 자르기
         }
-
-        System.out.println(userId);
 
         apiWebClient.post()
                 .uri("/v1/user/logout")

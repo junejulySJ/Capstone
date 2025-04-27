@@ -8,5 +8,6 @@
 프론트엔드: `http://localhost:3000`
 
 ## 📚 목차
+- **Home**
 - [User API](docs/UserAPI.md) ✏️
 - [Auth API](docs/AuthAPI.md) ✏️

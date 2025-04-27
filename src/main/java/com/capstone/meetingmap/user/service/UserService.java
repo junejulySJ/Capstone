@@ -11,7 +11,6 @@ import com.capstone.meetingmap.userrole.entity.UserRole;
 import com.capstone.meetingmap.userrole.repository.UserRoleRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -59,7 +58,7 @@ public class UserService {
         return UserResponseDto.fromEntity(user); //User 엔티티를 UserResponseDto로 변환해 반환
     }
 
-    //일반 회원가입
+    //카카오 회원가입
     @Transactional
     public User kakaoJoin(KakaoUserInfo kakaoUser) {
         String userId = "kakao_" + kakaoUser.getId();
@@ -79,29 +78,14 @@ public class UserService {
         return user;
     }
 
-    //특정 유저 조회
+    //특정 회원 조회
     public UserResponseDto findOne(String userId) {
-        String jwtUserId = SecurityContextHolder.getContext().getAuthentication().getName();
-        String role = SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority();
-
-        // 관리자는 바로 조회 가능
-        if ("ROLE_Admin".equals(role)) {
-            return userRepository.findById(userId)
-                    .map(UserResponseDto::fromEntity)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
-        }
-
-        // 일반 사용자는 본인만 조회 가능
-        if (!jwtUserId.equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인만 접근 가능합니다");
-        }
-
         return userRepository.findById(userId)
                 .map(UserResponseDto::fromEntity)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
     }
 
-    //모든 유저 조회
+    //모든 회원 조회
     public List<UserResponseDto> findAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream()

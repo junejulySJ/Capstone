@@ -27,8 +27,8 @@ public class ScheduleService {
         this.userRepository = userRepository;
     }
 
-    public List<ScheduleResponseDto> getAllSchedules() {
-        List<Schedule> schedules = scheduleRepository.findAll();
+    public List<ScheduleResponseDto> getSchedulesByUserId(String userId) {
+        List<Schedule> schedules = scheduleRepository.findSchedulesByUserId(userId);
         List<ScheduleResponseDto> scheduleDtos = new ArrayList<>();
         for (Schedule schedule : schedules) {
             scheduleDtos.add(ScheduleResponseDto.fromEntity(schedule));

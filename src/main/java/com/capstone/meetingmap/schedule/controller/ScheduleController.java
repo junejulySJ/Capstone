@@ -1,12 +1,12 @@
 package com.capstone.meetingmap.schedule.controller;
 
-import com.capstone.meetingmap.schedule.dto.ScheduleDetailResponseDto;
 import com.capstone.meetingmap.schedule.dto.ScheduleCreateRequestDto;
+import com.capstone.meetingmap.schedule.dto.ScheduleDetailResponseDto;
 import com.capstone.meetingmap.schedule.dto.ScheduleResponseDto;
 import com.capstone.meetingmap.schedule.dto.ScheduleUpdateRequestDto;
 import com.capstone.meetingmap.schedule.service.ScheduleService;
-import com.capstone.meetingmap.util.SessionUtil;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,8 +22,8 @@ public class ScheduleController {
 
     @GetMapping
     public List<ScheduleResponseDto> getAllSchedules() {
-        System.out.println(SessionUtil.getLoggedInUserId());
-        return scheduleService.getAllSchedules();
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        return scheduleService.getSchedulesByUserId(userId);
     }
 
     @GetMapping("/{scheduleNo}/details")

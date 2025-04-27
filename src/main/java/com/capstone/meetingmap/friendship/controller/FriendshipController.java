@@ -23,14 +23,14 @@ public class FriendshipController {
         return ResponseEntity.ok(friendshipService.getFriendships(userId));
     }
 
-    //보낸 요청 조회
+    //보낸 친구 요청 조회
     @GetMapping("/sent")
     public ResponseEntity<?> getSentWaitingFriends() {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         return ResponseEntity.ok(friendshipService.getSentWaitingFriends(userId));
     }
 
-    //받은 요청 조회
+    //받은 친구 요청 조회
     @GetMapping("/received")
     public ResponseEntity<?> getReceivedWaitingFriends() {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -45,7 +45,7 @@ public class FriendshipController {
         return ResponseEntity.ok(null);
     }
 
-    // 요청 수락
+    //친구 요청 수락
     @PostMapping("/approve/{friendshipNo}")
     public ResponseEntity<?> approveFriendship(@PathVariable Integer friendshipNo) {
         friendshipService.approveFriendshipRequest(friendshipNo);

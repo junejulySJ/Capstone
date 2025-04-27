@@ -11,8 +11,9 @@
 - **Home**
 - [User API](docs/UserAPI.md) ✏️
 - [Auth API](docs/AuthAPI.md) ✏️
+- [Friendship API](docs/FriendshipAPI.md) ✏️
 
-## 주의사항
+## 주의사항 ✏️
 - 비밀번호 암호화 방식이 변경되어 기존 사용자로 로그인을 하려면 다음과 같은 sql문을 적용해주세요.
 - 적용하면 기존대로 123456으로 로그인이 가능해집니다.
 ```mysql

@@ -7,6 +7,7 @@ import com.capstone.meetingmap.user.entity.User;
 import com.capstone.meetingmap.user.repository.UserRepository;
 import com.capstone.meetingmap.user.service.UserService;
 import com.capstone.meetingmap.util.JWTUtil;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,15 +25,17 @@ public class AuthService {
     private final UserService userService;
     private final UserRepository userRepository;
     private final JWTUtil jwtUtil;
+    private final HttpSession session;
 
     @Value("${kakao.service.app.admin.key}")
     private String serviceAppAdminKey;
 
-    public AuthService(KakaoOAuthProperties kakaoOAuthProperties, UserService userService, UserRepository userRepository, JWTUtil jwtUtil) {
+    public AuthService(KakaoOAuthProperties kakaoOAuthProperties, UserService userService, UserRepository userRepository, JWTUtil jwtUtil, HttpSession session) {
         this.kakaoOAuthProperties = kakaoOAuthProperties;
         this.userService = userService;
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
+        this.session = session;
 
         DefaultUriBuilderFactory authFactory = new DefaultUriBuilderFactory(kakaoOAuthProperties.getAuthBaseUrl());
         authFactory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY);
@@ -77,12 +80,16 @@ public class AuthService {
         System.out.println(code);
         // 1. 카카오 토큰 요청
         KakaoTokenResponse tokenResponse = requestToken(code);
-        System.out.println("token=" + tokenResponse.getAccessToken());
 
-        // 2. 사용자 정보 요청
+//        // 2. 세션에 accessToken 저장
+//        session.setAttribute("accessToken", tokenResponse.getAccessToken());
+//        System.out.println(tokenResponse.getAccessToken());
+
+        // 3. 사용자 정보 요청
         KakaoUserInfo kakaoUser = requestUserInfo(tokenResponse.getAccessToken());
 
-        // 3. 사용자 존재 확인 (없으면 가입 처리)
+
+        // 4. 사용자 존재 확인 (없으면 가입 처리)
         User user;
         boolean isExists = userRepository.existsById("kakao_" + kakaoUser.getId());
         if (!isExists) {
@@ -92,7 +99,7 @@ public class AuthService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
         }
 
-        // 4. JWT 발급
+        // 5. JWT 발급
         return jwtUtil.createJwt(user.getUserId(), user.getUserRole().getUserTypeName(), 60 * 60 * 1000L);
     }
 

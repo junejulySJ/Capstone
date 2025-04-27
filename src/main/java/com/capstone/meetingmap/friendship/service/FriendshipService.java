@@ -62,6 +62,7 @@ public class FriendshipService {
     public List<FriendshipResponseDto> getFriendships(String userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
+
         List<Friendship> friendshipList = user.getFriendshipList();
 
         return friendshipList.stream()

@@ -2,6 +2,7 @@
 - [Home](../README.md)
 - [User API](UserAPI.md)
 - **Auth API**
+- [Friendship API](FriendshipAPI.md)
 
 # Auth API
 주요 기능:
@@ -20,6 +21,7 @@
 
 > 일반 로그인을 진행합니다.
 
+#### 요청 바디
 ```json
 {
   "userId": "exampleUser",

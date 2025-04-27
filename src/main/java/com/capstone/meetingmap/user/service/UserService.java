@@ -1,10 +1,7 @@
 package com.capstone.meetingmap.user.service;
 
 import com.capstone.meetingmap.auth.dto.KakaoUserInfo;
-import com.capstone.meetingmap.user.dto.UserCheckIdRequestDto;
-import com.capstone.meetingmap.user.dto.UserCheckIdResponseDto;
-import com.capstone.meetingmap.user.dto.UserRegisterRequestDto;
-import com.capstone.meetingmap.user.dto.UserResponseDto;
+import com.capstone.meetingmap.user.dto.*;
 import com.capstone.meetingmap.user.entity.User;
 import com.capstone.meetingmap.user.repository.UserRepository;
 import com.capstone.meetingmap.userrole.entity.UserRole;
@@ -91,5 +88,14 @@ public class UserService {
         return users.stream()
                 .map(UserResponseDto::fromEntity)
                 .collect(Collectors.toList());
+    }
+
+    //회원 정보 변경
+    public UserResponseDto updateUser(String userId, UserUpdateRequestDto userUpdateRequestDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
+        User updatedUser = userUpdateRequestDto.toEntity(user);
+        userRepository.save(updatedUser);
+        return UserResponseDto.fromEntity(updatedUser);
     }
 }

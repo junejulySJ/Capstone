@@ -1,9 +1,6 @@
 package com.capstone.meetingmap.user.controller;
 
-import com.capstone.meetingmap.user.dto.UserCheckIdRequestDto;
-import com.capstone.meetingmap.user.dto.UserCheckIdResponseDto;
-import com.capstone.meetingmap.user.dto.UserRegisterRequestDto;
-import com.capstone.meetingmap.user.dto.UserResponseDto;
+import com.capstone.meetingmap.user.dto.*;
 import com.capstone.meetingmap.user.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,5 +52,13 @@ public class UserController {
     public ResponseEntity<List<UserResponseDto>> list() {
         List<UserResponseDto> users = userService.findAllUsers();
         return ResponseEntity.ok(users);
+    }
+
+    //회원 정보 수정
+    @PutMapping
+    public ResponseEntity<?> updateUser(@RequestBody UserUpdateRequestDto userUpdateRequestDto) {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserResponseDto userResponseDto = userService.updateUser(userId, userUpdateRequestDto);
+        return ResponseEntity.ok(userResponseDto);
     }
 }

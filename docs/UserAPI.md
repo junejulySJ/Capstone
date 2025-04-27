@@ -2,6 +2,7 @@
 - [Home](../README.md)
 - **User API**
 - [Auth API](AuthAPI.md)
+- [Friendship API](FriendshipAPI.md) ✏️
 
 # User API
 주요 기능:
@@ -9,6 +10,7 @@
 - 회원가입
 - 회원 정보 조회 (현재 로그인한 회원 정보 접근)
 - 전체 회원 조회 (관리자만 접근 가능)
+- 회원 정보 수정
 
 ---
 
@@ -151,4 +153,42 @@ axios
 
 #### 실패 응답
 - **403 Forbidden** : 로그인 중이 아니거나 관리자가 아닌 경우 ✏️
+</details>
+
+---
+
+<details>
+<summary>회원 정보 변경 ✏️</summary>
+
+**PUT** `/user`
+
+> 회원 본인의 정보를 변경합니다.
+
+#### 요청 코드
+- 로그인을 진행해 JWT 쿠키가 있어야 함
+```javascript
+axios
+    .put(`${API_BASE_URL}/user`, {
+        "userEmail": "hong1@example.com",
+        "userNick": "홍길동",
+        "userAddress": "서울특별시 용산구 남산공원길 105",
+    }, {
+    withCredentials: true,
+})
+```
+
+#### 성공 응답
+```json
+{
+    "userId": "exampleUser1",
+    "userEmail": "hong1@example.com",
+    "userNick": "홍길동",
+    "userImg": "hong.png",
+    "userAddress": "서울특별시 용산구 남산공원길 105",
+    "userType": 1
+  }
+```
+
+#### 실패 응답
+- **403 Forbidden** : 로그인 중이 아닌 경우 ✏️
 </details>

@@ -3,7 +3,7 @@ package com.capstone.meetingmap.schedule.controller;
 import com.capstone.meetingmap.schedule.dto.ScheduleDetailResponseDto;
 import com.capstone.meetingmap.schedule.dto.ScheduleCreateRequestDto;
 import com.capstone.meetingmap.schedule.dto.ScheduleResponseDto;
-import com.capstone.meetingmap.schedule.dto.ScheduleUpdaterRequestDto;
+import com.capstone.meetingmap.schedule.dto.ScheduleUpdateRequestDto;
 import com.capstone.meetingmap.schedule.service.ScheduleService;
 import com.capstone.meetingmap.util.SessionUtil;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:3000")
+@RequestMapping("/api/schedules")
 public class ScheduleController {
     private final ScheduleService scheduleService;
 
@@ -21,18 +20,18 @@ public class ScheduleController {
         this.scheduleService = scheduleService;
     }
 
-    @GetMapping("/schedules")
+    @GetMapping
     public List<ScheduleResponseDto> getAllSchedules() {
         System.out.println(SessionUtil.getLoggedInUserId());
         return scheduleService.getAllSchedules();
     }
 
-    @GetMapping("/schedules/{scheduleNo}/details")
+    @GetMapping("/{scheduleNo}/details")
     public List<ScheduleDetailResponseDto> getScheduleDetails(@PathVariable Integer scheduleNo) {
         return scheduleService.getScheduleDetails(scheduleNo);
     }
 
-    @PostMapping("/schedules")
+    @PostMapping
     public ResponseEntity<String> createSchedule(@RequestBody ScheduleCreateRequestDto request) {
         try {
             scheduleService.createScheduleWithDetails(request);
@@ -44,16 +43,15 @@ public class ScheduleController {
     }
 
     // 삭제
-    @DeleteMapping("/schedules/{scheduleNo}")
+    @DeleteMapping("/{scheduleNo}")
     public ResponseEntity<Void> deleteSchedule(@PathVariable Integer scheduleNo) {
         scheduleService.deleteSchedule(scheduleNo);
         return ResponseEntity.ok().build();
     }
 
-
     // 수정
-    @PutMapping("/schedules/{scheduleNo}")
-    public ResponseEntity<Void> updateSchedule(@PathVariable Integer scheduleNo, @RequestBody ScheduleUpdaterRequestDto request) {
+    @PutMapping("/{scheduleNo}")
+    public ResponseEntity<Void> updateSchedule(@PathVariable Integer scheduleNo, @RequestBody ScheduleUpdateRequestDto request) {
         scheduleService.updateSchedule(scheduleNo, request);
         return ResponseEntity.ok().build();
     }

@@ -2,16 +2,12 @@ package com.capstone.meetingmap.friendship.controller;
 
 import com.capstone.meetingmap.friendship.dto.FriendshipSendRequestDto;
 import com.capstone.meetingmap.friendship.service.FriendshipService;
-import com.capstone.meetingmap.util.SessionUtil;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/api/users/{userId}")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@RequestMapping("/api/user/friends")
 public class FriendshipController {
 
     private final FriendshipService friendshipService;
@@ -21,54 +17,37 @@ public class FriendshipController {
     }
 
     //친구 목록 조회
-    @GetMapping("/friends")
-    public ResponseEntity<?> getFriends(@PathVariable String userId) {
-        if (SessionUtil.getLoggedInUserId() == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // 로그인 안 된 경우 접근 거부
-        }
-        return ResponseEntity.ok(friendshipService.getFriendships(SessionUtil.getLoggedInUserId()));
+    @GetMapping
+    public ResponseEntity<?> getFriends() {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.ok(friendshipService.getFriendships(userId));
     }
 
     //보낸 요청 조회
-    @GetMapping("/friends/sent")
-    public ResponseEntity<?> getSentWaitingFriends(@PathVariable String userId) {
-        if (SessionUtil.getLoggedInUserId() == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // 로그인 안 된 경우 접근 거부
-        }
-        return ResponseEntity.ok(friendshipService.getSentWaitingFriends(SessionUtil.getLoggedInUserId()));
+    @GetMapping("/sent")
+    public ResponseEntity<?> getSentWaitingFriends() {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.ok(friendshipService.getSentWaitingFriends(userId));
     }
 
     //받은 요청 조회
-    @GetMapping("/friends/received")
-    public ResponseEntity<?> getReceivedWaitingFriends(@PathVariable String userId) {
-        if (SessionUtil.getLoggedInUserId() == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // 로그인 안 된 경우 접근 거부
-        }
-        return ResponseEntity.ok(friendshipService.getReceivedWaitingFriends(SessionUtil.getLoggedInUserId()));
+    @GetMapping("/received")
+    public ResponseEntity<?> getReceivedWaitingFriends() {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.ok(friendshipService.getReceivedWaitingFriends(userId));
     }
 
     //친구 추가
-    @PostMapping("/friends/add")
-    public ResponseEntity<?> addFriend(@PathVariable String userId, @RequestBody FriendshipSendRequestDto friendshipSendRequestDto) {
-
-        if (SessionUtil.getLoggedInUserId() == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // 로그인 안 된 경우 접근 거부
-        }
-
-        try {
-            friendshipService.createFriendship(SessionUtil.getLoggedInUserId(), friendshipSendRequestDto);
-            return ResponseEntity.ok(null);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @PostMapping("/add")
+    public ResponseEntity<?> addFriend(@RequestBody FriendshipSendRequestDto friendshipSendRequestDto) {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        friendshipService.createFriendship(userId, friendshipSendRequestDto);
+        return ResponseEntity.ok(null);
     }
 
     // 요청 수락
-    @PostMapping("/friends/approve/{friendshipNo}")
-    public ResponseEntity<?> approveFriendship(@PathVariable String userId, @PathVariable Integer friendshipNo) {
-        if (SessionUtil.getLoggedInUserId() == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // 로그인 안 된 경우 접근 거부
-        }
+    @PostMapping("/approve/{friendshipNo}")
+    public ResponseEntity<?> approveFriendship(@PathVariable Integer friendshipNo) {
         friendshipService.approveFriendshipRequest(friendshipNo);
         return ResponseEntity.ok(null);
     }

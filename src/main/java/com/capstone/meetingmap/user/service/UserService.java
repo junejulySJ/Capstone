@@ -33,7 +33,7 @@ public class UserService {
     //중복 아이디 검증
     public UserCheckIdResponseDto existsByUserId(UserCheckIdRequestDto userCheckIdRequestDto) {
         String userId = userCheckIdRequestDto.getUserId();
-        boolean isExists = userRepository.existsByUserId(userId);
+        boolean isExists = userRepository.existsById(userId);
         return new UserCheckIdResponseDto(!isExists);
     }
 
@@ -42,15 +42,15 @@ public class UserService {
     public UserResponseDto join(UserRegisterRequestDto userRegisterRequestDto) {
         String userId = userRegisterRequestDto.getUserId();
         String userPasswd = userRegisterRequestDto.getUserPasswd();
-        boolean isExists = userRepository.existsByUserId(userId);
+        boolean isExists = userRepository.existsById(userId);
 
         //중복 회원 검증
         if (isExists) {
-            throw new IllegalStateException("이미 존재하는 회원입니다.");
+            throw new IllegalStateException("이미 존재하는 회원입니다");
         }
 
         String hashedUserPasswd = bCryptPasswordEncoder.encode(userPasswd); //비밀번호를 해시함수로 암호화
-        UserRole userRole = userRoleRepository.findByUserType(1).get(); //회원 유형을 1(일반사용자)로 고정
+        UserRole userRole = userRoleRepository.findById(1).get(); //회원 유형을 1(일반사용자)로 고정
 
         User user = userRegisterRequestDto.toEntity(hashedUserPasswd, userRole); // 암호화된 비밀번호와 회원 유형을 넘겨서 User 엔티티 생성
         userRepository.save(user);
@@ -63,7 +63,7 @@ public class UserService {
     public User kakaoJoin(KakaoUserInfo kakaoUser) {
         String userId = "kakao_" + kakaoUser.getId();
 
-        UserRole userRole = userRoleRepository.findByUserType(1).get(); //회원 유형을 1(일반사용자)로 고정
+        UserRole userRole = userRoleRepository.findById(1).get(); //회원 유형을 1(일반사용자)로 고정
 
         User user = User.builder()
                 .userId(userId)

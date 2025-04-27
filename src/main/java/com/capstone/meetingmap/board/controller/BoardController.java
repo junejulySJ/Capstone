@@ -4,18 +4,17 @@ import com.capstone.meetingmap.board.dto.BoardCreateRequestDto;
 import com.capstone.meetingmap.board.dto.BoardCreateResponseDto;
 import com.capstone.meetingmap.board.dto.BoardResponseDto;
 import com.capstone.meetingmap.board.service.BoardService;
-import com.capstone.meetingmap.util.SessionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@RequestMapping("/api/boards")
 public class BoardController {
 
     private static final Logger log = LoggerFactory.getLogger(BoardController.class);
@@ -26,16 +25,14 @@ public class BoardController {
     }
 
     //게시글 상세보기
-    @GetMapping("/boards/{boardNo}")
+    @GetMapping("/{boardNo}")
     public ResponseEntity<BoardResponseDto> viewDetail(@PathVariable("boardNo") Integer boardNo) {
         return ResponseEntity.ok(boardService.searchByBoardNo(boardNo));
     }
 
     //전체/카테고리별 게시글 보기
-    @GetMapping("/boards")
+    @GetMapping
     public ResponseEntity<List<BoardResponseDto>> search(@RequestParam(value = "category", required = false) Integer categoryNo) {
-        System.out.println(categoryNo);
-
         // category 파라미터가 없으면 전체 목록을 가져오는 메서드 호출
         if (categoryNo == null) {
             return ResponseEntity.ok(boardService.searchAllDesc());
@@ -45,24 +42,13 @@ public class BoardController {
     }
 
     //게시글 추가
-    @PostMapping("/boards/create")
+    @PostMapping("/create")
     public ResponseEntity<BoardCreateResponseDto> apiCreate(@RequestBody BoardCreateRequestDto boardCreateRequestDto) {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        BoardCreateResponseDto boardCreateResponseDto = boardService.create(boardCreateRequestDto, userId);
 
-        String userId = SessionUtil.getLoggedInUserId();
-        if (userId == null) {
-            log.warn("Unauthorized access attempt to create board.");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // 로그인 안 된 경우 접근 거부
-        }
+        log.info("post added: {}", boardCreateRequestDto.getBoardTitle());
 
-        try {
-            BoardCreateResponseDto boardCreateResponseDto = boardService.create(boardCreateRequestDto, userId);
-
-            log.info("post added: {}", boardCreateRequestDto.getBoardTitle());
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(boardCreateResponseDto);
-        } catch(RuntimeException e) {
-            log.error("Failed to create post: {} by userId: {}", boardCreateRequestDto.getBoardTitle(), userId, e);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // 존재하지 않는 카테고리나 회원 정보가 없으면 404 NOT FOUND
-        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(boardCreateResponseDto);
     }
 }

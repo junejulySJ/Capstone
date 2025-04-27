@@ -7,8 +7,10 @@ import com.capstone.meetingmap.schedule.repository.ScheduleDetailRepository;
 import com.capstone.meetingmap.schedule.repository.ScheduleRepository;
 import com.capstone.meetingmap.user.entity.User;
 import com.capstone.meetingmap.user.repository.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +37,7 @@ public class ScheduleService {
     }
 
     public List<ScheduleDetailResponseDto> getScheduleDetails(int scheduleNo) {
-        List<ScheduleDetail> scheduleDetails = scheduleDetailRepository.findAllByScheduleNo(scheduleNo);
+        List<ScheduleDetail> scheduleDetails = scheduleDetailRepository.findBySchedule_ScheduleNo(scheduleNo);
         List<ScheduleDetailResponseDto> scheduleDetailDtos = new ArrayList<>();
         for (ScheduleDetail scheduleDetail : scheduleDetails) {
             scheduleDetailDtos.add(ScheduleDetailResponseDto.fromEntity(scheduleDetail));
@@ -47,8 +49,8 @@ public class ScheduleService {
     @Transactional
     public void createScheduleWithDetails(ScheduleCreateRequestDto scheduleCreateRequestDto) {
         // 1. User 조회
-        User user = userRepository.findByUserId(scheduleCreateRequestDto.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(scheduleCreateRequestDto.getUserId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
 
         // 2. Schedule 생성 및 저장
         Schedule schedule = scheduleCreateRequestDto.toEntity(scheduleCreateRequestDto, user);
@@ -62,11 +64,11 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void updateSchedule(Integer scheduleNo, ScheduleUpdaterRequestDto requestDto) {
-        Schedule schedule = scheduleRepository.findByScheduleNo(scheduleNo)
-                .orElseThrow(() -> new RuntimeException("Schedule not found"));
+    public void updateSchedule(Integer scheduleNo, ScheduleUpdateRequestDto requestDto) {
+        Schedule schedule = scheduleRepository.findById(scheduleNo)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 스케줄을 찾을 수 없습니다"));
 
-        scheduleDetailRepository.deleteByScheduleNo(scheduleNo); // 기존 상세일정 삭제
+        scheduleDetailRepository.deleteByScheduleScheduleNo(scheduleNo); // 기존 상세일정 삭제
 
         //일정 저장
         schedule.setScheduleWithoutUserId(requestDto.getScheduleName(), requestDto.getScheduleAbout());
@@ -81,7 +83,8 @@ public class ScheduleService {
 
     @Transactional
     public void deleteSchedule(Integer scheduleNo) {
-        scheduleRepository.deleteByScheduleNo(scheduleNo);
+        scheduleDetailRepository.deleteByScheduleScheduleNo(scheduleNo);
+        scheduleRepository.deleteById(scheduleNo);
     }
 
 

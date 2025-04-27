@@ -1,13 +1,11 @@
 package com.capstone.meetingmap.board.repository;
 
 import com.capstone.meetingmap.board.entity.Board;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface BoardRepository {
-    Board save(Board board);
-    Optional<Board> findByBoardNo(Integer boardNo);
-    List<Board> findByCategoryNoOrderByBoardNoDesc(Integer categoryNo);
-    List<Board> findAllOrderByBoardNoDesc();
+public interface BoardRepository extends JpaRepository<Board, Integer> {
+    List<Board> findByCategory_CategoryNoOrderByBoardNoDesc(Integer categoryNo);
+    List<Board> findAllByOrderByBoardNoDesc();
 }

@@ -10,7 +10,9 @@ import com.capstone.meetingmap.category.repository.CategoryRepository;
 import com.capstone.meetingmap.user.entity.User;
 import com.capstone.meetingmap.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,12 +33,12 @@ public class BoardService {
     @Transactional
     public BoardCreateResponseDto create(BoardCreateRequestDto boardCreateRequestDto, String userId) {
         // 실제 존재하는 카테고리 가져오기
-        Category category = categoryRepository.findByCategoryNo(boardCreateRequestDto.getCategoryNo())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+        Category category = categoryRepository.findById(boardCreateRequestDto.getCategoryNo())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 카테고리가 없습니다"));
 
         // 실제 존재하는 회원 가져오기
-        User user = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
 
         Board board = boardCreateRequestDto.toEntity(category, user);
         boardRepository.save(board);
@@ -46,18 +48,18 @@ public class BoardService {
 
     //게시글 상세보기
     public BoardResponseDto searchByBoardNo(Integer boardNo) {
-        Board board = boardRepository.findByBoardNo(boardNo)
-                .orElseThrow(() -> new RuntimeException("Board not found"));
+        Board board = boardRepository.findById(boardNo)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 게시글이 없습니다"));
         return BoardResponseDto.fromEntity(board);
     }
 
     //카테고리별 게시글 보기
     public List<BoardResponseDto> searchByCategoryNoDesc(Integer categoryNo) {
         // 실제 존재하는 카테고리인지 검증
-        categoryRepository.findByCategoryNo(categoryNo)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+        categoryRepository.findById(categoryNo)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 카테고리가 없습니다"));
 
-        List<Board> boards = boardRepository.findByCategoryNoOrderByBoardNoDesc(categoryNo);
+        List<Board> boards = boardRepository.findByCategory_CategoryNoOrderByBoardNoDesc(categoryNo);
         List<BoardResponseDto> boardDtos = new ArrayList<>();
         for (Board board : boards) {
             boardDtos.add(BoardResponseDto.fromEntity(board));
@@ -67,7 +69,7 @@ public class BoardService {
 
     //전체 게시글 보기
     public List<BoardResponseDto> searchAllDesc() {
-        List<Board> boards = boardRepository.findAllOrderByBoardNoDesc();
+        List<Board> boards = boardRepository.findAllByOrderByBoardNoDesc();
         List<BoardResponseDto> posts = new ArrayList<>();
         for (Board board : boards) {
             posts.add(BoardResponseDto.fromEntity(board));

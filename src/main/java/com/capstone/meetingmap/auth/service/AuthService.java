@@ -88,7 +88,7 @@ public class AuthService {
         if (!isExists) {
             user = userService.kakaoJoin(kakaoUser);
         } else {
-            user = userRepository.findByUserId("kakao_" + kakaoUser.getId())
+            user = userRepository.findById("kakao_" + kakaoUser.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
         }
 

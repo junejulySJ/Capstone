@@ -1,12 +1,7 @@
 package com.capstone.meetingmap.category.repository;
 
 import com.capstone.meetingmap.category.entity.Category;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-import java.util.Optional;
-
-public interface CategoryRepository {
-    Category save(Category category);
-    Optional<Category> findByCategoryNo(Integer categoryNo);
-    List<Category> findAll();
+public interface CategoryRepository extends JpaRepository<Category, Integer> {
 }

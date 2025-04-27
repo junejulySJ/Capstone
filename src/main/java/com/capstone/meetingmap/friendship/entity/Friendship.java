@@ -2,10 +2,7 @@ package com.capstone.meetingmap.friendship.entity;
 
 import com.capstone.meetingmap.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
@@ -30,6 +27,7 @@ public class Friendship {
     @Column(columnDefinition = "TINYINT(1)")
     private boolean isFrom;
 
+    @Setter
     private Integer counterpartFriendshipNo;
 
     @Builder
@@ -43,9 +41,5 @@ public class Friendship {
 
     public void acceptFriendshipRequest() {
         status = FriendshipStatus.ACCEPTED;
-    }
-
-    public void setCounterpartFriendshipNo(Integer counterpartFriendshipNo) {
-        this.counterpartFriendshipNo = counterpartFriendshipNo;
     }
 }

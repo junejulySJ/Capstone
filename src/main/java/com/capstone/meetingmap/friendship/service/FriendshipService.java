@@ -7,11 +7,11 @@ import com.capstone.meetingmap.friendship.entity.FriendshipStatus;
 import com.capstone.meetingmap.friendship.repository.FriendshipRepository;
 import com.capstone.meetingmap.user.entity.User;
 import com.capstone.meetingmap.user.repository.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,10 +28,10 @@ public class FriendshipService {
     //친구 요청
     @Transactional
     public void createFriendship(String userId, FriendshipSendRequestDto friendshipSendRequestDto) {
-        User fromUser = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        User toUser = userRepository.findByUserId(friendshipSendRequestDto.getOpponentId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User fromUser = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
+        User toUser = userRepository.findById(friendshipSendRequestDto.getOpponentId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
 
         Friendship friendshipFrom = Friendship.builder() //보내는 사람 측
                 .user(fromUser)
@@ -60,8 +60,8 @@ public class FriendshipService {
 
     //친구 목록 조회
     public List<FriendshipResponseDto> getFriendships(String userId) {
-        User user = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
         List<Friendship> friendshipList = user.getFriendshipList();
 
         return friendshipList.stream()
@@ -72,8 +72,8 @@ public class FriendshipService {
 
     //보낸 친구 요청중 대기 상태 조회
     public List<FriendshipResponseDto> getSentWaitingFriends(String userId) {
-        User user = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
         List<Friendship> friendshipList = user.getFriendshipList();
         return friendshipList.stream()
                 .filter(friendship -> friendship.getStatus() == FriendshipStatus.WAITING && Boolean.TRUE.equals(friendship.isFrom()))
@@ -83,8 +83,8 @@ public class FriendshipService {
 
     //받은 친구 요청중 대기 상태 조회
     public List<FriendshipResponseDto> getReceivedWaitingFriends(String userId) {
-        User user = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
         List<Friendship> friendshipList = user.getFriendshipList();
         return friendshipList.stream()
                 .filter(friendship -> friendship.getStatus() == FriendshipStatus.WAITING && Boolean.FALSE.equals(friendship.isFrom()))
@@ -94,12 +94,12 @@ public class FriendshipService {
 
     // 친구 요청 수락
     @Transactional
-    public void approveFriendshipRequest(Integer friendshipId) {
+    public void approveFriendshipRequest(Integer friendshipNo) {
         // 누를 친구 요청과 매칭되는 상대방 친구 요청 둘다 가져옴
-        Friendship friendship = friendshipRepository.findByFriendshipId(friendshipId)
-                .orElseThrow(() -> new RuntimeException("Friendship not found"));
-        Friendship counterFriendship = friendshipRepository.findByFriendshipId(friendship.getCounterpartFriendshipNo())
-                .orElseThrow(() -> new RuntimeException("CounterpartFriendship not found"));
+        Friendship friendship = friendshipRepository.findById(friendshipNo)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "친구 요청을 찾을 수 없습니다"));
+        Friendship counterFriendship = friendshipRepository.findById(friendship.getCounterpartFriendshipNo())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "친구 요청을 찾을 수 없습니다"));
 
         // 둘다 상태를 ACCEPTED로 변경함
         friendship.acceptFriendshipRequest();

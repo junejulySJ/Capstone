@@ -3,7 +3,7 @@ package com.capstone.meetingmap.map.dto;
 import lombok.Data;
 
 @Data
-public class AreaBasedListItem {
+public class LocationBasedListItem {
     private String addr1;
     private String addr2;
     private String areacode;
@@ -14,6 +14,7 @@ public class AreaBasedListItem {
     private String contentid;
     private String contenttypeid;
     private String createdtime;
+    private String dist; //중심 좌표로부터 거리
     private String firstimage;
     private String firstimage2;
     private String cpyrhtDivCd;
@@ -24,5 +25,4 @@ public class AreaBasedListItem {
     private String sigungucode;
     private String tel;
     private String title;
-    private String zipcode; //우편번호
 }

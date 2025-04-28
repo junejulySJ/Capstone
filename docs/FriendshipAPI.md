@@ -3,6 +3,7 @@
 - [User API](UserAPI.md)
 - [Auth API](AuthAPI.md)
 - **Friendship API**
+- [Map API](MapAPI.md)
 
 # Friendship API
 주요 기능:

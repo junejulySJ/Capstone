@@ -2,7 +2,8 @@
 - [Home](../README.md)
 - **User API**
 - [Auth API](AuthAPI.md)
-- [Friendship API](FriendshipAPI.md) ✏️
+- [Friendship API](FriendshipAPI.md)
+- [Map API](MapAPI.md)
 
 # User API
 주요 기능:

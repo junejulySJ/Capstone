@@ -31,7 +31,7 @@
 
 #### 성공 응답 ✏️
 - accessToken 쿠키: `eyJhbGciOiJIUzI1NiJ9.eyJ1c2Vy...`  
-**※ axios 요청시 `withCredentials: true`만 넣어주면 됩니다.**
+**※ 이후 로그인이 필요한 api로 axios 요청시 `withCredentials: true`만 추가로 넣어주면 됩니다.**
 
 #### 실패 응답
 - **401 Unauthorized** : 아이디 또는 패스워드 불일치

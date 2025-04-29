@@ -48,7 +48,8 @@ public class FriendshipController {
     //친구 요청 수락
     @PostMapping("/approve/{friendshipNo}")
     public ResponseEntity<?> approveFriendship(@PathVariable Integer friendshipNo) {
-        friendshipService.approveFriendshipRequest(friendshipNo);
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        friendshipService.approveFriendshipRequest(userId, friendshipNo);
         return ResponseEntity.ok(null);
     }
 }

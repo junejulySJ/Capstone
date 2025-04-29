@@ -4,5 +4,5 @@ import com.capstone.meetingmap.friendship.entity.Friendship;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface FriendshipRepository extends JpaRepository<Friendship, Integer> {
-    //List<Friendship> findByUser_UserId(String userId);
+    boolean existsByFriendshipNoAndUser_UserIdAndIsFrom(Integer friendshipNo, String userId, boolean isFrom);
 }

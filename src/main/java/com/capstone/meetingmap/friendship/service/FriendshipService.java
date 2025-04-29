@@ -95,7 +95,11 @@ public class FriendshipService {
 
     // 친구 요청 수락
     @Transactional
-    public void approveFriendshipRequest(Integer friendshipNo) {
+    public void approveFriendshipRequest(String userId, Integer friendshipNo) {
+
+        if (!friendshipRepository.existsByFriendshipNoAndUser_UserIdAndIsFrom(friendshipNo, userId, false))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "자신이 받은 친구 요청만 수락 가능합니다");
+
         // 누를 친구 요청과 매칭되는 상대방 친구 요청 둘다 가져옴
         Friendship friendship = friendshipRepository.findById(friendshipNo)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "친구 요청을 찾을 수 없습니다"));

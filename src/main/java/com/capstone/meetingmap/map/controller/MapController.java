@@ -1,10 +1,16 @@
 package com.capstone.meetingmap.map.controller;
 
 import com.capstone.meetingmap.map.dto.*;
+import com.capstone.meetingmap.map.service.ConvexHullService;
 import com.capstone.meetingmap.map.service.KakaoMapService;
 import com.capstone.meetingmap.map.service.TourApiMapService;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Point;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -14,10 +20,12 @@ public class MapController {
 
     private final TourApiMapService tourApiMapService;
     private final KakaoMapService kakaoMapService;
+    private final ConvexHullService convexHullService;
 
-    public MapController(TourApiMapService tourApiMapService, KakaoMapService kakaoMapService) {
+    public MapController(TourApiMapService tourApiMapService, KakaoMapService kakaoMapService, ConvexHullService convexHullService) {
         this.tourApiMapService = tourApiMapService;
         this.kakaoMapService = kakaoMapService;
+        this.convexHullService = convexHullService;
     }
 
     //지역/시군구 코드 반환
@@ -50,6 +58,18 @@ public class MapController {
             case "middle-point" -> { //"middle-point"면 address, contentTypeId 필요
                 XYDto xyDto = kakaoMapService.getMiddlePoint(addresses);
                 MiddlePointResponseDto<List<LocationBasedListResponseDto>> responseDto = tourApiMapService.getMiddlePointBasedMap(addresses, xyDto.getCoodinates(), String.valueOf(xyDto.getMiddleX()), String.valueOf(xyDto.getMiddleY()), "1000", contentTypeId);
+                return ResponseEntity.ok(responseDto);
+            }
+            case "middle-point2" -> { //"middle-point2"면 address, contentTypeId 필요
+                List<Coordinate> coordList = kakaoMapService.getCoordList(addresses);
+                Point middlePoint = convexHullService.calculateConvexHullCentroid(coordList);
+                List<XYCoordinate> xyCoordList = coordList.stream()
+                        .map(coord -> new XYCoordinate(
+                                String.valueOf(coord.getX()), // double → String
+                                String.valueOf(coord.getY())
+                        ))
+                        .toList();
+                MiddlePointResponseDto<List<LocationBasedListResponseDto>> responseDto = tourApiMapService.getMiddlePointBasedMap(addresses, xyCoordList, String.valueOf(middlePoint.getX()), String.valueOf(middlePoint.getY()), "1000", contentTypeId);
                 return ResponseEntity.ok(responseDto);
             }
             default -> throw new IllegalStateException("올바르지 않은 검색 방법입니다");

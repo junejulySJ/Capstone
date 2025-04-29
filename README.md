@@ -2,16 +2,16 @@
 
 ## 🚀 기본 URL
 
-`http://localhost:8080/api` ✏️
+`http://localhost:8080/api`
 - 각 API 문서의 주소는 모두 `http://localhost:8080/api` 가 생략된 형태로 작성하였습니다.
 
 프론트엔드: `http://localhost:3000`
 
 ## 📚 목차
 - **Home**
-- [User API](docs/UserAPI.md) ✏️
-- [Auth API](docs/AuthAPI.md) ✏️
-- [Friendship API](docs/FriendshipAPI.md) ✏️
+- [User API](docs/UserAPI.md)
+- [Auth API](docs/AuthAPI.md)
+- [Friendship API](docs/FriendshipAPI.md)
 - [Map API](docs/MapAPI.md) ✏️
 
 ## 주의사항 ✏️

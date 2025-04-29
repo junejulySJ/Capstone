@@ -16,9 +16,9 @@
 ## API 목록
 
 <details>
-<summary>로그인 ✏️</summary>
+<summary>로그인</summary>
 
-**POST** `/auth/login` ✏️
+**POST** `/auth/login`
 
 > 일반 로그인을 진행합니다.
 
@@ -41,9 +41,9 @@
 ---
 
 <details>
-<summary>카카오 로그인 ✏️</summary>
+<summary>카카오 로그인</summary>
 
-**POST** `/auth/kakao` ✏️
+**POST** `/auth/kakao`
 
 > 카카오 로그인을 진행합니다.
 1. 카카오 로그인 버튼 클릭시 다음과 같은 주소로 연결되게 합니다
@@ -107,9 +107,9 @@ export default function KakaoLogin() {
 ---
 
 <details>
-<summary>로그아웃 ✏️</summary>
+<summary>로그아웃</summary>
 
-**POST** `/auth/logout` ✏️
+**POST** `/auth/logout`
 
 > 로그아웃을 진행합니다.
 

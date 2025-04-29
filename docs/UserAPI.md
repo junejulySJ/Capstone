@@ -58,7 +58,7 @@
 }
 ```
 
-#### 성공 응답 ✏️
+#### 성공 응답
 - **HTTP 201 Created**
 #### 응답 바디
 ```json
@@ -79,14 +79,14 @@
 ---
 
 <details>
-<summary>회원 정보 조회 ✏️</summary>
+<summary>회원 정보 조회</summary>
 
-**GET** `/user` ✏️
+**GET** `/user`
 
 > 회원 본인의 정보를 조회합니다.
 
 #### 요청 코드
-- 로그인을 진행해 JWT 쿠키가 있어야 함 ✏️
+- 로그인을 진행해 JWT 쿠키가 있어야 함
 ```javascript
 axios
     .get(`${API_BASE_URL}/user`, {
@@ -107,22 +107,22 @@ axios
 ```
 
 #### 실패 응답
-- **403 Forbidden** : 로그인 중이 아닌 경우 ✏️
+- **403 Forbidden** : 로그인 중이 아닌 경우
 - **404 Not Found** : 존재하지 않는 사용자 ID를 요청 시
 </details>
 
 ---
 
 <details>
-<summary>전체 회원 조회 ✏️</summary>
+<summary>전체 회원 조회</summary>
 
-**GET** `/user/list` ✏️
+**GET** `/user/list`
 
 > 모든 회원 정보를 조회합니다.  
 관리자 계정으로 로그인된 경우만 접근할 수 있습니다.
 
 #### 요청 코드
-- 로그인을 진행해 JWT 쿠키가 있어야 함 ✏️
+- 로그인을 진행해 JWT 쿠키가 있어야 함
 ```javascript
 axios
     .get(`${API_BASE_URL}/user`, {
@@ -153,7 +153,7 @@ axios
 ```
 
 #### 실패 응답
-- **403 Forbidden** : 로그인 중이 아니거나 관리자가 아닌 경우 ✏️
+- **403 Forbidden** : 로그인 중이 아니거나 관리자가 아닌 경우
 </details>
 
 ---
@@ -191,5 +191,5 @@ axios
 ```
 
 #### 실패 응답
-- **403 Forbidden** : 로그인 중이 아닌 경우 ✏️
+- **403 Forbidden** : 로그인 중이 아닌 경우
 </details>

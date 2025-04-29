@@ -84,7 +84,7 @@ axios
 ---
 
 <details>
-<summary>지도 출력</summary>
+<summary>지도 출력 ✏️</summary>
 
 **GET** `/map`
 
@@ -176,7 +176,7 @@ axios
 ]
 ```
 
-3. 중간 위치를 기반으로 조회할 경우
+3. 중간 위치를 기반으로 조회할 경우(좌표 평균 알고리즘)
 #### 요청 코드
 ```javascript
 axios
@@ -238,6 +238,72 @@ axios
       "modifiedtime": "20250417103756",
       "tel": "070-5143-5662",
       "title": "서울세계도시문화축제"
+    }
+  ]
+}
+```
+4. 중간 위치를 기반으로 조회할 경우(그라함 스캔(Graham Scan)과 무게 중심 알고리즘) ✏️
+#### 요청 코드
+```javascript
+axios
+    .get(`${API_BASE_URL}/map?search=middle-point2&address=${address1}&address=${address2}&address=${address3}&contentTypeId=0`)
+```
+※address 파라미터는 여러 개 가능합니다.
+
+#### 응답 바디
+```json
+{
+  "addresses": [
+    "서울 도봉구 창동 677",
+    "서울특별시 관악구 보라매로 62",
+    "서울특별시 동대문구 답십리로56길 105"
+  ],
+  "coordinates": [
+    {
+      "x": "127.040085321587",
+      "y": "37.6491528337101"
+    },
+    {
+      "x": "126.927602560192",
+      "y": "37.4948015028766"
+    },
+    {
+      "x": "127.058401410042",
+      "y": "37.5677702572124"
+    }
+  ],
+  "middleX": "127.008696430607",
+  "middleY": "37.5705748645997",
+  "list": [
+    {
+      "addr": "서울특별시 종로구 종로33길 15 (연지동) ",
+      "contentid": "509267",
+      "contenttypeid": "14",
+      "createdtime": "20080311185754",
+      "dist": "697.6459496347278",
+      "firstimage": "http://tong.visitkorea.or.kr/cms/resource/25/3481925_image2_1.jpg",
+      "firstimage2": "http://tong.visitkorea.or.kr/cms/resource/25/3481925_image3_1.jpg",
+      "mapx": "127.0010160404",
+      "mapy": "37.5718651424",
+      "mlevel": "6",
+      "modifiedtime": "20250428153821",
+      "tel": "",
+      "title": "두산갤러리"
+    },
+    {
+      "addr": "서울특별시 중구 을지로 281 ",
+      "contentid": "2968672",
+      "contenttypeid": "15",
+      "createdtime": "20230413140011",
+      "dist": "501.92090540033377",
+      "firstimage": "http://tong.visitkorea.or.kr/cms/resource/00/3304500_image2_1.jpg",
+      "firstimage2": "http://tong.visitkorea.or.kr/cms/resource/00/3304500_image3_1.jpg",
+      "mapx": "127.0095709797",
+      "mapy": "37.5661076320",
+      "mlevel": "6",
+      "modifiedtime": "20250421144055",
+      "tel": "02-2088-4957",
+      "title": "DDP 봄축제 : 디자인 테마파크"
     }
   ]
 }

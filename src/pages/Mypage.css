@@ -1,4 +1,241 @@
 /* src/pages/Mypage.css */
-.mypage {
-    padding: 20px;
-  }
+.mypage-container {
+  max-width: 960px;
+  margin: 40px auto;
+  display: flex;
+  gap: 16px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* 사이드바 */
+.sidebar {
+  width: 160px;
+  background: #f0fdf4;
+  border: 1px solid #cce3d0;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.menu-item + .menu-item {
+  margin-top: 8px;
+}
+.menu-item button {
+  width: 100%;
+  padding: 8px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-radius: 4px;
+  color: #256029;
+}
+.menu-item button:hover,
+.menu-item button:focus {
+  background: #d9fbe5;
+}
+.sidebar-bottom button {
+  width: 100%;
+  padding: 8px;
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 8px;
+  text-align: left;
+}
+.sidebar-bottom button:hover {
+  color: #388e3c;
+}
+
+/* 메인 콘텐츠 */
+.content {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid #cce3d0;
+  border-radius: 8px;
+  padding: 24px;
+}
+.content section {
+  margin-bottom: 24px;
+}
+.content h2 {
+  font-size: 18px;
+  border-bottom: 1px solid #d6e9d6;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+  color: #1b5e20;
+}
+
+/* 뒤로가기 버튼 */
+.back-btn {
+  display: inline-block;
+  background: #66bb6a;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 14px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: -8px;
+}
+.back-btn:hover {
+  background: #4caf50;
+}
+
+/* 프로필 */
+.profile-section h2 {
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.avatar-wrapper {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #4caf50;
+}
+.avatar-edit {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: #4caf50;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  font-size: 12px;
+}
+.avatar-edit input {
+  display: none;
+}
+.profile-details p {
+  font-size: 14px;
+}
+
+/* 후기 & 일정 아이템 */
+.post-item,
+.schedule-item {
+  padding: 12px;
+  border: 1px solid #e0f2e9;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  background-color: #f9fdfb;
+}
+.schedule-item .date {
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+/* 빠른 이동 버튼 */
+.quick-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+.quick-btn {
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #e8f5e9;
+  border: 1px solid #c8e6c9;
+  color: #2e7d32;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.quick-btn:hover {
+  background-color: #c8e6c9;
+}
+
+.setting-item {
+  margin-bottom: 20px;
+}
+
+.setting-item label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.toggle-btn {
+  padding: 8px 12px;
+  border: none;
+  background-color: #4caf50;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.danger-btn {
+  padding: 8px 12px;
+  border: none;
+  background-color: #f44336;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.dark-mode {
+  background-color: #121212;
+  color: white;
+}
+
+.edit-btn, .delete-btn, .save-btn {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.edit-btn {
+  background-color: #2196f3;
+  color: white;
+}
+
+.delete-btn {
+  background-color: #f44336;
+  color: white;
+}
+
+.save-btn {
+  margin-top: 10px;
+  background-color: #4caf50;
+  color: white;
+}
+
+.edit-input, .edit-textarea {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+

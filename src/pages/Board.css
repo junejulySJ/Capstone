@@ -1,4 +1,222 @@
-/* src/pages/Board.css */
+:root {
+  --primary: #4caf50;
+  --primary-dark: #388e3c;
+  --header-bg: #e8f5e9;
+  --row-hover-bg: #f1f8e9;
+  --bg-light: #f9fdf9;
+  --text-main: #2e2e2e;
+  --text-secondary: #555;
+  --title-font: 'Montserrat', sans-serif;
+  --title-size: 1.7rem;
+}
+
 .board-page {
-    padding: 20px;
-  }
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 10px 20px 20px; /* 상단 여백 추가 */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-main);
+  background: var(--bg-light);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.board-header h2,
+.board-page > h2 {
+  font-family: var(--title-font);
+  font-size: var(--title-size);
+  text-align: center;
+  margin: 0;
+}
+
+.board-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.board-header .new-post-btn {
+  margin-left: auto;
+}
+
+button.new-post-btn,
+button.back-btn,
+.comment-form button,
+.new-post-form button {
+  background-color: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 18px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button.new-post-btn:hover,
+button.back-btn:hover,
+.comment-form button:hover,
+.new-post-form button:hover {
+  background-color: var(--primary-dark);
+}
+
+.board-header .new-post-btn {
+  position: static;
+  margin-left: auto;
+}
+
+.back-btn {
+  float: right;
+  margin: 20px 0 24px 0;
+}
+
+
+.post-table {
+  width: calc(100% + 40px); /* 좌우 패딩(20px씩)을 더해 전체 폭 채움 */
+  margin: 0 -20px 24px;     /* 컨테이너 좌우 마진 음수로 채움 */
+  min-height: 60vh;
+  border-collapse: collapse;
+}                                    
+
+.post-table thead {
+  background-color: var(--header-bg);
+}
+
+.post-table th,
+.post-table td {
+  padding: 12px 16px;
+  text-align: left;
+}
+
+.post-table th {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.post-table tbody tr {
+  border-bottom: 1px solid #e0e0e0;
+  transition: background-color 0.2s ease;
+}
+
+.post-table tbody tr:hover {
+  background-color: var(--row-hover-bg);
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 16px 0;
+}
+
+.pagination button {
+  background: #fff;
+  color: var(--primary);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 6px 12px;
+  margin: 0 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: var(--row-hover-bg);
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.pagination span {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.post-content {
+  margin: 16px 0;
+  line-height: 1.6;
+}
+
+.post-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.post-image {
+  max-width: calc(50% - 12px);
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.comments-section {
+  margin-top: 32px;
+}
+
+.comment-item {
+  padding: 12px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.comment-item p:first-child {
+  margin: 0 0 4px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.comment-item p:last-child {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.comment-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.comment-form input[type="text"] {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.new-post-form input[type="text"],
+.new-post-form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  resize: vertical;
+}
+
+.new-post-form textarea {
+  min-height: 60vh;
+}
+
+.new-post-form input[type="file"] {
+  margin-bottom: 16px;
+}
+
+.new-post-form button {
+  display: block;
+  margin: 10px auto 0;
+}
+
+.board-page > h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.no-posts {
+  text-align: center;
+  color: #777;
+  font-size: 1rem;
+  padding: 40px 0;
+}

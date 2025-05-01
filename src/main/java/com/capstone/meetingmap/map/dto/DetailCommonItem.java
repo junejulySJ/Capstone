@@ -6,6 +6,7 @@ import lombok.Data;
 public class DetailCommonItem {
     private String contentid;
     private String contenttypeid;
+    private String booktour;
     private String createdtime;
     private String homepage;
     private String modifiedtime;

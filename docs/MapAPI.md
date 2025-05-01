@@ -88,13 +88,24 @@ axios
 
 **GET** `/map`
 
-> 사용자가 선택한 방법으로 주변의 장소를 조회합니다.
+> 사용자가 선택한 방법으로 주변의 장소를 조회합니다.  
+> theme 종류는 다음과 같습니다.  
+
+| theme    | 테마 이름 | contentTypeId/cat, 키워드                                       |
+|----------|-------|--------------------------------------------------------------|
+| tour     | 관광 명소 | 12(관광지), 39(음식점)                                             |
+| nature   | 자연 힐링 | 12(관광지)/A01(자연), 39(음식점)                                     |
+| history  | 역사 탐방 | 12(관광지)/A02(인문)/A0201(역사관광지), 39(음식점)                        |
+| food     | 맛집 투어 | 39(음식점)                                                      |
+| shopping | 쇼핑    | 38(쇼핑), 39(음식점)                                              |
+| activity | 액티비티  | 28(레포츠), 39(음식점)                                             |
+| date     | 데이트   | A05(음식)/A0502(음식점)/A05020900(카페/전통찻집), 키워드(전망대, 공원, 한옥마을, 궁) |
 
 1. 지역구를 기반으로 조회할 경우
-#### 요청 코드
+#### 요청 코드 ✏️
 ```javascript
 axios
-    .get(`${API_BASE_URL}/map?search=area&areaCode=${areaCode}&sigunguCode=${sigunguCode}&contentTypeId=${contentTypeId}`)
+    .get(`${API_BASE_URL}/map?search=area&areaCode=${areaCode}&sigunguCode=${sigunguCode}&theme=${theme}`)
 ```
 
 #### 응답 바디
@@ -134,10 +145,10 @@ axios
 ```
 
 2. 현재 위치를 기반으로 조회할 경우
-#### 요청 코드
+#### 요청 코드 ✏️
 ```javascript
 axios
-    .get(`${API_BASE_URL}/map?search=location&latitude=${latitude}&longitude=${longitude}&contentTypeId=${contentTypeId}`)
+    .get(`${API_BASE_URL}/map?search=location&latitude=${latitude}&longitude=${longitude}&theme=${theme}`)
 ```
 
 #### 응답 바디
@@ -180,7 +191,7 @@ axios
 #### 요청 코드
 ```javascript
 axios
-    .get(`${API_BASE_URL}/map?search=middle-point&address=${address1}&address=${address2}&address=${address3}&contentTypeId=0`)
+    .get(`${API_BASE_URL}/map?search=middle-point&address=${address1}&address=${address2}&address=${address3}&theme=${theme}`)
 ```
 ※address 파라미터는 여러 개 가능합니다.
 
@@ -246,7 +257,7 @@ axios
 #### 요청 코드
 ```javascript
 axios
-    .get(`${API_BASE_URL}/map?search=middle-point2&address=${address1}&address=${address2}&address=${address3}&contentTypeId=0`)
+    .get(`${API_BASE_URL}/map?search=middle-point2&address=${address1}&address=${address2}&address=${address3}&theme=${theme}`)
 ```
 ※address 파라미터는 여러 개 가능합니다.
 

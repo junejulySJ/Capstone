@@ -2,15 +2,22 @@ package com.capstone.meetingmap.map.service;
 
 import com.capstone.meetingmap.TourApiProperties;
 import com.capstone.meetingmap.map.dto.*;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilder;
 
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,7 +42,8 @@ public class TourApiMapService {
             ParameterizedTypeReference<CommonTourApiResponse<T>> responseType,
             Consumer<UriBuilder> uriBuilderConsumer
     ) {
-        return webClient.get()
+
+        String rawJson = webClient.get()
                 .uri(uriBuilder -> {
                     UriBuilder builder = uriBuilder.path(path)
                             .queryParam("serviceKey", tourApiProperties.getKey())
@@ -47,8 +55,33 @@ public class TourApiMapService {
                     return builder.build();
                 })
                 .retrieve()
-                .bodyToMono(responseType)
+                .bodyToMono(String.class)
                 .block(); //동기 방식, 비동기는 subscribe()
+        // 이후 ObjectMapper로 수동 파싱
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            JsonNode root = mapper.readTree(rawJson);
+
+            // items가 빈 문자열인지 체크
+            JsonNode itemsNode = root.path("response").path("body").path("items");
+            if (itemsNode.isTextual() && itemsNode.asText().isEmpty()) {
+                // 빈 리스트를 가진 객체 생성해서 반환
+                CommonTourApiResponse<T> emptyResponse = new CommonTourApiResponse<>();
+                CommonTourApiResponse.Response<T> res = new CommonTourApiResponse.Response<>();
+                CommonTourApiResponse.Body<T> body = new CommonTourApiResponse.Body<>();
+                body.setItems(new CommonTourApiResponse.Items<>());
+                body.getItems().setItem(Collections.emptyList());
+                res.setBody(body);
+                emptyResponse.setResponse(res);
+                return emptyResponse;
+            }
+            // 정상 파싱
+            JavaType javaType = mapper.getTypeFactory().constructType(responseType.getType());
+            return mapper.readValue(rawJson, javaType);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 
@@ -58,7 +91,7 @@ public class TourApiMapService {
                 "/areaCode1",
                 new ParameterizedTypeReference<>() {},
                 builder -> {
-                    builder.queryParam("numOfRows", 20)
+                    builder.queryParam("numOfRows", 30)
                             .queryParam("pageNo", 1);
                     if (areaCode != null && !areaCode.isEmpty()) {
                         builder.queryParam("areaCode", areaCode); //areaCode가 비지 않았다면 파라미터에 추가
@@ -81,125 +114,25 @@ public class TourApiMapService {
                 .collect(Collectors.toList());
     }
 
-    public List<AreaBasedListResponseDto> getAreaBasedMap(String areaCode, String sigunguCode, String contentTypeId) {
-        CommonTourApiResponse<AreaBasedListItem> response;
-        if (contentTypeId.equals("0")) { //전체를 선택
-            response = fetchFromApi(
-                    "/areaBasedList1",
-                    new ParameterizedTypeReference<>() {},
-                    builder -> builder.queryParam("numOfRows", 10)
-                            .queryParam("pageNo", 1)
-                            .queryParam("areaCode", areaCode) //지역코드 적용
-                            .queryParam("sigunguCode", sigunguCode) //시군구코드 적용
-                            .queryParam("arrange", "Q")
-                            .queryParam("listYN", "Y") //Y=목록, N=개수
-            );
-        } else {
-            response = fetchFromApi(
-                    "/areaBasedList1",
-                    new ParameterizedTypeReference<>() {},
-                    builder -> builder.queryParam("numOfRows", 10)
-                            .queryParam("pageNo", 1)
-                            .queryParam("areaCode", areaCode) //지역코드 적용
-                            .queryParam("sigunguCode", sigunguCode) //시군구코드 적용
-                            .queryParam("contentTypeId", contentTypeId) //타입 ID 적용(관광지: 12, 숙박: 32, 쇼핑: 38, 음식점: 39, ...)
-                            .queryParam("arrange", "Q")
-                            .queryParam("listYN", "Y") //Y=목록, N=개수
-            );
-        }
-
-        if (response == null
-                || response.getResponse() == null
-                || response.getResponse().getBody() == null
-                || response.getResponse().getBody().getItems() == null) {
-            return Collections.emptyList();
-        }
-        return response.getResponse().getBody().getItems().getItem().stream()
-                .map(item -> AreaBasedListResponseDto.builder()
-                        .addr(item.getAddr1() + " " + item.getAddr2())
-                        .contentid(item.getContentid())
-                        .contenttypeid(item.getContenttypeid())
-                        .createdtime(item.getCreatedtime())
-                        .firstimage(item.getFirstimage())
-                        .firstimage2(item.getFirstimage2())
-                        .mapx(item.getMapx())
-                        .mapy(item.getMapy())
-                        .mlevel(item.getMlevel())
-                        .modifiedtime(item.getModifiedtime())
-                        .tel(item.getTel())
-                        .title(item.getTitle())
-                        .zipcode(item.getZipcode())
-                        .build()
-                )
-                .collect(Collectors.toList());
-    }
-
-    public List<LocationBasedListResponseDto> getLocationBasedMap(String mapX, String mapY, String radius, String contentTypeId) {
-
-        CommonTourApiResponse<LocationBasedListItem> response;
-        if (contentTypeId.equals("0")) { //전체를 선택
-            response = fetchFromApi(
-                    "/locationBasedList1",
-                    new ParameterizedTypeReference<>() {},
-                    builder -> builder.queryParam("numOfRows", 10)
-                            .queryParam("pageNo", 1)
-                            .queryParam("mapX", mapX) //GPS X좌표 적용
-                            .queryParam("mapY", mapY) //GPS Y좌표 적용
-                            .queryParam("radius", radius) //거리반경 적용
-                            .queryParam("arrange", "Q")
-                            .queryParam("listYN", "Y") //Y=목록, N=개수
-            );
-        } else {
-            response = fetchFromApi(
-                    "/areaBasedList1",
-                    new ParameterizedTypeReference<>() {},
-                    builder -> builder.queryParam("numOfRows", 10)
-                            .queryParam("pageNo", 1)
-                            .queryParam("mapX", mapX) //GPS X좌표 적용
-                            .queryParam("mapY", mapY) //GPS Y좌표 적용
-                            .queryParam("radius", radius) //거리반경 적용
-                            .queryParam("contentTypeId", contentTypeId) //타입 ID 적용(관광지: 12, 숙박: 32, 쇼핑: 38, 음식점: 39, ...)
-                            .queryParam("arrange", "Q")
-                            .queryParam("listYN", "Y") //Y=목록, N=개수
-            );
-        }
-
-        if (response == null
-                || response.getResponse() == null
-                || response.getResponse().getBody() == null
-                || response.getResponse().getBody().getItems() == null) {
-            return Collections.emptyList();
-        }
-        return response.getResponse().getBody().getItems().getItem().stream()
-                .map(item -> LocationBasedListResponseDto.builder()
-                        .addr(item.getAddr1() + " " + item.getAddr2())
-                        .contentid(item.getContentid())
-                        .contenttypeid(item.getContenttypeid())
-                        .createdtime(item.getCreatedtime())
-                        .dist(item.getDist())
-                        .firstimage(item.getFirstimage())
-                        .firstimage2(item.getFirstimage2())
-                        .mapx(item.getMapx())
-                        .mapy(item.getMapy())
-                        .mlevel(item.getMlevel())
-                        .modifiedtime(item.getModifiedtime())
-                        .tel(item.getTel())
-                        .title(item.getTitle())
-                        .build()
-                )
-                .collect(Collectors.toList());
-    }
-
-    public MiddlePointResponseDto<List<LocationBasedListResponseDto>> getMiddlePointBasedMap(List<String> addresses, List<XYCoordinate> xyCoordinates, String x, String y, String radius, String contentTypeId) {
-        List<LocationBasedListResponseDto> dto = getLocationBasedMap(x, y, radius, contentTypeId);
-        System.out.println(dto.get(0).getMapx());
-        return MiddlePointResponseDto.<List<LocationBasedListResponseDto>>builder()
+    public MiddlePointResponseDto<List<PlaceResponseDto>> getPlacesByMiddlePoint(List<String> addresses, XYDto xyDto, List<PlaceResponseDto> placeDto) {
+        return MiddlePointResponseDto.<List<PlaceResponseDto>>builder()
                 .addresses(addresses)
-                .coordinates(xyCoordinates)
-                .middleX(x)
-                .middleY(y)
-                .list(dto)
+                .coordinates(xyDto.getCoordinates())
+                .middleX(String.valueOf(xyDto.getMiddleX()))
+                .middleY(String.valueOf(xyDto.getMiddleY()))
+                .list(placeDto)
                 .build();
+    }
+
+    public List<PlaceResponseDto> getAreaBasedList(String areaCode, String sigunguCode, String contentTypeId, int count, String cat1, String cat2, String cat3) {
+        return searchPlaces("/areaBasedList1", areaCode, sigunguCode, contentTypeId, null, count,
+                new ParameterizedTypeReference<>() {}, PlaceResponseDto::fromAreaBasedListItem, cat1, cat2, cat3);
+    }
+
+    public List<PlaceResponseDto> getKeywordBasedList(String areaCode, String sigunguCode, String contentTypeId, String keyword, int count, String cat1, String cat2, String cat3) {
+        String nullableKeywords = (keyword == null ? null : URLEncoder.encode(keyword, StandardCharsets.UTF_8));
+        return searchPlaces("/searchKeyword1", areaCode, sigunguCode, contentTypeId, nullableKeywords, count,
+                new ParameterizedTypeReference<>() {}, PlaceResponseDto::fromKeywordBasedListItem, cat1, cat2, cat3);
     }
 
     public DetailCommonResponseDto getPlaceDetail(String contentId) {
@@ -238,5 +171,78 @@ public class TourApiMapService {
                 .zipcode(item.getZipcode())
                 .overview(item.getOverview())
                 .build();
+    }
+
+    public <T> List<PlaceResponseDto> searchPlaces(
+            String path,
+            String areaCode,
+            String sigunguCode,
+            String contentTypeId,
+            String keyword,
+            int count,
+            ParameterizedTypeReference<CommonTourApiResponse<T>> responseType,
+            Function<T, PlaceResponseDto> mapper,
+            String cat1,
+            String cat2,
+            String cat3
+    ) {
+        CommonTourApiResponse<T> response = fetchFromApi(
+                path,
+                responseType,
+                builder -> {
+                    builder.queryParam("numOfRows", count)
+                            .queryParam("pageNo", 1)
+                            .queryParam("listYN", "Y")
+                            .queryParam("arrange", "Q");
+                    if (areaCode != null && !areaCode.isBlank()) {
+                        builder.queryParam("areaCode", areaCode); //지역코드 적용
+                    }
+                    if (sigunguCode != null && !sigunguCode.isBlank()) {
+                        builder.queryParam("sigunguCode", sigunguCode); //시군구코드 적용
+                    }
+                    if (contentTypeId != null && !contentTypeId.isBlank()) {
+                        builder.queryParam("contentTypeId", contentTypeId); //타입 ID 적용(관광지: 12, 숙박: 32, 쇼핑: 38, 음식점: 39, ...)
+                    }
+                    if (keyword != null && !keyword.isBlank()) {
+                        builder.queryParam("keyword", keyword);
+                    }
+                    if (cat1 != null && !cat1.isBlank()) {
+                        builder.queryParam("cat1", cat1);
+                    }
+                    if (cat2 != null && !cat2.isBlank()) {
+                        builder.queryParam("cat2", cat2);
+                    }
+                    if (cat3 != null && !cat3.isBlank()) {
+                        builder.queryParam("cat3", cat3);
+                    }
+                }
+        );
+        if (response == null
+                || response.getResponse() == null
+                || response.getResponse().getBody() == null
+                || response.getResponse().getBody().getItems() == null) {
+            return Collections.emptyList();
+        }
+
+        return response.getResponse().getBody().getItems().getItem()
+                .stream()
+                .map(mapper)
+                .collect(Collectors.toList());
+    }
+
+    private String findCodeByName(List<CodeResponseDto> list, String name, String errorMsg) {
+        return list.stream()
+                .filter(dto -> dto.getName().equals(name))
+                .map(CodeResponseDto::getCode)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(errorMsg + ": " + name));
+    }
+
+    public String findAreaCodeByName(String name) {
+        return findCodeByName(getRegionCodes(null), name, "지역명 없음");
+    }
+
+    public String findSigunguCodeByName(String name, String areaCode) {
+        return findCodeByName(getRegionCodes(areaCode), name, "시군구명 없음");
     }
 }

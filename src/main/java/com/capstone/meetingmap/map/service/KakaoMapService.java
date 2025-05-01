@@ -2,6 +2,7 @@ package com.capstone.meetingmap.map.service;
 
 import com.capstone.meetingmap.KakaoApiProperties;
 import com.capstone.meetingmap.map.dto.KakaoAddressSearchResponse;
+import com.capstone.meetingmap.map.dto.KakaoCoordinateSearchResponse;
 import com.capstone.meetingmap.map.dto.XYCoordinate;
 import com.capstone.meetingmap.map.dto.XYDto;
 import org.locationtech.jts.geom.Coordinate;
@@ -38,7 +39,7 @@ public class KakaoMapService {
 
         // 각 주소에 대해 좌표 검색 후 리스트에 저장
         for (String address : addresses) {
-            KakaoAddressSearchResponse response = getKakaoAddressSearch(address);
+            KakaoAddressSearchResponse response = getCoordinateFromRegion(address);
             Double x = Double.parseDouble(response.getDocuments().get(0).getX());
             Double y = Double.parseDouble(response.getDocuments().get(0).getY());
 
@@ -53,25 +54,33 @@ public class KakaoMapService {
 
         // XYDto 반환
         return XYDto.builder()
-                .coodinates(coordinates)
+                .coordinates(coordinates)
                 .middleX(middleX)
                 .middleY(middleY)
                 .build();
     }
 
-    // ssearch=middle-point2에 대한 알고리즘을 사용하기 위한 변환
+    // search=middle-point2에 대한 알고리즘을 사용하기 위한 변환
     public List<Coordinate> getCoordList(List<String> addresses) {
         List<Coordinate> coordList = new ArrayList<>();
         // 각 주소에 대해 좌표 검색 후 리스트에 저장
         for (String address : addresses) {
-            KakaoAddressSearchResponse response = getKakaoAddressSearch(address);
+            KakaoAddressSearchResponse response = getCoordinateFromRegion(address);
             coordList.add(new Coordinate(Double.parseDouble(response.getDocuments().get(0).getX()), Double.parseDouble(response.getDocuments().get(0).getY())));
         }
         return coordList;
     }
 
+    // 좌표를 주소로 변환하는 카카오 api 요청
+    public List<String> getAreaFromCoordinate(String longitude, String latitude) {
+        KakaoCoordinateSearchResponse response = getAddressFromCoordinate(longitude, latitude);
+        String area = response.getDocuments().get(0).getRoad_address().getRegion_1depth_name();
+        String sigungu = response.getDocuments().get(0).getRoad_address().getRegion_2depth_name();
+        return List.of(area, sigungu);
+    }
+
     // 주소를 좌표로 변환하는 카카오 api 요청
-    private KakaoAddressSearchResponse getKakaoAddressSearch(String address) {
+    private KakaoAddressSearchResponse getCoordinateFromRegion(String address) {
         try {
             String encodedAddress = URLEncoder.encode(address, StandardCharsets.UTF_8);
             return webClient.get()
@@ -87,5 +96,24 @@ public class KakaoMapService {
             e.printStackTrace();
             return null;
             }
+    }
+
+    // 좌표를 주소로 변환하는 카카오 api 요청
+    private KakaoCoordinateSearchResponse getAddressFromCoordinate(String x, String y) {
+        try {
+            return webClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/v2/local/geo/coord2address.json")
+                            .queryParam("x", x)
+                            .queryParam("y", y)
+                            .build())
+                    .header("Authorization", "KakaoAK " + kakaoApiProperties.getRestApiKey())
+                    .retrieve()
+                    .bodyToMono(KakaoCoordinateSearchResponse.class)
+                    .block();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.capstone.meetingmap.map.controller;
 import com.capstone.meetingmap.map.dto.*;
 import com.capstone.meetingmap.map.service.ConvexHullService;
 import com.capstone.meetingmap.map.service.KakaoMapService;
+import com.capstone.meetingmap.map.service.MapService;
 import com.capstone.meetingmap.map.service.TourApiMapService;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Point;
@@ -21,11 +22,13 @@ public class MapController {
     private final TourApiMapService tourApiMapService;
     private final KakaoMapService kakaoMapService;
     private final ConvexHullService convexHullService;
+    private final MapService mapService;
 
-    public MapController(TourApiMapService tourApiMapService, KakaoMapService kakaoMapService, ConvexHullService convexHullService) {
+    public MapController(TourApiMapService tourApiMapService, KakaoMapService kakaoMapService, ConvexHullService convexHullService, MapService mapService) {
         this.tourApiMapService = tourApiMapService;
         this.kakaoMapService = kakaoMapService;
         this.convexHullService = convexHullService;
+        this.mapService = mapService;
     }
 
     //지역/시군구 코드 반환
@@ -44,33 +47,36 @@ public class MapController {
             @RequestParam(value = "latitude", required = false) Double latitude,
             @RequestParam(value = "longitude", required = false) Double longitude,
             @RequestParam(value = "address", required = false) List<String> addresses,
-            @RequestParam(value = "contentTypeId") String contentTypeId
+            @RequestParam(value = "theme") String theme
     ) {
+
         switch (search) {
-            case "area" -> { //"area"면 areaCode, sigunguCode, contentTypeId 필요
-                List<AreaBasedListResponseDto> areaBasedListResponseDtoList = tourApiMapService.getAreaBasedMap(areaCode, sigunguCode, contentTypeId);
-                return ResponseEntity.ok(areaBasedListResponseDtoList);
+            case "area" -> { //"area"면 areaCode, sigunguCode, theme 필요
+                return ResponseEntity.ok(mapService.getPlacesByArea(areaCode, sigunguCode, theme));
             }
-            case "location" -> { //"location"이면 latitude, longitude, contentTypeId 필요
-                List<LocationBasedListResponseDto> locationBasedListResponseDtoList = tourApiMapService.getLocationBasedMap(String.valueOf(longitude), String.valueOf(latitude), "1000", contentTypeId);
-                return ResponseEntity.ok(locationBasedListResponseDtoList);
+            case "location" -> { //"location"이면 latitude, longitude, theme 필요
+                List<String> area = kakaoMapService.getAreaFromCoordinate(String.valueOf(longitude), String.valueOf(latitude));
+                String searchedAreaCode = tourApiMapService.findAreaCodeByName(area.get(0));
+                String searchedSigunguCode = tourApiMapService.findSigunguCodeByName(area.get(1), searchedAreaCode);
+
+                return ResponseEntity.ok(mapService.getPlacesByArea(searchedAreaCode, searchedSigunguCode, theme));
             }
-            case "middle-point" -> { //"middle-point"면 address, contentTypeId 필요
-                XYDto xyDto = kakaoMapService.getMiddlePoint(addresses);
-                MiddlePointResponseDto<List<LocationBasedListResponseDto>> responseDto = tourApiMapService.getMiddlePointBasedMap(addresses, xyDto.getCoodinates(), String.valueOf(xyDto.getMiddleX()), String.valueOf(xyDto.getMiddleY()), "1000", contentTypeId);
-                return ResponseEntity.ok(responseDto);
-            }
-            case "middle-point2" -> { //"middle-point2"면 address, contentTypeId 필요
-                List<Coordinate> coordList = kakaoMapService.getCoordList(addresses);
-                Point middlePoint = convexHullService.calculateConvexHullCentroid(coordList);
-                List<XYCoordinate> xyCoordList = coordList.stream()
-                        .map(coord -> new XYCoordinate(
-                                String.valueOf(coord.getX()), // double → String
-                                String.valueOf(coord.getY())
-                        ))
-                        .toList();
-                MiddlePointResponseDto<List<LocationBasedListResponseDto>> responseDto = tourApiMapService.getMiddlePointBasedMap(addresses, xyCoordList, String.valueOf(middlePoint.getX()), String.valueOf(middlePoint.getY()), "1000", contentTypeId);
-                return ResponseEntity.ok(responseDto);
+            case "middle-point", "middle-point2" -> { //"middle-point", "middle-point2"면 address, theme 필요
+                XYDto xyDto;
+                if (search.equals("middle-point")) {
+                    xyDto = kakaoMapService.getMiddlePoint(addresses);
+                } else { // middle-point2
+                    List<Coordinate> coordList = kakaoMapService.getCoordList(addresses);
+                    Point middlePoint = convexHullService.calculateConvexHullCentroid(coordList);
+                    xyDto = XYDto.buildXYDtoByGeometry(middlePoint, coordList);
+                }
+                List<String> area = kakaoMapService.getAreaFromCoordinate(String.valueOf(xyDto.getMiddleX()), String.valueOf(xyDto.getMiddleY()));
+
+                String searchedAreaCode = tourApiMapService.findAreaCodeByName(area.get(0));
+                String searchedSigunguCode = tourApiMapService.findSigunguCodeByName(area.get(1), searchedAreaCode);
+
+                List<PlaceResponseDto> places = mapService.getPlacesByArea(searchedAreaCode, searchedSigunguCode, theme);
+                return ResponseEntity.ok(tourApiMapService.getPlacesByMiddlePoint(addresses, xyDto, places));
             }
             default -> throw new IllegalStateException("올바르지 않은 검색 방법입니다");
         }

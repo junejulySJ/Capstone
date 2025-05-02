@@ -38,6 +38,16 @@ public class MapController {
         return ResponseEntity.ok(codeResponseDtoList);
     }
 
+    //분류 코드 반환
+    @GetMapping("/category")
+    public ResponseEntity<List<CodeResponseDto>> getCategoryCodes(
+            @RequestParam(value = "cat1", required = false) String cat1,
+            @RequestParam(value = "cat2", required = false) String cat2
+    ) {
+        List<CodeResponseDto> codeResponseDtoList = tourApiMapService.getCategoryCodes(cat1, cat2);
+        return ResponseEntity.ok(codeResponseDtoList);
+    }
+
     //지도 출력
     @GetMapping
     public ResponseEntity<?> getMap(
@@ -52,16 +62,15 @@ public class MapController {
 
         switch (search) {
             case "area" -> { //"area"면 areaCode, sigunguCode, theme 필요
-                return ResponseEntity.ok(mapService.getPlacesByArea(areaCode, sigunguCode, theme));
+                return ResponseEntity.ok(mapService.getAllPlaces(areaCode, sigunguCode, null, null, null, theme));
+            }
+            case "address" -> { //"address"면 address, theme 필요
+                return ResponseEntity.ok(mapService.getAllPlaces(null, null, addresses.get(0), null, null, theme));
             }
             case "location" -> { //"location"이면 latitude, longitude, theme 필요
-                List<String> area = kakaoMapService.getAreaFromCoordinate(String.valueOf(longitude), String.valueOf(latitude));
-                String searchedAreaCode = tourApiMapService.findAreaCodeByName(area.get(0));
-                String searchedSigunguCode = tourApiMapService.findSigunguCodeByName(area.get(1), searchedAreaCode);
-
-                return ResponseEntity.ok(mapService.getPlacesByArea(searchedAreaCode, searchedSigunguCode, theme));
+                return ResponseEntity.ok(mapService.getAllPlaces(null, null, null, String.valueOf(latitude), String.valueOf(longitude), theme));
             }
-            case "middle-point", "middle-point2" -> { //"middle-point", "middle-point2"면 address, theme 필요
+            case "middle-point", "middle-point2" -> { //"middle-point", "middle-point2"면 address 리스트, theme 필요
                 XYDto xyDto;
                 if (search.equals("middle-point")) {
                     xyDto = kakaoMapService.getMiddlePoint(addresses);
@@ -70,13 +79,9 @@ public class MapController {
                     Point middlePoint = convexHullService.calculateConvexHullCentroid(coordList);
                     xyDto = XYDto.buildXYDtoByGeometry(middlePoint, coordList);
                 }
-                List<String> area = kakaoMapService.getAreaFromCoordinate(String.valueOf(xyDto.getMiddleX()), String.valueOf(xyDto.getMiddleY()));
 
-                String searchedAreaCode = tourApiMapService.findAreaCodeByName(area.get(0));
-                String searchedSigunguCode = tourApiMapService.findSigunguCodeByName(area.get(1), searchedAreaCode);
-
-                List<PlaceResponseDto> places = mapService.getPlacesByArea(searchedAreaCode, searchedSigunguCode, theme);
-                return ResponseEntity.ok(tourApiMapService.getPlacesByMiddlePoint(addresses, xyDto, places));
+                List<PlaceResponseDto> places = mapService.getAllPlaces(null, null, null, String.valueOf(xyDto.getMiddleY()), String.valueOf(xyDto.getMiddleX()), theme);
+                return ResponseEntity.ok(mapService.getPlacesByMiddlePoint(addresses, xyDto, places));
             }
             default -> throw new IllegalStateException("올바르지 않은 검색 방법입니다");
         }

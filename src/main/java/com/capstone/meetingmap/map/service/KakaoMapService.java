@@ -30,6 +30,11 @@ public class KakaoMapService {
                 .build();
     }
 
+    // search=address에 대한 좌표->주소 변환
+    public KakaoAddressSearchResponse getPoint(String address) {
+        return getCoordinateFromRegion(address);
+    }
+
     // search=middle-point에 대한 알고리즘(좌표 평균 계산)
     public XYDto getMiddlePoint(List<String> addresses) {
         // 각 주소에 대한 x, y 좌표를 저장할 리스트

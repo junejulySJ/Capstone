@@ -16,4 +16,11 @@ public class CodeResponseDto {
         this.code = code;
         this.name = name;
     }
+
+    public static CodeResponseDto fromCodeItem(CodeItem item) {
+        return CodeResponseDto.builder()
+                .code(item.getCode())
+                .name(item.getName())
+                .build();
+    }
 }

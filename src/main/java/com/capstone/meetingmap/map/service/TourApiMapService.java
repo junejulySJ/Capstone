@@ -12,8 +12,6 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilder;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -25,8 +23,9 @@ public class TourApiMapService {
 
     private final WebClient webClient;
     private final TourApiProperties tourApiProperties;
+    private final KakaoMapService kakaoMapService;
 
-    public TourApiMapService(TourApiProperties tourApiProperties) {
+    public TourApiMapService(TourApiProperties tourApiProperties, KakaoMapService kakaoMapService) {
         this.tourApiProperties = tourApiProperties;
         DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory(tourApiProperties.getBaseUrl());
         factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY);
@@ -35,8 +34,10 @@ public class TourApiMapService {
                 .baseUrl(tourApiProperties.getBaseUrl())
                 .uriBuilderFactory(factory) // URI 빌더 팩토리 설정
                 .build();
+        this.kakaoMapService = kakaoMapService;
     }
 
+    // TourAPI를 webClient로 호출, 공통 쿼리 추가, lists=""일 경우 빈 객체로 변환(변경X)
     private <T> CommonTourApiResponse<T> fetchFromApi(
             String path,
             ParameterizedTypeReference<CommonTourApiResponse<T>> responseType,
@@ -84,57 +85,146 @@ public class TourApiMapService {
         }
     }
 
-
-    public List<CodeResponseDto> getRegionCodes(String areaCode) {
-
-        CommonTourApiResponse<CodeItem> response = fetchFromApi(
-                "/areaCode1",
-                new ParameterizedTypeReference<>() {},
-                builder -> {
-                    builder.queryParam("numOfRows", 30)
-                            .queryParam("pageNo", 1);
-                    if (areaCode != null && !areaCode.isEmpty()) {
-                        builder.queryParam("areaCode", areaCode); //areaCode가 비지 않았다면 파라미터에 추가
-                    }
-                }
-        );
-
+    // webClient로 호출한 response 검증 및 dto로 매핑(변경X)
+    private static <T, R> List<R> getResultDtoList(Function<T, R> mapper, CommonTourApiResponse<T> response) {
         if (response == null
                 || response.getResponse() == null
                 || response.getResponse().getBody() == null
                 || response.getResponse().getBody().getItems() == null) {
             return Collections.emptyList();
         }
-        return response.getResponse().getBody().getItems().getItem().stream()
-                .map(item -> CodeResponseDto.builder()
-                        .code(item.getCode())
-                        .name(item.getName())
-                        .build()
-                )
+
+        return response.getResponse().getBody().getItems().getItem()
+                .stream()
+                .map(mapper)
                 .collect(Collectors.toList());
     }
 
-    public MiddlePointResponseDto<List<PlaceResponseDto>> getPlacesByMiddlePoint(List<String> addresses, XYDto xyDto, List<PlaceResponseDto> placeDto) {
-        return MiddlePointResponseDto.<List<PlaceResponseDto>>builder()
-                .addresses(addresses)
-                .coordinates(xyDto.getCoordinates())
-                .middleX(String.valueOf(xyDto.getMiddleX()))
-                .middleY(String.valueOf(xyDto.getMiddleY()))
-                .list(placeDto)
-                .build();
+    //지역코드, 시군구코드, 대/중/소분류코드를 fetchFromApi로 검색(변경X)
+    private <T> List<CodeResponseDto> searchCodes(
+            String path,
+            String areaCode,
+            String cat1,
+            String cat2,
+            int count,
+            ParameterizedTypeReference<CommonTourApiResponse<T>> responseType,
+            Function<T, CodeResponseDto> mapper
+    ) {
+        CommonTourApiResponse<T> response = fetchFromApi(
+                path,
+                responseType,
+                builder -> {
+                    builder.queryParam("numOfRows", count)
+                            .queryParam("pageNo", 1);
+                    if (areaCode != null && !areaCode.isBlank()) {
+                        builder.queryParam("areaCode", areaCode); //지역코드 적용
+                    }
+                    if (cat1 != null && !cat1.isBlank()) {
+                        builder.queryParam("cat1", cat1); //대분류 적용
+                    }
+                    if (cat2 != null && !cat2.isBlank()) {
+                        builder.queryParam("cat2", cat2); //중분류 적용
+                    }
+                }
+        );
+        return getResultDtoList(mapper, response);
     }
 
-    public List<PlaceResponseDto> getAreaBasedList(String areaCode, String sigunguCode, String contentTypeId, int count, String cat1, String cat2, String cat3) {
-        return searchPlaces("/areaBasedList1", areaCode, sigunguCode, contentTypeId, null, count,
-                new ParameterizedTypeReference<>() {}, PlaceResponseDto::fromAreaBasedListItem, cat1, cat2, cat3);
+    //장소 정보를 fetchFromApi로 검색(변경X)
+    private <T> List<PlaceResponseDto> searchPlaces(
+            String path,
+            String areaCode,
+            String sigunguCode,
+            String mapX,
+            String mapY,
+            String radius,
+            String contentTypeId,
+            int count,
+            ParameterizedTypeReference<CommonTourApiResponse<T>> responseType,
+            Function<T, PlaceResponseDto> mapper,
+            String cat1,
+            String cat2,
+            String cat3
+    ) {
+        CommonTourApiResponse<T> response = fetchFromApi(
+                path,
+                responseType,
+                builder -> {
+                    builder.queryParam("numOfRows", count)
+                            .queryParam("pageNo", 1)
+                            .queryParam("listYN", "Y")
+                            .queryParam("arrange", "Q");
+                    if (areaCode != null && !areaCode.isBlank()) {
+                        builder.queryParam("areaCode", areaCode); //지역코드 적용
+                    }
+                    if (sigunguCode != null && !sigunguCode.isBlank()) {
+                        builder.queryParam("sigunguCode", sigunguCode); //시군구코드 적용
+                    }
+                    if (mapX != null && !mapX.isBlank()) {
+                        builder.queryParam("mapX", mapX); //x좌표 적용
+                    }
+                    if (mapY != null && !mapY.isBlank()) {
+                        builder.queryParam("mapY", mapY); //y좌표 적용
+                    }
+                    if (radius != null && !radius.isBlank()) {
+                        builder.queryParam("radius", radius); //반경 적용
+                    }
+                    if (contentTypeId != null && !contentTypeId.isBlank()) {
+                        builder.queryParam("contentTypeId", contentTypeId); //타입 ID 적용(관광지: 12, 숙박: 32, 쇼핑: 38, 음식점: 39, ...)
+                    }
+                    if (cat1 != null && !cat1.isBlank()) {
+                        builder.queryParam("cat1", cat1);
+                    }
+                    if (cat2 != null && !cat2.isBlank()) {
+                        builder.queryParam("cat2", cat2);
+                    }
+                    if (cat3 != null && !cat3.isBlank()) {
+                        builder.queryParam("cat3", cat3);
+                    }
+                }
+        );
+        return getResultDtoList(mapper, response);
     }
 
-    public List<PlaceResponseDto> getKeywordBasedList(String areaCode, String sigunguCode, String contentTypeId, String keyword, int count, String cat1, String cat2, String cat3) {
-        String nullableKeywords = (keyword == null ? null : URLEncoder.encode(keyword, StandardCharsets.UTF_8));
-        return searchPlaces("/searchKeyword1", areaCode, sigunguCode, contentTypeId, nullableKeywords, count,
-                new ParameterizedTypeReference<>() {}, PlaceResponseDto::fromKeywordBasedListItem, cat1, cat2, cat3);
+    //지역코드/시군구코드를 조회
+    public List<CodeResponseDto> getRegionCodes(String areaCode) {
+        return searchCodes("/areaCode1", areaCode, null, null, 40,
+                new ParameterizedTypeReference<>() {}, CodeResponseDto::fromCodeItem);
     }
 
+    //대/중/소분류코드를 조회
+    public List<CodeResponseDto> getCategoryCodes(String cat1, String cat2) {
+        return searchCodes("/categoryCode1", null, cat1, cat2, 30,
+                new ParameterizedTypeReference<>() {}, CodeResponseDto::fromCodeItem);
+    }
+
+    //지역/좌표(중간위치 포함)/도착지별 장소 조회
+    public List<PlaceResponseDto> getPlaceList(String areaCode, String sigunguCode, String address, String x, String y, String contentTypeId, int count, String cat1, String cat2, String cat3) {
+        //지역 기반 장소 조회
+        if (areaCode != null && !areaCode.isEmpty()) {
+            return searchPlaces("/areaBasedList1", areaCode, sigunguCode, null, null, null, contentTypeId, count,
+                    new ParameterizedTypeReference<>() {}, PlaceResponseDto::fromAreaBasedListItem, cat1, cat2, cat3);
+        }
+
+        //도착지 기반 장소 조회
+        else if (address != null && !address.isEmpty()) {
+            KakaoAddressSearchResponse response = kakaoMapService.getPoint(address);
+            return searchPlaces("/locationBasedList1", null, null, response.getDocuments().get(0).getX(), response.getDocuments().get(0).getY(), "3000", contentTypeId, count,
+                    new ParameterizedTypeReference<>() {}, PlaceResponseDto::fromLocationBasedListItem, null, null, null);
+            //이후에 cat1, cat2, cat3를 바탕으로 필터링 필요
+            //현재는 cat1, cat2, cat3를 무시하고 출력
+        }
+
+        //좌표 기반 장소 조회
+        else {
+            return searchPlaces("/locationBasedList1", null, null, x, y, "3000", contentTypeId, count,
+                    new ParameterizedTypeReference<>() {}, PlaceResponseDto::fromLocationBasedListItem, null, null, null);
+            //이후에 cat1, cat2, cat3를 바탕으로 필터링 필요
+            //현재는 cat1, cat2, cat3를 무시하고 출력
+        }
+    }
+
+    //장소 상세 조회(로직 수정 예정)
     public DetailCommonResponseDto getPlaceDetail(String contentId) {
         CommonTourApiResponse<DetailCommonItem> response = fetchFromApi(
                 "/detailCommon1",
@@ -173,76 +263,5 @@ public class TourApiMapService {
                 .build();
     }
 
-    public <T> List<PlaceResponseDto> searchPlaces(
-            String path,
-            String areaCode,
-            String sigunguCode,
-            String contentTypeId,
-            String keyword,
-            int count,
-            ParameterizedTypeReference<CommonTourApiResponse<T>> responseType,
-            Function<T, PlaceResponseDto> mapper,
-            String cat1,
-            String cat2,
-            String cat3
-    ) {
-        CommonTourApiResponse<T> response = fetchFromApi(
-                path,
-                responseType,
-                builder -> {
-                    builder.queryParam("numOfRows", count)
-                            .queryParam("pageNo", 1)
-                            .queryParam("listYN", "Y")
-                            .queryParam("arrange", "Q");
-                    if (areaCode != null && !areaCode.isBlank()) {
-                        builder.queryParam("areaCode", areaCode); //지역코드 적용
-                    }
-                    if (sigunguCode != null && !sigunguCode.isBlank()) {
-                        builder.queryParam("sigunguCode", sigunguCode); //시군구코드 적용
-                    }
-                    if (contentTypeId != null && !contentTypeId.isBlank()) {
-                        builder.queryParam("contentTypeId", contentTypeId); //타입 ID 적용(관광지: 12, 숙박: 32, 쇼핑: 38, 음식점: 39, ...)
-                    }
-                    if (keyword != null && !keyword.isBlank()) {
-                        builder.queryParam("keyword", keyword);
-                    }
-                    if (cat1 != null && !cat1.isBlank()) {
-                        builder.queryParam("cat1", cat1);
-                    }
-                    if (cat2 != null && !cat2.isBlank()) {
-                        builder.queryParam("cat2", cat2);
-                    }
-                    if (cat3 != null && !cat3.isBlank()) {
-                        builder.queryParam("cat3", cat3);
-                    }
-                }
-        );
-        if (response == null
-                || response.getResponse() == null
-                || response.getResponse().getBody() == null
-                || response.getResponse().getBody().getItems() == null) {
-            return Collections.emptyList();
-        }
 
-        return response.getResponse().getBody().getItems().getItem()
-                .stream()
-                .map(mapper)
-                .collect(Collectors.toList());
-    }
-
-    private String findCodeByName(List<CodeResponseDto> list, String name, String errorMsg) {
-        return list.stream()
-                .filter(dto -> dto.getName().equals(name))
-                .map(CodeResponseDto::getCode)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException(errorMsg + ": " + name));
-    }
-
-    public String findAreaCodeByName(String name) {
-        return findCodeByName(getRegionCodes(null), name, "지역명 없음");
-    }
-
-    public String findSigunguCodeByName(String name, String areaCode) {
-        return findCodeByName(getRegionCodes(areaCode), name, "시군구명 없음");
-    }
 }

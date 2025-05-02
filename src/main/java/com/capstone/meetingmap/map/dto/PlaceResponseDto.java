@@ -42,7 +42,7 @@ public class PlaceResponseDto {
                 .build();
     }
 
-    public static PlaceResponseDto fromKeywordBasedListItem(KeywordBasedListItem item) {
+    public static PlaceResponseDto fromLocationBasedListItem(LocationBasedListItem item) {
         return PlaceResponseDto.builder()
                 .addr((item.getAddr1() == null ? "" : item.getAddr1()) + " " + (item.getAddr2() == null ? "" : item.getAddr2()).trim())
                 .areacode(item.getAreacode())

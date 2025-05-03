@@ -1,6 +1,5 @@
 package com.capstone.meetingmap.groupuser.entity;
 
-import com.capstone.meetingmap.board.entity.BoardInteractionId;
 import com.capstone.meetingmap.schedule.entity.Schedule;
 import com.capstone.meetingmap.user.entity.User;
 import jakarta.persistence.*;

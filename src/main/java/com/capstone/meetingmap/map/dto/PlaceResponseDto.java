@@ -14,6 +14,9 @@ public class PlaceResponseDto {
     private String areacode;
     private String sigungucode;
     private String contentid;
+    private String cat1;
+    private String cat2;
+    private String cat3;
     private String createdtime;
     private String firstimage;
     private String firstimage2;
@@ -30,6 +33,9 @@ public class PlaceResponseDto {
                 .areacode(item.getAreacode())
                 .sigungucode(item.getSigungucode())
                 .contentid(item.getContentid())
+                .cat1(item.getCat1())
+                .cat2(item.getCat2())
+                .cat3(item.getCat3())
                 .createdtime(item.getCreatedtime())
                 .firstimage(item.getFirstimage())
                 .firstimage2(item.getFirstimage2())
@@ -48,6 +54,9 @@ public class PlaceResponseDto {
                 .areacode(item.getAreacode())
                 .sigungucode(item.getSigungucode())
                 .contentid(item.getContentid())
+                .cat1(item.getCat1())
+                .cat2(item.getCat2())
+                .cat3(item.getCat3())
                 .createdtime(item.getCreatedtime())
                 .firstimage(item.getFirstimage())
                 .firstimage2(item.getFirstimage2())

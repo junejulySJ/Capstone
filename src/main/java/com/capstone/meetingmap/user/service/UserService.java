@@ -94,7 +94,7 @@ public class UserService {
     public UserResponseDto updateUser(String userId, UserUpdateRequestDto userUpdateRequestDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
-        User updatedUser = userUpdateRequestDto.toEntity(user);
+        User updatedUser = user.updateInfo(userUpdateRequestDto.getUserEmail(), userUpdateRequestDto.getUserNick(), userUpdateRequestDto.getUserAddress());
         userRepository.save(updatedUser);
         return UserResponseDto.fromEntity(updatedUser);
     }

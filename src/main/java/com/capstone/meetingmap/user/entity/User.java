@@ -43,4 +43,14 @@ public class User {
         this.userAddress = userAddress;
         this.userRole = userRole;
     }
+
+    public User updateInfo(String userEmail, String userNick, String userAddress) {
+        if (userEmail != null)
+            this.userEmail = userEmail;
+        if (userNick != null)
+            this.userNick = userNick;
+        if (userAddress != null)
+            this.userAddress = userAddress;
+        return this;
+    }
 }

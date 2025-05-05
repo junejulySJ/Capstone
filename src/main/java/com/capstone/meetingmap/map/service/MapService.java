@@ -47,7 +47,17 @@ public class MapService {
         }
 
         // 추가 검색 조건
-        boolean isRequiredAdditionalSearch = (cat1 == null || cat1.equals("A02") || cat1.equals("A04") || cat1.equals("A05"));
+        boolean isRequiredAdditionalSearch = ((cat1 == null) ||
+                (cat1.equals("A02") && cat2 == null) ||
+                (cat1.equals("A02") && cat2.equals("A0202") && cat3 == null) ||
+                (cat1.equals("A02") && cat2.equals("A0202") && cat3.equals("A02020200")) ||
+                (cat1.equals("A04") && cat2 == null) ||
+                (cat1.equals("A04") && cat2.equals("A0401") && cat3 == null) ||
+                (cat1.equals("A04") && cat2.equals("A0401") && cat3.equals("A040101000")) ||
+                (cat1.equals("A05") && cat2 == null) ||
+                (cat1.equals("A05") && cat2.equals("A0502") && cat3 == null) ||
+                (cat1.equals("A05") && cat2.equals("A0502") && cat3.equals("A050200900")));
+
         // 지역 기반 검색이고 추가 검색 조건에 속한다면 Google Places API의 textsearch로 3개씩 추가로 검색
         if (sigunguCode != null && !sigunguCode.isEmpty() && isRequiredAdditionalSearch) {
             List<PlaceResponseDto> additionalPlace = googleMapService.getPlaceListByArea(sigunguCode, cat1, cat2, cat3, 3);

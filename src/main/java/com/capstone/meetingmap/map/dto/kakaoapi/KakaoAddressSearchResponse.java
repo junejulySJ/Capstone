@@ -1,4 +1,4 @@
-package com.capstone.meetingmap.map.dto;
+package com.capstone.meetingmap.map.dto.kakaoapi;
 
 import lombok.Data;
 

@@ -1,11 +1,14 @@
 package com.capstone.meetingmap.map.service;
 
 import com.capstone.meetingmap.KakaoApiProperties;
-import com.capstone.meetingmap.map.dto.KakaoAddressSearchResponse;
-import com.capstone.meetingmap.map.dto.KakaoCoordinateSearchResponse;
+import com.capstone.meetingmap.map.dto.kakaoapi.KakaoAddressSearchResponse;
+import com.capstone.meetingmap.map.dto.kakaoapi.KakaoCoordinateSearchResponse;
 import com.capstone.meetingmap.map.dto.XYCoordinate;
 import com.capstone.meetingmap.map.dto.XYDto;
+import com.capstone.meetingmap.util.ClampUtil;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.DefaultUriBuilderFactory;
@@ -54,14 +57,17 @@ public class KakaoMapService {
         }
 
         // x와 y의 평균을 계산하여 중간점 구하기
-        Double middleX = xCoordinates.stream().mapToDouble(Double::doubleValue).average().orElse(0);
-        Double middleY = yCoordinates.stream().mapToDouble(Double::doubleValue).average().orElse(0);
+        double middleX = xCoordinates.stream().mapToDouble(Double::doubleValue).average().orElse(0);
+        double middleY = yCoordinates.stream().mapToDouble(Double::doubleValue).average().orElse(0);
+
+        // 좌표 클램핑(경계 조정)
+        Point clampedMiddlePoint = ClampUtil.clampPoint(new GeometryFactory().createPoint(new Coordinate(middleX, middleY)));
 
         // XYDto 반환
         return XYDto.builder()
                 .coordinates(coordinates)
-                .middleX(middleX)
-                .middleY(middleY)
+                .middleX(clampedMiddlePoint.getX())
+                .middleY(clampedMiddlePoint.getY())
                 .build();
     }
 

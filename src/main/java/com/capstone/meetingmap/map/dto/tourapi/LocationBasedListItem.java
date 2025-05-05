@@ -1,9 +1,9 @@
-package com.capstone.meetingmap.map.dto;
+package com.capstone.meetingmap.map.dto.tourapi;
 
 import lombok.Data;
 
 @Data
-public class KeywordBasedListItem {
+public class LocationBasedListItem {
     private String addr1;
     private String addr2;
     private String areacode;
@@ -14,6 +14,7 @@ public class KeywordBasedListItem {
     private String contentid;
     private String contenttypeid;
     private String createdtime;
+    private String dist; //중심 좌표로부터 거리
     private String firstimage;
     private String firstimage2;
     private String cpyrhtDivCd;

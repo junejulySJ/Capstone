@@ -1,80 +1,86 @@
 package com.capstone.meetingmap.map.service;
 
-import com.capstone.meetingmap.map.dto.MiddlePointResponseDto;
-import com.capstone.meetingmap.map.dto.PlaceResponseDto;
-import com.capstone.meetingmap.map.dto.XYDto;
+import com.capstone.meetingmap.map.dto.*;
+import com.capstone.meetingmap.map.entity.ContentType;
+import com.capstone.meetingmap.map.repository.ContentTypeRepository;
+import com.capstone.meetingmap.util.ParseUtil;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class MapService {
 
     private final TourApiMapService tourApiMapService;
+    private final GoogleMapService googleMapService;
+    private final ContentTypeRepository contentTypeRepository;
 
-    public MapService(TourApiMapService tourApiMapService) {
+    public MapService(TourApiMapService tourApiMapService, GoogleMapService googleMapService, ContentTypeRepository contentTypeRepository) {
         this.tourApiMapService = tourApiMapService;
+        this.googleMapService = googleMapService;
+        this.contentTypeRepository = contentTypeRepository;
     }
 
-    // theme별로 분류해 장소 조회 후 리스트 merge
-    public List<PlaceResponseDto> getAllPlaces(String areaCode, String sigunguCode, String address, String latitude, String longitude, String theme) {
+    // TourAPI 결과와 Google Places API 결과를 합쳐서 출력
+    public List<PlaceResponseDto> getAllPlaces(String sort, String sigunguCode, String latitude, String longitude, String typeCode, String cat1, String cat2, String cat3) {
+        ContentType contentType;
+        if (typeCode != null) {
+            contentType = contentTypeRepository.findById(Integer.parseInt(typeCode))
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "타입 코드를 찾을 수 없습니다"));
+        } else contentType = null;
+
         List<PlaceResponseDto> mergedList = new ArrayList<>();
-        switch (theme) {
-            // 관광 명소->관광지(12), 음식점(39)
-            case "tour" -> {
-                List<PlaceResponseDto> list1 = tourApiMapService.getPlaceList(areaCode, sigunguCode, address, longitude, latitude, "12", 20, null, null, null);
-                mergedList.addAll(list1);
-                List<PlaceResponseDto> list2 = tourApiMapService.getPlaceList(areaCode, sigunguCode, address, longitude, latitude,"39", 5, null, null, null);
-                mergedList.addAll(list2);
-            }
-            // 자연 힐링->관광지(12)/자연(A01), 음식점(39)
-            case "nature" -> {
-                List<PlaceResponseDto> list1 = tourApiMapService.getPlaceList(areaCode, sigunguCode, address, longitude, latitude, "12", 20, "A01", null, null);
-                mergedList.addAll(list1);
-                List<PlaceResponseDto> list2 = tourApiMapService.getPlaceList(areaCode, sigunguCode, address, longitude, latitude, "39", 5, null, null, null);
-                mergedList.addAll(list2);
-            }
-            // 역사 탐방->관광지(12)/인문(A02)/역사관광지(A0201), 음식점(39)
-            case "history" -> {
-                List<PlaceResponseDto> list1 = tourApiMapService.getPlaceList(areaCode, sigunguCode, address, longitude, latitude, "12", 20, "A02", "A0201", null);
-                mergedList.addAll(list1);
-                List<PlaceResponseDto> list2 = tourApiMapService.getPlaceList(areaCode, sigunguCode, address, longitude, latitude, "39", 5, null, null, null);
-                mergedList.addAll(list2);
-            }
-            // 맛집 투어->음식점(39)
-            case "food" -> {
-                List<PlaceResponseDto> list1 = tourApiMapService.getPlaceList(areaCode, sigunguCode, address, longitude, latitude, "39", 25, null, null, null);
-                mergedList.addAll(list1);
-            }
-            // 쇼핑->쇼핑(38), 음식점(39)
-            case "shopping" -> {
-                List<PlaceResponseDto> list1 = tourApiMapService.getPlaceList(areaCode, sigunguCode, address, longitude, latitude, "38", 20, null, null, null);
-                mergedList.addAll(list1);
-                List<PlaceResponseDto> list2 = tourApiMapService.getPlaceList(areaCode, sigunguCode, address, longitude, latitude, "39", 5, null, null, null);
-                mergedList.addAll(list2);
-            }
-            // 액티비티->레포츠(28), 음식점(39)
-            case "activity" -> {
-                List<PlaceResponseDto> list1 = tourApiMapService.getPlaceList(areaCode, sigunguCode, address, longitude, latitude, "28", 20, null, null, null);
-                mergedList.addAll(list1);
-                List<PlaceResponseDto> list2 = tourApiMapService.getPlaceList(areaCode, sigunguCode, address, longitude, latitude, "39", 5, null, null, null);
-                mergedList.addAll(list2);
-            }
-            // 데이트->분류(카페), 키워드(전망대, 공원, 한옥마을, 궁)
-            case "date" -> {
-                List<PlaceResponseDto> list1 = tourApiMapService.getPlaceList(areaCode, sigunguCode, address, longitude, latitude, null, 10, "A05", "A0502", "A05020900");
-                mergedList.addAll(list1);
-                List<PlaceResponseDto> list2 = tourApiMapService.getPlaceList(areaCode, sigunguCode, address, longitude, latitude, "12", 1, "A02", "A0205", "A02050600");
-                mergedList.addAll(list2);
-                List<PlaceResponseDto> list3 = tourApiMapService.getPlaceList(areaCode, sigunguCode, address, longitude, latitude, null, 10, "A02", "A0202", "A02020700");
-                mergedList.addAll(list3);
-                List<PlaceResponseDto> list4 = tourApiMapService.getPlaceList(areaCode, sigunguCode, address, longitude, latitude, "12", 1, "A02", "A0201", "A02010600");
-                mergedList.addAll(list4);
-                List<PlaceResponseDto> list5 = tourApiMapService.getPlaceList(areaCode, sigunguCode, address, longitude, latitude, "12", 3, "A02", "A0201", "A02010100");
-                mergedList.addAll(list5);
-            }
+
+        // TourAPI로 10개 장소 검색
+        List<PlaceResponse> tourApiPlaceList = tourApiMapService.getPlaceList(sigunguCode, longitude, latitude, (contentType != null ? contentType.getContentTypeId() : null), 10, cat1, cat2, cat3);
+        System.out.println(tourApiPlaceList);
+        // Google Places API로 10개 장소에 대해 평점 붙이기
+        if (!tourApiPlaceList.isEmpty()) {
+            System.out.println(tourApiPlaceList.get(0).getTitle());
+            List<PlaceResponseDto> placeListWithRating = googleMapService.getPlaceListWithRating(tourApiPlaceList);
+            mergedList.addAll(placeListWithRating);
         }
+
+        // 추가 검색 조건
+        boolean isRequiredAdditionalSearch = (cat1 == null || cat1.equals("A02") || cat1.equals("A04") || cat1.equals("A05"));
+        // 지역 기반 검색이고 추가 검색 조건에 속한다면 Google Places API의 textsearch로 3개씩 추가로 검색
+        if (sigunguCode != null && !sigunguCode.isEmpty() && isRequiredAdditionalSearch) {
+            List<PlaceResponseDto> additionalPlace = googleMapService.getPlaceListByArea(sigunguCode, cat1, cat2, cat3, 3);
+            mergedList.addAll(additionalPlace);
+        }
+
+        // 위치 기반 검색이고 추가 검색 조건에 속한다면 Google Places API의 nearbysearch로 5개 추가 검색
+        if (latitude != null && longitude != null && isRequiredAdditionalSearch) {
+            List<PlaceResponseDto> additionalPlace = googleMapService.getPlaceListByLocation(longitude, latitude, cat1, cat2, cat3, 5);
+            mergedList.addAll(additionalPlace);
+        }
+
+        switch (sort) {
+            case "title_dsc":
+                mergedList.sort(Comparator.comparing(PlaceResponseDto::getTitle).reversed());
+                break;
+            case "rating_asc":
+                mergedList.sort(Comparator.comparing(dto -> ParseUtil.parseDoubleSafe(dto.getRating())));
+                break;
+            case "rating_dsc":
+                mergedList.sort(Comparator.comparing((PlaceResponseDto dto) -> ParseUtil.parseDoubleSafe(dto.getRating())).reversed());
+                break;
+            case "user_ratings_total_asc":
+                mergedList.sort(Comparator.comparing(dto -> ParseUtil.parseIntSafe(dto.getUserRatingsTotal())));
+                break;
+            case "user_ratings_total_dsc":
+                mergedList.sort(Comparator.comparing((PlaceResponseDto dto) -> ParseUtil.parseIntSafe(dto.getUserRatingsTotal())).reversed());
+                break;
+            case "title_asc":
+            default:
+                mergedList.sort(Comparator.comparing(PlaceResponseDto::getTitle));
+        }
+
         return mergedList;
     }
 
@@ -87,5 +93,12 @@ public class MapService {
                 .middleY(String.valueOf(xyDto.getMiddleY()))
                 .list(placeDto)
                 .build();
+    }
+
+    public List<CodeResponseDto> getTypeCodes() {
+        List<ContentType> contentTypeList = contentTypeRepository.findAll();
+        return contentTypeList.stream()
+                .map(CodeResponseDto::fromContentType)
+                .collect(Collectors.toList());
     }
 }

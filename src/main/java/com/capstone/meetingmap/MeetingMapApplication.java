@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
 @EnableJpaAuditing
-@EnableConfigurationProperties({TourApiProperties.class, KakaoApiProperties.class})
+@EnableConfigurationProperties({GoogleApiProperties.class, TourApiProperties.class, KakaoApiProperties.class})
 public class MeetingMapApplication {
 
 	public static void main(String[] args) {

@@ -115,4 +115,37 @@
   }
 ]
 ```
+
+#### 보충 설명
+
+- 클라이언트에서는 다음 예시와 같이 불러와서 선을 그릴 수 있습니다.
+```javascript
+axios.post(`${API_BASE_URL}/path`, details)
+    .then((response) => {
+        const result = response.data;
+        const fullPath = [];
+
+        result.forEach((route) => {
+          route.roads.forEach((road) => {
+            for (let j = 0; j < road.vertexes.length; j += 2) {
+              fullPath.push(
+                new kakao.maps.LatLng(road.vertexes[j + 1], road.vertexes[j])
+              );
+            }
+          });
+        });
+        const polyline = new kakao.maps.Polyline({
+          path: fullPath,
+          strokeWeight: 5,
+          strokeColor: "#0b85ff",
+          strokeOpacity: 0.8,
+          strokeStyle: "solid",
+        });
+        polyline.setMap(mapObj);
+    })
+    .catch((error) => {
+        console.error(`❌ 경로 요청 실패: ${error}`);
+    });
+```
+
 </details>

@@ -1,210 +1,97 @@
 import React, { useState } from 'react';
 import './Board.css';
-// 더미 초기 데이터
+import { FaComment, FaThumbsUp, FaEye } from 'react-icons/fa';
 import initialPosts from '../data/initialPosts';
 
+const CATEGORIES = [
+  { key: '맛집 추천', title: '맛집' },
+  { key: '카페 추천', title: '카페' },
+  { key: '문화·여가 추천', title: '놀거리' },
+  { key: '일정 경험 추천', title: '일정·코스 추천' }
+];
+
 export default function Board() {
-  const [mode, setMode] = useState('list');
-  const [posts, setPosts] = useState(
-    // 최근 날짜순으로 정렬
-    [...initialPosts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+  const [posts, setPosts] = useState([...initialPosts]);
+  const [sortMode, setSortMode] = useState({
+    '맛집 추천': '최신순',
+    '카페 추천': '최신순',
+    '문화·여가 추천': '최신순',
+    '일정 경험 추천': '최신순'
+  });
+
+  // 정렬 함수
+  const sortPosts = (posts, mode) => {
+    if (mode === '인기순') {
+      return [...posts].sort((a, b) => (b.likes || 0) - (a.likes || 0));
+    } else { // 최신순
+      return [...posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+  };
+
+  return (
+    <div className="board-container">
+      {/* 왼쪽 사이드바 */}
+      <aside className="sidebar">
+        <div className="menu-icon">☰</div>
+        <div className="logo">MeetingMap</div>
+      </aside>
+
+      {/* 오른쪽 메인 콘텐츠 */}
+      <main className="main-content">
+        <h1 className="board-title">Board</h1>
+        <div className="grid-2x2">
+          {CATEGORIES.map(cat => {
+            const filtered = posts.filter(p => p.category === cat.key);
+            const sorted = sortPosts(filtered, sortMode[cat.key]);
+
+            return (
+              <div key={cat.key} className="category-block">
+                <div className="category-header">
+                  <h2>#{cat.title}</h2>
+                  <div className="sort-buttons">
+                    <button
+                      className={sortMode[cat.key] === '최신순' ? 'active' : ''}
+                      onClick={() => setSortMode(prev => ({ ...prev, [cat.key]: '최신순' }))}
+                    >
+                      최신순
+                    </button>
+                    <button
+                      className={sortMode[cat.key] === '인기순' ? 'active' : ''}
+                      onClick={() => setSortMode(prev => ({ ...prev, [cat.key]: '인기순' }))}
+                    >
+                      인기순
+                    </button>
+                  </div>
+                </div>
+
+                <div className="post-grid">
+                  {sorted.slice(0, 6).map(post => (
+                    <div key={post.id} className="post-card">
+                      {post.images[0] && (
+                        <div className="card-thumb">
+                          <img src={post.images[0]} alt={post.title} />
+                        </div>
+                      )}
+                      <div className="card-body">
+                        <h3 className="card-title">{post.title}</h3>
+                        <p className="card-meta">
+                          {post.author} · {new Date(post.createdAt).toLocaleDateString()}
+                        </p>
+                        <div className="card-stats">
+                          <span><FaComment /> {post.comments.length}</span>
+                          <span><FaThumbsUp /> {post.likes || 0}</span>
+                          <span><FaEye /> {post.views || 0}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {sorted.length === 0 && <p className="no-posts">게시물이 없습니다.</p>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </main>
+    </div>
   );
-  const [currentPage, setCurrentPage] = useState(1);
-  const postsPerPage = 10;
-
-  const [selectedPost, setSelectedPost] = useState(null);
-
-  // 새 글 폼 필드
-  const [newAuthor, setNewAuthor] = useState('');
-  const [newTitle, setNewTitle] = useState('');
-  const [newContent, setNewContent] = useState('');
-  const [newImages, setNewImages] = useState([]);
-
-  // 댓글 폼
-  const [commentInput, setCommentInput] = useState('');
-
-  // 페이지 이동
-  const totalPages = Math.ceil(posts.length / postsPerPage);
-  const startIndex = (currentPage - 1) * postsPerPage;
-  const currentPosts = posts.slice(startIndex, startIndex + postsPerPage);
-
-  // 목록 클릭 시 상세 뷰
-  const handleSelectPost = (post) => {
-    setSelectedPost(post);
-    setMode('detail');
-  };
-
-  // 새 글 등록
-  const handleNewPostSubmit = (e) => {
-    e.preventDefault();
-    const nextId = posts.length ? Math.max(...posts.map(p => p.id)) + 1 : 1;
-    const newPost = {
-      id: nextId,
-      author: newAuthor,
-      title: newTitle,
-      content: newContent,
-      createdAt: new Date().toISOString(),
-      images: newImages.map(file => URL.createObjectURL(file)),
-      comments: []
-    };
-    const updated = [newPost, ...posts];
-    setPosts(updated);
-    setNewAuthor('');
-    setNewTitle('');
-    setNewContent('');
-    setNewImages([]);
-    setCurrentPage(1);
-    setMode('list');
-  };
-
-  // 댓글 등록
-  const handleCommentSubmit = (e) => {
-    e.preventDefault();
-    const newComment = {
-      id: selectedPost.comments.length ? Math.max(...selectedPost.comments.map(c => c.id)) + 1 : 1,
-      author: '익명',
-      text: commentInput,
-      createdAt: new Date().toISOString()
-    };
-    // 선택된 게시글에 댓글 추가
-    const updatedPost = {
-      ...selectedPost,
-      comments: [...selectedPost.comments, newComment]
-    };
-    setPosts(posts.map(p => p.id === updatedPost.id ? updatedPost : p));
-    setSelectedPost(updatedPost);
-    setCommentInput('');
-  };
-
-  // 이미지 파일 선택
-  const handleImageChange = (e) => {
-    setNewImages(Array.from(e.target.files));
-  };
-
-  // 목록 화면
-  if (mode === 'list') {
-    return (
-      <div className="board-page">
-        <div className="board-header">
-          <h2>Board</h2>
-          <button className="new-post-btn" onClick={() => setMode('new')}>글 작성</button>
-        </div>
-        {posts.length ? (
-          <>
-            <table className="post-table">
-              <thead>
-                <tr>
-                  <th>제목</th>
-                  <th>작성자</th>
-                  <th>등록일</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentPosts.map(post => (
-                  <tr key={post.id} onClick={() => handleSelectPost(post)}>
-                    <td>{post.title}</td>
-                    <td>{post.author}</td>
-                    <td>{new Date(post.createdAt).toLocaleDateString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <div className="pagination">
-              <button
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-              >
-                이전
-              </button>
-              <span>{currentPage} / {totalPages}</span>
-              <button
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-              >
-                다음
-              </button>
-            </div>
-          </>
-        ) : (
-          <p className="no-posts">등록된 게시글이 없습니다.</p>
-        )}
-      </div>
-    );
-  }
-
-
-  // 상세 화면
-  if (mode === 'detail' && selectedPost) {
-    return (
-      <div className="board-page">
-        <button className="back-btn" onClick={() => setMode('list')}>← 목록으로</button>
-        <h2>{selectedPost.title}</h2>
-        <p className="post-meta">{selectedPost.author} · {new Date(selectedPost.createdAt).toLocaleString()}</p>
-        <div className="post-content">{selectedPost.content}</div>
-        {selectedPost.images.length > 0 && (
-          <div className="post-images">
-            {selectedPost.images.map((url, idx) => (
-              <img key={idx} src={url} alt={`img-${idx}`} className="post-image" />
-            ))}
-          </div>
-        )}
-        <hr />
-        <div className="comments-section">
-          <h3>댓글</h3>
-          {selectedPost.comments.map(c => (
-            <div key={c.id} className="comment-item">
-              <p><strong>{c.author}</strong> · {new Date(c.createdAt).toLocaleTimeString()}</p>
-              <p>{c.text}</p>
-            </div>
-          ))}
-          <form className="comment-form" onSubmit={handleCommentSubmit}>
-            <input
-              type="text"
-              value={commentInput}
-              onChange={e => setCommentInput(e.target.value)}
-              placeholder="댓글을 입력하세요"
-              required
-            />
-            <button type="submit">등록</button>
-          </form>
-        </div>
-      </div>
-    );
-  }
-
-  // 새 게시글 작성 화면
-  if (mode === 'new') {
-    return (
-      <div className="board-page">
-        <button className="back-btn" onClick={() => setMode('list')}>← 목록으로</button>
-        <h2>게시글 작성</h2>
-        <form className="new-post-form" onSubmit={handleNewPostSubmit}>
-          <input
-            type="text"
-            value={newAuthor}
-            onChange={e => setNewAuthor(e.target.value)}
-            placeholder="작성자"
-            required
-          />
-          <input
-            type="text"
-            value={newTitle}
-            onChange={e => setNewTitle(e.target.value)}
-            placeholder="제목"
-            required
-          />
-          <textarea
-            value={newContent}
-            onChange={e => setNewContent(e.target.value)}
-            placeholder="내용"
-            required
-          />
-          <input type="file" multiple onChange={handleImageChange} />
-          <button type="submit">등록</button>
-        </form>
-      </div>
-    );
-  }
-
-  return null;
 }

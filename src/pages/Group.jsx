@@ -2,276 +2,158 @@
 import React, { useState } from 'react';
 import './Group.css';
 
-const mockGroups = [
-  {
-    id: 1,
-    name: '캡스톤 팀플 모임',
-    description: '매주 화요일 회의하는 우리 조 모임입니다.',
-    latestPost: '다음 회의 안건 정리했어요!'
-  },
-  {
-    id: 2,
-    name: '헬스장 친구들',
-    description: '운동과 건강 정보 공유해요!',
-    latestPost: '이번 주 루틴 공유해요!'
-  }
-];
-
 export default function Group() {
+  const [friends, setFriends] = useState(['홍길동', '김철수', '이영희']);
+  const [friendRequests, setFriendRequests] = useState(['박이삼', '김가나']);
+  const [groups, setGroups] = useState(['A 그룹', 'B 그룹', 'C 그룹']);
+  const [groupSchedules, setGroupSchedules] = useState({
+    'A 그룹': ['5/20 강남역 모임', '5/25 카페 투어'],
+    'B 그룹': ['5/22 영화관 약속'],
+    'C 그룹': []
+  });
   const [selectedGroup, setSelectedGroup] = useState(null);
-  const [groups, setGroups] = useState(mockGroups);
-  const [newGroup, setNewGroup] = useState({ name: '', description: '' });
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [friendName, setFriendName] = useState('');
-  const [friends, setFriends] = useState(['홍길동', '김철수']);
-  const [selectedFriend, setSelectedFriend] = useState(null);
-  const [chatMessages, setChatMessages] = useState({});
-  const [chatInput, setChatInput] = useState('');
+  const [searchInput, setSearchInput] = useState('');
 
-  // 그룹용 추가 상태들
-  const [groupPosts, setGroupPosts] = useState({});
-  const [groupPostInput, setGroupPostInput] = useState('');
-  const [groupChats, setGroupChats] = useState({});
-  const [groupChatInput, setGroupChatInput] = useState('');
-  const [groupSchedules, setGroupSchedules] = useState({});
-  const [groupMembers, setGroupMembers] = useState({});
-  const [scheduleInput, setScheduleInput] = useState('');
-
-  const handleCreateGroup = (e) => {
-    e.preventDefault();
-    const nextId = groups.length + 1;
-    setGroups([...groups, {
-      id: nextId,
-      name: newGroup.name,
-      description: newGroup.description,
-      latestPost: '그룹이 생성되었습니다.'
-    }]);
-    setGroupMembers(prev => ({
-      ...prev,
-      [nextId]: ['나']
-    }));
-    setNewGroup({ name: '', description: '' });
-    setShowCreateForm(false);
+  const handleDeleteFriend = (name) => {
+    setFriends(prev => prev.filter(friend => friend !== name));
   };
 
-  const handleAddFriend = () => {
-    if (friendName.trim()) {
-      setFriends([...friends, friendName]);
-      setFriendName('');
+  const handleAcceptRequest = (name) => {
+    setFriends(prev => [...prev, name]);
+    setFriendRequests(prev => prev.filter(req => req !== name));
+  };
+
+  const handleRejectRequest = (name) => {
+    setFriendRequests(prev => prev.filter(req => req !== name));
+  };
+
+  const handleAddGroup = () => {
+    const newGroup = prompt('새 그룹 이름을 입력하세요:');
+    if (newGroup) {
+      setGroups(prev => [...prev, newGroup]);
+      setGroupSchedules(prev => ({ ...prev, [newGroup]: [] }));
     }
   };
 
-  const handleSendMessage = (e) => {
-    e.preventDefault();
-    if (chatInput.trim() && selectedFriend) {
-      setChatMessages(prev => ({
-        ...prev,
-        [selectedFriend]: [...(prev[selectedFriend] || []), { sender: '나', message: chatInput }]
-      }));
-      setChatInput('');
-    }
-  };
-
-  const handlePostSubmit = (e) => {
-    e.preventDefault();
-    if (groupPostInput.trim() && selectedGroup) {
-      setGroupPosts(prev => ({
-        ...prev,
-        [selectedGroup.id]: [...(prev[selectedGroup.id] || []), groupPostInput]
-      }));
-      setGroupPostInput('');
-    }
-  };
-
-  const handleGroupChatSubmit = (e) => {
-    e.preventDefault();
-    if (groupChatInput.trim() && selectedGroup) {
-      setGroupChats(prev => ({
-        ...prev,
-        [selectedGroup.id]: [...(prev[selectedGroup.id] || []), { sender: '나', message: groupChatInput }]
-      }));
-      setGroupChatInput('');
-    }
-  };
-
-  const handleScheduleSubmit = (e) => {
-    e.preventDefault();
-    if (scheduleInput.trim() && selectedGroup) {
+  const handleAddSchedule = () => {
+    const newSchedule = prompt('추가할 일정을 입력하세요:');
+    if (newSchedule && selectedGroup) {
       setGroupSchedules(prev => ({
         ...prev,
-        [selectedGroup.id]: [...(prev[selectedGroup.id] || []), scheduleInput]
+        [selectedGroup]: [...prev[selectedGroup], newSchedule]
       }));
-      setScheduleInput('');
     }
+  };
+
+  const handleDeleteSchedule = (idx) => {
+    if (selectedGroup) {
+      setGroupSchedules(prev => ({
+        ...prev,
+        [selectedGroup]: prev[selectedGroup].filter((_, i) => i !== idx)
+      }));
+    }
+  };
+
+  const handleEditSchedule = (idx) => {
+    const newText = prompt('수정할 일정을 입력하세요:');
+    if (newText && selectedGroup) {
+      setGroupSchedules(prev => ({
+        ...prev,
+        [selectedGroup]: prev[selectedGroup].map((item, i) => i === idx ? newText : item)
+      }));
+    }
+  };
+
+  const handleSearchFriend = () => {
+    if (!searchInput.trim()) return;
+    if (friends.includes(searchInput)) {
+      alert(`친구 목록에 존재합니다: ${searchInput}`);
+    } else {
+      if (window.confirm(`${searchInput}님이 친구 목록에 없습니다. 추가하시겠습니까?`)) {
+        setFriends(prev => [...prev, searchInput]);
+      }
+    }
+    setSearchInput('');
   };
 
   return (
     <div className="group-page">
-      <h2>그룹</h2>
-
-      {!selectedGroup && !selectedFriend && (
-        <>
-          <div className="action-buttons">
-            <button className="quick-btn" onClick={() => setShowCreateForm(!showCreateForm)}>
-              {showCreateForm ? '← 닫기' : '➕ 그룹 만들기'}
-            </button>
-            <div className="friend-form">
-              <input
-                type="text"
-                placeholder="친구 이름"
-                value={friendName}
-                onChange={(e) => setFriendName(e.target.value)}
-              />
-              <button onClick={handleAddFriend}>➕ 친구 추가</button>
-            </div>
-          </div>
-
-          {showCreateForm && (
-            <form onSubmit={handleCreateGroup} className="create-form">
-              <input
-                type="text"
-                placeholder="그룹 이름"
-                value={newGroup.name}
-                onChange={(e) => setNewGroup({ ...newGroup, name: e.target.value })}
-                required
-              />
-              <input
-                type="text"
-                placeholder="그룹 설명"
-                value={newGroup.description}
-                onChange={(e) => setNewGroup({ ...newGroup, description: e.target.value })}
-                required
-              />
-              <button type="submit">✅ 생성</button>
-            </form>
-          )}
-
-          <div className="group-list">
-            {groups.map(group => (
-              <div
-                key={group.id}
-                className="group-card"
-                onClick={() => setSelectedGroup(group)}
-              >
-                <h3>{group.name}</h3>
-                <p>{group.description}</p>
-                <span className="latest-post">최근 글: {group.latestPost}</span>
-              </div>
-            ))}
-          </div>
-
-          <div className="friend-list">
-            <h3>내 친구</h3>
-            <ul>
-              {friends.map((name, index) => (
-                <li key={index} onClick={() => setSelectedFriend(name)} style={{ cursor: 'pointer' }}>
-                  {name}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </>
-      )}
-
-      {selectedGroup && (
-        <div className="group-detail">
-          <button className="back-btn" onClick={() => setSelectedGroup(null)}>← 그룹 목록으로</button>
-          <h3>{selectedGroup.name}</h3>
-          <p>{selectedGroup.description}</p>
-          <p className="latest-post">최근 글: {selectedGroup.latestPost}</p>
-
-          <div className="group-section">
-            <h4>📋 그룹 게시판</h4>
-            <form onSubmit={handlePostSubmit} className="group-form">
-              <input
-                type="text"
-                placeholder="게시글 작성"
-                value={groupPostInput}
-                onChange={(e) => setGroupPostInput(e.target.value)}
-              />
-              <button type="submit">게시</button>
-            </form>
-            <ul>
-              {(groupPosts[selectedGroup.id] || []).map((post, index) => (
-                <li key={index}>{post}</li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="group-section">
-            <h4>💬 그룹 채팅</h4>
-            <form onSubmit={handleGroupChatSubmit} className="group-form">
-              <input
-                type="text"
-                placeholder="채팅 메시지 입력"
-                value={groupChatInput}
-                onChange={(e) => setGroupChatInput(e.target.value)}
-              />
-              <button type="submit">전송</button>
-            </form>
-            <div className="chat-box">
-              {(groupChats[selectedGroup.id] || []).map((msg, index) => (
-                <div key={index} className="chat-message">
-                  <strong>{msg.sender}: </strong>
-                  <span>{msg.message}</span>
+      <h1 className="group-title">Group</h1>
+      <div className="group-layout">
+        {/* 왼쪽 친구 관리 */}
+        <div className="friend-section">
+          <div className="section-block">
+            <h3># 친구 목록</h3>
+            {friends.map(friend => (
+              <div key={friend} className="list-item">
+                {friend}
+                <div className="button-group">
+                  <button className="small-btn delete" onClick={() => handleDeleteFriend(friend)}>삭제</button>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="group-section">
-            <h4>📅 그룹 일정</h4>
-            <form onSubmit={handleScheduleSubmit} className="group-form">
-              <input
-                type="text"
-                placeholder="일정 추가"
-                value={scheduleInput}
-                onChange={(e) => setScheduleInput(e.target.value)}
-              />
-              <button type="submit">추가</button>
-            </form>
-            <ul>
-              {(groupSchedules[selectedGroup.id] || []).map((schedule, index) => (
-                <li key={index}>{schedule}</li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="group-section">
-  <h4>👥 그룹 멤버</h4>
-  <ul>
-    {(groupMembers[selectedGroup.id] || []).map((member, index) => (
-      <li key={index}>{member}</li>
-    ))}
-  </ul>
-</div>
-
-        </div>
-      )}
-
-      {selectedFriend && (
-        <div className="chat-window">
-          <button className="back-btn" onClick={() => setSelectedFriend(null)}>← 나가기</button>
-          <h3>{selectedFriend} 님과의 채팅</h3>
-          <div className="chat-box">
-            {(chatMessages[selectedFriend] || []).map((msg, index) => (
-              <div key={index} className="chat-message">
-                <strong>{msg.sender}: </strong>
-                <span>{msg.message}</span>
               </div>
             ))}
           </div>
-          <form onSubmit={handleSendMessage} className="chat-input">
+
+          <div className="section-block">
+            <h3># 친구 초대 및 추가</h3>
             <input
               type="text"
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              placeholder="메시지를 입력하세요"
+              placeholder="아이디를 검색하세요."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="search-input"
             />
-            <button type="submit">전송</button>
-          </form>
+            <button className="small-btn search" onClick={handleSearchFriend}>검색</button>
+          </div>
+
+          <div className="section-block">
+            <h3># 친구 요청 목록</h3>
+            {friendRequests.map(request => (
+              <div key={request} className="list-item">
+                {request}
+                <div className="button-group">
+                  <button className="small-btn accept" onClick={() => handleAcceptRequest(request)}>수락</button>
+                  <button className="small-btn reject" onClick={() => handleRejectRequest(request)}>거절</button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      )}
+
+        {/* 오른쪽 그룹 관리 */}
+        <div className="group-section">
+          <div className="section-block">
+            <h3># 그룹 목록</h3>
+            {groups.map(group => (
+              <div key={group} className="list-item" onClick={() => setSelectedGroup(group)} style={{ cursor: 'pointer' }}>
+                {group}
+              </div>
+            ))}
+            <button className="big-btn" onClick={handleAddGroup}>➕ 그룹 추가</button>
+          </div>
+
+          {/* 그룹 일정 표시 */}
+          {selectedGroup && (
+            <div className="section-block">
+              <h3># {selectedGroup} 일정 및 약속</h3>
+              {groupSchedules[selectedGroup].length > 0 ? (
+                groupSchedules[selectedGroup].map((schedule, idx) => (
+                  <div key={idx} className="list-item">
+                    {schedule}
+                    <div>
+                      <button className="small-btn edit" onClick={() => handleEditSchedule(idx)}>✏ 수정</button>
+                      <button className="small-btn delete" onClick={() => handleDeleteSchedule(idx)}>🗑 삭제</button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>등록된 일정이 없습니다.</p>
+              )}
+              <button className="big-btn" onClick={handleAddSchedule}>➕ 일정 추가</button>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

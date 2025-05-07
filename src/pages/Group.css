@@ -1,178 +1,104 @@
-/* src/pages/Group.css */
+/* 전체 페이지 레이아웃 */
 .group-page {
-  max-width: 960px;
-  margin: 40px auto;
-  padding: 24px;
+  background: #f9f9f9;
+  padding: 30px;
+  border-radius: 12px;
+}
+
+.group-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #212121;
+  text-align: left; /* ✅ 왼쪽 정렬 */
+  margin-bottom: 30px;
+  padding-left: 10px; /* ✅ 살짝 들여쓰기 느낌 */
+}
+
+/* 레이아웃 */
+.group-layout {
+  display: flex;
+  gap: 32px;
+}
+
+/* 친구 영역 */
+.friend-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 그룹 영역 */
+.group-section {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 카드형 블록 */
+.section-block {
   background: #ffffff;
-  border: 1px solid #cce3d0;
-  border-radius: 8px;
-  font-family: 'Segoe UI', sans-serif;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  padding: 24px;
 }
 
-.group-page h2 {
+/* 블록 타이틀 */
+.section-block h3 {
   font-size: 20px;
-  margin-bottom: 20px;
-  color: #1b5e20;
-  border-bottom: 1px solid #d6e9d6;
-  padding-bottom: 8px;
-}
-
-.group-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
-}
-
-.group-card {
-  background: #f0fdf4;
-  border: 1px solid #cce3d0;
-  border-radius: 10px;
-  padding: 16px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-.group-card:hover {
-  background: #e1f7e7;
-}
-.group-card h3 {
-  margin: 0 0 8px 0;
-  font-size: 16px;
-  color: #2e7d32;
-}
-.group-card p {
-  font-size: 14px;
-  color: #333;
-}
-.latest-post {
-  margin-top: 8px;
-  font-size: 12px;
-  color: #4caf50;
-}
-
-.group-detail {
-  padding: 16px;
-  background-color: #f9fdfb;
-  border: 1px solid #e0f2e9;
-  border-radius: 8px;
-}
-.group-detail h3 {
-  font-size: 18px;
-  color: #256029;
-  margin-bottom: 8px;
-}
-.group-detail p {
-  font-size: 14px;
-  color: #333;
-  margin-bottom: 8px;
-}
-.group-detail .latest-post {
-  font-size: 13px;
-  color: #388e3c;
-  margin-bottom: 12px;
-}
-
-.placeholder {
-  padding: 20px;
-  border: 1px dashed #a5d6a7;
-  background-color: #f1f8f4;
-  border-radius: 6px;
-  text-align: center;
-  color: #2e7d32;
-}
-
-.back-btn {
-  display: inline-block;
-  background: #66bb6a;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 6px 12px;
-  font-size: 14px;
   margin-bottom: 16px;
-  cursor: pointer;
-  transition: background 0.2s;
-  margin-top: -8px;
-}
-.back-btn:hover {
-  background: #4caf50;
+  color: #333;
 }
 
-.friend-form {
+/* 리스트 아이템 */
+.list-item {
   display: flex;
+  justify-content: space-between; /* ✅ 양쪽 끝으로 배치 */
   align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-}
-.friend-form input {
-  padding: 8px;
-  border: 1px solid #cce3d0;
-  border-radius: 6px;
-  flex: 1;
-}
-.friend-form button {
-  padding: 8px 12px;
-  background: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.friend-form button:hover {
-  background: #388e3c;
-}
-
-.friend-list ul {
-  padding-left: 16px;
-  margin-top: 8px;
-}
-.friend-list li {
-  margin-bottom: 4px;
-  cursor: pointer;
-  color: #2e7d32;
-}
-.friend-list li:hover {
-  text-decoration: underline;
-}
-
-/* 채팅창 */
-.chat-window {
-  background: #f9fdfb;
-  border: 1px solid #cce3d0;
-  padding: 20px;
-  border-radius: 8px;
-}
-.chat-box {
-  max-height: 300px;
-  overflow-y: auto;
-  margin-bottom: 16px;
+  background: #f4f6f8;
   padding: 12px;
-  background-color: #f0fdf4;
-  border: 1px solid #d0e9d2;
-  border-radius: 6px;
+  border-radius: 8px;
+  margin-bottom: 10px;
 }
-.chat-message {
-  margin-bottom: 8px;
-  font-size: 14px;
-  color: #333;
-}
-.chat-input {
+
+/* 버튼 묶기 */
+.button-group {
   display: flex;
-  gap: 8px;
+  gap: 8px; /* 버튼 사이 간격 */
 }
-.chat-input input {
-  flex: 1;
-  padding: 8px;
-  border: 1px solid #cce3d0;
-  border-radius: 6px;
+
+.list-item:hover {
+  background: #e0f7fa;
 }
-.chat-input button {
-  background: #66bb6a;
-  border: none;
-  padding: 8px 12px;
+
+.small-btn.delete {
+  background: #e53935;
   color: white;
-  border-radius: 6px;
-  cursor: pointer;
 }
-.chat-input button:hover {
+
+.small-btn.accept {
   background: #43a047;
+  color: white;
+}
+
+.small-btn.edit {
+  background: #1976d2;
+  color: white;
+}
+
+/* 큰 버튼 */
+.big-btn {
+  background: #1976d2;
+  color: white;
+}
+
+.big-btn:hover {
+  background: #1565c0;
+}
+
+/* 그룹 선택 시 강조 */
+.selected-group {
+  background: #e3f2fd !important;
+  font-weight: bold;
 }

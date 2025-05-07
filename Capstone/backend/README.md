@@ -12,7 +12,9 @@
 - [User API](docs/UserAPI.md)
 - [Auth API](docs/AuthAPI.md)
 - [Friendship API](docs/FriendshipAPI.md)
-- [Map API](docs/MapAPI.md) ✏️
+- [Map API](docs/MapAPI.md)
+- [Schedule API](docs/ScheduleAPI.md) ✏️
+- [Path API](docs/PathAPI.md) ✏️
 
 ## 주의사항 1
 - 비밀번호 암호화 방식이 변경되어 기존 사용자로 로그인을 하려면 다음과 같은 sql문을 적용해주세요.

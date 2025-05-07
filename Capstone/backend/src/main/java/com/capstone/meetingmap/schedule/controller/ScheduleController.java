@@ -2,10 +2,7 @@ package com.capstone.meetingmap.schedule.controller;
 
 import com.capstone.meetingmap.groupuser.dto.GroupUserRequestDto;
 import com.capstone.meetingmap.groupuser.service.GroupUserService;
-import com.capstone.meetingmap.schedule.dto.ScheduleCreateRequestDto;
-import com.capstone.meetingmap.schedule.dto.ScheduleDetailResponseDto;
-import com.capstone.meetingmap.schedule.dto.ScheduleResponseDto;
-import com.capstone.meetingmap.schedule.dto.ScheduleUpdateRequestDto;
+import com.capstone.meetingmap.schedule.dto.*;
 import com.capstone.meetingmap.schedule.service.ScheduleService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,9 +36,10 @@ public class ScheduleController {
 
     // 등록
     @PostMapping
-    public ResponseEntity<String> createSchedule(@RequestBody ScheduleCreateRequestDto request) {
-        Integer scheduleNo = scheduleService.createScheduleWithDetails(request);
-        groupUserService.addGroup(new GroupUserRequestDto(scheduleNo, request.getUserId()));
+    public ResponseEntity<String> saveSchedule(@RequestBody ScheduleSaveRequestDto request) {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Integer scheduleNo = scheduleService.saveScheduleWithDetails(userId, request);
+        groupUserService.addGroup(new GroupUserRequestDto(scheduleNo, userId));
         return ResponseEntity.ok("일정 등록 성공");
     }
 
@@ -62,4 +60,10 @@ public class ScheduleController {
         return ResponseEntity.ok().build();
     }
 
+    // 사용자로부터 입력받은 데이터를 통해 스케줄 생성
+    @PostMapping("/create")
+    public ResponseEntity<?> createSchedule(@RequestBody ScheduleCreateRequestDto scheduleCreateRequestDto) {
+        ScheduleCreateResponseDto scheduleCreateResponseDto = scheduleService.createSchedule(scheduleCreateRequestDto);
+        return ResponseEntity.ok(scheduleCreateResponseDto);
+    }
 }

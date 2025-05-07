@@ -1,35 +1,37 @@
 package com.capstone.meetingmap.schedule.dto;
 
-import com.capstone.meetingmap.schedule.entity.Schedule;
-import com.capstone.meetingmap.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
 @NoArgsConstructor
 public class ScheduleCreateRequestDto {
-    private String userId;
+    private List<SelectedPlace> selectedPlace;
     private String scheduleName;
     private String scheduleAbout;
-    private List<ScheduleDetailRequestDto> details;
+    private LocalDateTime scheduleStartTime;
+    private LocalDateTime scheduleEndTime;
+    private String startContentId;
+    private Boolean additionalRecommendation;
+    private Integer totalPlaceCount;
+    private String theme;
+    private Double minimumRating;
 
     @Builder
-    public ScheduleCreateRequestDto(String userId, String scheduleName, String scheduleAbout, List<ScheduleDetailRequestDto> details) {
-        this.userId = userId;
+    public ScheduleCreateRequestDto(List<SelectedPlace> selectedPlace, String scheduleName, String scheduleAbout, LocalDateTime scheduleStartTime, LocalDateTime scheduleEndTime, String startContentId, Boolean additionalRecommendation, Integer totalPlaceCount, String theme, Double minimumRating) {
+        this.selectedPlace = selectedPlace;
         this.scheduleName = scheduleName;
         this.scheduleAbout = scheduleAbout;
-        this.details = details;
-    }
-
-    //dto를 엔티티로 변환
-    public Schedule toEntity(ScheduleCreateRequestDto scheduleCreateRequestDto, User user) {
-        return Schedule.builder()
-                .scheduleName(scheduleCreateRequestDto.getScheduleName())
-                .scheduleAbout(scheduleCreateRequestDto.getScheduleAbout())
-                .user(user)
-                .build();
+        this.scheduleStartTime = scheduleStartTime;
+        this.scheduleEndTime = scheduleEndTime;
+        this.startContentId = startContentId;
+        this.additionalRecommendation = additionalRecommendation;
+        this.totalPlaceCount = totalPlaceCount;
+        this.theme = theme;
+        this.minimumRating = minimumRating;
     }
 }

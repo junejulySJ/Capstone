@@ -4,6 +4,8 @@
 - [Auth API](AuthAPI.md)
 - [Friendship API](FriendshipAPI.md)
 - **Map API**
+- [Schedule API](ScheduleAPI.md)
+- [Path API](PathAPI.md)
 
 # MAP API
 주요 기능:

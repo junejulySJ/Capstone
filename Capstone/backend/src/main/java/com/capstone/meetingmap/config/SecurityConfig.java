@@ -22,7 +22,7 @@ import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class  SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
@@ -83,7 +83,7 @@ public class SecurityConfig {
         //경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/", "/api/auth/**", "/api/user/check-id", "/api/user/register", "/api/boards", "/api/map/**").permitAll()
+                        .requestMatchers("/", "/api/auth/**", "/api/user/check-id", "/api/user/register", "/api/boards", "/api/map/**", "/api/path/**", "/api/schedules/create").permitAll()
                         .requestMatchers("/api/user/list").hasAuthority("Admin")
                         .anyRequest().authenticated());
 

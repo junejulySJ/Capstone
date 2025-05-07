@@ -1,5 +1,6 @@
 package com.capstone.meetingmap.schedule.service;
 
+import com.capstone.meetingmap.api.kakaomobility.service.KakaoMobilityDirectionService;
 import com.capstone.meetingmap.groupuser.entity.GroupUser;
 import com.capstone.meetingmap.groupuser.repository.GroupUserRepository;
 import com.capstone.meetingmap.schedule.dto.*;
@@ -10,12 +11,17 @@ import com.capstone.meetingmap.schedule.repository.ScheduleRepository;
 import com.capstone.meetingmap.user.dto.UserResponseDto;
 import com.capstone.meetingmap.user.entity.User;
 import com.capstone.meetingmap.user.repository.UserRepository;
+import com.capstone.meetingmap.util.DistanceUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,12 +32,14 @@ public class ScheduleService {
     private final ScheduleDetailRepository scheduleDetailRepository;
     private final UserRepository userRepository;
     private final GroupUserRepository groupUserRepository;
+    private final KakaoMobilityDirectionService kakaoMobilityDirectionService;
 
-    public ScheduleService(ScheduleRepository scheduleRepository, ScheduleDetailRepository scheduleDetailRepository, UserRepository userRepository, GroupUserRepository groupUserRepository) {
+    public ScheduleService(ScheduleRepository scheduleRepository, ScheduleDetailRepository scheduleDetailRepository, UserRepository userRepository, GroupUserRepository groupUserRepository, KakaoMobilityDirectionService kakaoMobilityDirectionService) {
         this.scheduleRepository = scheduleRepository;
         this.scheduleDetailRepository = scheduleDetailRepository;
         this.userRepository = userRepository;
         this.groupUserRepository = groupUserRepository;
+        this.kakaoMobilityDirectionService = kakaoMobilityDirectionService;
     }
 
     // 회원이 속한 모든 스케줄 가져오기
@@ -70,17 +78,17 @@ public class ScheduleService {
 
     // 세부 스케줄과 함께 스케줄 추가
     @Transactional
-    public Integer createScheduleWithDetails(ScheduleCreateRequestDto scheduleCreateRequestDto) {
+    public Integer saveScheduleWithDetails(String userId, ScheduleSaveRequestDto scheduleSaveRequestDto) {
         // 1. User 조회
-        User user = userRepository.findById(scheduleCreateRequestDto.getUserId())
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
 
         // 2. Schedule 생성 및 저장
-        Schedule schedule = scheduleCreateRequestDto.toEntity(scheduleCreateRequestDto, user);
+        Schedule schedule = scheduleSaveRequestDto.toEntity(scheduleSaveRequestDto, user);
         Schedule savedSchedule = scheduleRepository.save(schedule);
 
         // 3. ScheduleDetail 저장
-        for (ScheduleDetailRequestDto detailDto : scheduleCreateRequestDto.getDetails()) {
+        for (ScheduleDetailRequestDto detailDto : scheduleSaveRequestDto.getDetails()) {
             ScheduleDetail detail = detailDto.toEntity(savedSchedule);
             scheduleDetailRepository.save(detail);
         }
@@ -123,5 +131,105 @@ public class ScheduleService {
 
         scheduleDetailRepository.deleteByScheduleScheduleNo(scheduleNo);
         scheduleRepository.deleteById(scheduleNo);
+    }
+
+    // 스케줄 생성
+    public ScheduleCreateResponseDto createSchedule(ScheduleCreateRequestDto dto) {
+
+        List<ScheduleDetailCreateDto> detailCreateDtoList = new ArrayList<>();
+
+        if (dto.getAdditionalRecommendation()) { // 추가 추천 받기를 체크한 경우
+            // 장소 수-선택한 장소 만큼 추가 장소를 테마, 평점 기준으로 필터링해 선택(정렬은 아마도 1순위: user_ratings_total, 2순위: rating?)
+            // 아직 미구현
+            int remainingCount = dto.getTotalPlaceCount() - dto.getSelectedPlace().size();
+        }
+        // 알고리즘
+        Set<SelectedPlace> visited = new HashSet<>();
+        LocalDateTime currentTime = dto.getScheduleStartTime();
+
+        // 시작 지점 선택
+        SelectedPlace current = dto.getSelectedPlace().stream()
+                .filter(p -> p.getContentId().equals(dto.getStartContentId()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("시작 장소를 찾을 수 없습니다: " + dto.getStartContentId()));
+
+        visited.add(current);
+        LocalDateTime startTime = currentTime; // 시작 시간 임시 저장
+        currentTime = currentTime.plusMinutes(current.getStayMinutes());
+        detailCreateDtoList.add(ScheduleDetailCreateDto.builder()
+                .scheduleContent(current.getTitle() + " 방문")
+                .scheduleAddress(current.getAddress())
+                .latitude(new BigDecimal(current.getLatitude()))
+                .longitude(new BigDecimal(current.getLongitude()))
+                .scheduleStartTime(startTime)
+                .scheduleEndTime(currentTime)
+                .build());
+
+        boolean hadLunch = false;
+        boolean hadDinner = false;
+
+        while (true) {
+
+            // 음식점 필터: 점심 or 저녁시간이면 음식점 우선
+            boolean isLunchTime = currentTime.toLocalTime().isAfter(LocalTime.of(11, 30)) &&
+                    currentTime.toLocalTime().isBefore(LocalTime.of(13, 30));
+            boolean isDinnerTime = currentTime.toLocalTime().isAfter(LocalTime.of(17, 30)) &&
+                    currentTime.toLocalTime().isBefore(LocalTime.of(19, 30));
+
+            List<SelectedPlace> candidates = new ArrayList<>();
+            for (SelectedPlace place : dto.getSelectedPlace()) {
+                if (visited.contains(place)) {
+                    continue;
+                }
+
+                if (isLunchTime && !hadLunch) { // 점심 or 저녁시간이면 음식점 추가
+                    if (List.of("A05020100", "A05020200", "A05020300", "A05020400", "A05020700").contains(place.getCat3())) {
+                        candidates.add(place);
+                        hadLunch = true;
+                    }
+                } else if (isDinnerTime && !hadDinner) {
+                    if (List.of("A05020100", "A05020200", "A05020300", "A05020400", "A05020700").contains(place.getCat3())) {
+                        candidates.add(place);
+                        hadDinner = true;
+                    }
+                } else {
+                    if (!List.of("A05020100", "A05020200", "A05020300", "A05020400", "A05020700").contains(place.getCat3())) {
+                        candidates.add(place);
+                    }
+                }
+            }
+
+            if (candidates.isEmpty()) break;
+
+            // NN 알고리즘: 가장 가까운 장소 선택
+            NearestInfo nearestInfo = DistanceUtil.findNearest(current, candidates);
+            SelectedPlace next = nearestInfo.getNearest();
+            int travelMinutes = DistanceUtil.estimateTravelTime(nearestInfo.getMinDistance(), 4.0);
+            //kakaoMobilityDirectionService.getDistanceAndDuration(current, candidates); 미구현
+
+            if (currentTime.plusMinutes(travelMinutes + next.getStayMinutes()).isAfter(dto.getScheduleEndTime())) {
+                break; // 시간 초과
+            }
+
+            currentTime = currentTime.plusMinutes(travelMinutes);
+            visited.add(next);
+            current = next;
+            LocalDateTime startTime2 = currentTime; // 시작 시간 임시 저장
+            currentTime = currentTime.plusMinutes(current.getStayMinutes());
+            detailCreateDtoList.add(ScheduleDetailCreateDto.builder()
+                    .scheduleContent(current.getTitle() + " 방문")
+                    .scheduleAddress(current.getAddress())
+                    .latitude(new BigDecimal(current.getLatitude()))
+                    .longitude(new BigDecimal(current.getLongitude()))
+                    .scheduleStartTime(startTime2)
+                    .scheduleEndTime(currentTime)
+                    .build());
+        }
+
+        return ScheduleCreateResponseDto.builder()
+                .scheduleName(dto.getScheduleName())
+                .scheduleAbout(dto.getScheduleAbout())
+                .details(detailCreateDtoList)
+                .build();
     }
 }

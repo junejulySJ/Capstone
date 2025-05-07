@@ -9,5 +9,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 public class KakaoApiProperties {
     private String baseUrl;
+    private String mobilityBaseUrl;
     private String restApiKey;
 }

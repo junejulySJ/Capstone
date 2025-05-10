@@ -156,16 +156,18 @@ axios
 ---
 
 <details>
-<summary>친구 요청 수락</summary>
+<summary>친구 요청 수락 ✏️</summary>
 
-**GET** `/user/friends/approve/{friendshipNo}`
+**POST** `/user/friends/approve`
 
 > 친구 요청을 수락합니다.
 
 - 로그인을 진행해 JWT 쿠키가 있어야 함
 ```javascript
 axios
-    .get(`${API_BASE_URL}/user/friends/approve/{friendshipNo}`, {
+    .post(`${API_BASE_URL}/user/friends/approve/{friendshipNo}`, {
+        "friendshipNo": 8,
+    }, {
         withCredentials: true,
     })
 ```

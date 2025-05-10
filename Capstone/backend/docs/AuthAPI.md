@@ -32,7 +32,7 @@
 }
 ```
 
-#### 성공 응답 ✏️
+#### 성공 응답
 - accessToken 쿠키: `eyJhbGciOiJIUzI1NiJ9.eyJ1c2Vy...`  
 **※ 이후 로그인이 필요한 api로 axios 요청시 `withCredentials: true`만 추가로 넣어주면 됩니다.**
 

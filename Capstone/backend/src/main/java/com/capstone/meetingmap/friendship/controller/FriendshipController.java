@@ -1,6 +1,7 @@
 package com.capstone.meetingmap.friendship.controller;
 
-import com.capstone.meetingmap.friendship.dto.FriendshipSendRequestDto;
+import com.capstone.meetingmap.friendship.dto.FriendshipAddRequestDto;
+import com.capstone.meetingmap.friendship.dto.FriendshipApproveRequestDto;
 import com.capstone.meetingmap.friendship.service.FriendshipService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,17 +40,17 @@ public class FriendshipController {
 
     //친구 추가
     @PostMapping("/add")
-    public ResponseEntity<?> addFriend(@RequestBody FriendshipSendRequestDto friendshipSendRequestDto) {
+    public ResponseEntity<?> addFriend(@RequestBody FriendshipAddRequestDto friendshipAddRequestDto) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-        friendshipService.createFriendship(userId, friendshipSendRequestDto);
-        return ResponseEntity.ok(null);
+        friendshipService.createFriendship(userId, friendshipAddRequestDto);
+        return ResponseEntity.ok("친구 추가 성공");
     }
 
     //친구 요청 수락
-    @PostMapping("/approve/{friendshipNo}")
-    public ResponseEntity<?> approveFriendship(@PathVariable Integer friendshipNo) {
+    @PostMapping("/approve")
+    public ResponseEntity<?> approveFriendship(@RequestBody FriendshipApproveRequestDto friendshipApproveRequestDto) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-        friendshipService.approveFriendshipRequest(userId, friendshipNo);
-        return ResponseEntity.ok(null);
+        friendshipService.approveFriendshipRequest(userId, friendshipApproveRequestDto.getFriendshipNo());
+        return ResponseEntity.ok("친구 요청 수락 성공");
     }
 }

@@ -340,7 +340,7 @@ axios
 ---
 
 <details>
-<summary>스케줄 공유</summary>
+<summary>스케줄 공유 ✏️</summary>
 
 **POST** `/schedules/share`
 
@@ -368,7 +368,7 @@ axios
 ---
 
 <details>
-<summary>스케줄 공유 취소</summary>
+<summary>스케줄 공유 취소 ✏️</summary>
 
 **POST** `/schedules/unshare`
 

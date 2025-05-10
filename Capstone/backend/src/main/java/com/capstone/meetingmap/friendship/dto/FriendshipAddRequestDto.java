@@ -7,12 +7,12 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class FriendshipSendRequestDto {
+public class FriendshipAddRequestDto {
     @NotBlank(message = "추가할 친구 id는 반드시 입력해야 합니다.")
-    private String opponentId; //세션 로그인 사용중이므로 나의 id는 보내지 않음
+    private String opponentId;
 
     @Builder
-    public FriendshipSendRequestDto(String opponentId) {
+    public FriendshipAddRequestDto(String opponentId) {
         this.opponentId = opponentId;
     }
 }

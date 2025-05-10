@@ -1,7 +1,7 @@
 package com.capstone.meetingmap.friendship.service;
 
 import com.capstone.meetingmap.friendship.dto.FriendshipResponseDto;
-import com.capstone.meetingmap.friendship.dto.FriendshipSendRequestDto;
+import com.capstone.meetingmap.friendship.dto.FriendshipAddRequestDto;
 import com.capstone.meetingmap.friendship.entity.Friendship;
 import com.capstone.meetingmap.friendship.entity.FriendshipStatus;
 import com.capstone.meetingmap.friendship.repository.FriendshipRepository;
@@ -27,10 +27,10 @@ public class FriendshipService {
 
     //친구 요청
     @Transactional
-    public void createFriendship(String userId, FriendshipSendRequestDto friendshipSendRequestDto) {
+    public void createFriendship(String userId, FriendshipAddRequestDto friendshipAddRequestDto) {
         User fromUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
-        User toUser = userRepository.findById(friendshipSendRequestDto.getOpponentId())
+        User toUser = userRepository.findById(friendshipAddRequestDto.getOpponentId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
 
         Friendship friendshipFrom = Friendship.builder() //보내는 사람 측

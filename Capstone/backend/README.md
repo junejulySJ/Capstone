@@ -29,7 +29,7 @@ WHERE user_id IN (
 );
 ```
 
-## 주의사항 2✏️
+## 주의사항 2
 - contentTypeId를 DB에서 가져와 typeCode와 매칭하도록 하기 위해 테이블을 추가했습니다.
 - 클라이언트쪽에서는 contentTypeId가 아닌 typeCode를 사용하면 됩니다.
 ```mysql

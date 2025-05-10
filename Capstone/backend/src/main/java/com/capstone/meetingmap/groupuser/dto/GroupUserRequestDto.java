@@ -7,14 +7,16 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @NoArgsConstructor
 public class GroupUserRequestDto {
     private Integer scheduleNo;
-    private String userId;
+    private List<String> userId;
 
     @Builder
-    public GroupUserRequestDto(Integer scheduleNo, String userId) {
+    public GroupUserRequestDto(Integer scheduleNo, List<String> userId) {
         this.scheduleNo = scheduleNo;
         this.userId = userId;
     }

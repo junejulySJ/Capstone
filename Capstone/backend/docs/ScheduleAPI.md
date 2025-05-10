@@ -15,6 +15,9 @@
 - 스케줄 저장
 - 스케줄 수정
 - 스케줄 삭제
+- 스케줄에 참여한 회원 조회
+- 스케줄 공유
+- 스케줄 공유 취소
 
 ---
 
@@ -334,3 +337,58 @@ axios
 ```
 </details>
 
+---
+
+<details>
+<summary>스케줄 공유</summary>
+
+**POST** `/schedules/share`
+
+> 스케줄을 공유합니다.
+
+- 로그인을 진행해 JWT 쿠키가 있어야 함
+```javascript
+axios
+    .post(`${API_BASE_URL}/schedules/share`, {
+        withCredentials: true,
+    })
+```
+
+#### 요청 바디
+```json
+{
+  "scheduleNo": 7,
+  "userIds": [
+    "user3"
+  ]
+}
+```
+</details>
+
+---
+
+<details>
+<summary>스케줄 공유 취소</summary>
+
+**POST** `/schedules/unshare`
+
+> 스케줄 공유를 취소합니다.
+
+- 로그인을 진행해 JWT 쿠키가 있어야 함
+```javascript
+axios
+    .post(`${API_BASE_URL}/schedules/unshare`, {
+        withCredentials: true,
+    })
+```
+
+#### 요청 바디
+```json
+{
+  "scheduleNo": 7,
+  "userIds": [
+    "user3"
+  ]
+}
+```
+</details>

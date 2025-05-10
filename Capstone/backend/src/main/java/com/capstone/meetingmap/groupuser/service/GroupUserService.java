@@ -1,6 +1,5 @@
 package com.capstone.meetingmap.groupuser.service;
 
-import com.capstone.meetingmap.groupuser.dto.GroupUserRequestDto;
 import com.capstone.meetingmap.groupuser.entity.GroupUser;
 import com.capstone.meetingmap.groupuser.repository.GroupUserRepository;
 import com.capstone.meetingmap.schedule.entity.Schedule;
@@ -9,7 +8,10 @@ import com.capstone.meetingmap.user.entity.User;
 import com.capstone.meetingmap.user.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @Service
 public class GroupUserService {
@@ -23,30 +25,44 @@ public class GroupUserService {
         this.userRepository = userRepository;
     }
 
-    // 그룹 생성
-    public void addGroup(GroupUserRequestDto groupUserRequestDto) {
+    // 1명 그룹 생성(추가)
+    @Transactional
+    public void addGroup(Integer scheduleNo, String userId) {
+        addGroups(scheduleNo, List.of(userId));
+    }
+
+    // 여러명 그룹 생성(추가)
+    @Transactional
+    public void addGroups(Integer scheduleNo, List<String> userIds) {
         // 해당 Schedule 검색
-        Schedule schedule = scheduleRepository.findById(groupUserRequestDto.getScheduleNo())
+        Schedule schedule = scheduleRepository.findById(scheduleNo)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 스케줄을 찾을 수 없습니다"));
 
-        // 해당 User 검색
-        User user = userRepository.findById(groupUserRequestDto.getUserId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
+        for (String userId : userIds) {
+            // 해당 User 검색
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
+            // Schedule과 User 정보로 엔티티 생성
+            GroupUser groupUser = GroupUser.builder()
+                    .schedule(schedule)
+                    .user(user)
+                    .build();
 
-        // Schedule과 User 정보로 엔티티 생성
-        GroupUser groupUser = groupUserRequestDto.toEntity(schedule, user);
-
-        // 엔티티를 db에 저장
-        groupUserRepository.save(groupUser);
+            // 엔티티를 db에 저장
+            groupUserRepository.save(groupUser);
+        }
     }
 
     // 그룹 삭제
-    public void deleteGroup(GroupUserRequestDto groupUserRequestDto) {
+    @Transactional
+    public void deleteGroup(Integer scheduleNo, String userId) {
 
-        // 자신이 속한 group만 삭제 가능하도록 변경하기
-        if (!groupUserRepository.existsBySchedule_ScheduleNoAndUser_UserId(groupUserRequestDto.getScheduleNo(), groupUserRequestDto.getUserId()))
+        // 자신이 속한 group만 삭제 가능
+        if (!groupUserRepository.existsBySchedule_ScheduleNoAndUser_UserId(scheduleNo, userId))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "자신이 속한 그룹만 삭제 가능합니다");
 
-        groupUserRepository.deleteByScheduleScheduleNo(groupUserRequestDto.getScheduleNo());
+        groupUserRepository.deleteByGroupUserId_ScheduleNo(scheduleNo);
     }
+
+
 }

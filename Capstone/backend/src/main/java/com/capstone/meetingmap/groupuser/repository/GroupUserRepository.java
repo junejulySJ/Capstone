@@ -12,5 +12,5 @@ public interface GroupUserRepository extends JpaRepository<GroupUser, GroupUserI
     List<GroupUser> findByUser_UserId(String userId);
     List<GroupUser> findBySchedule_ScheduleNo(Integer scheduleNo);
     Optional<GroupUser> findByUser_UserIdAndSchedule_ScheduleNo(String userId, Integer scheduleNo);
-    void deleteByScheduleScheduleNo(Integer scheduleNo);
+    void deleteByGroupUserId_ScheduleNo(Integer scheduleNo);
 }

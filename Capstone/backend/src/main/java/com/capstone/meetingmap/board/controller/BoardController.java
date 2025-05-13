@@ -1,9 +1,11 @@
 package com.capstone.meetingmap.board.controller;
 
-import com.capstone.meetingmap.board.dto.BoardCreateRequestDto;
-import com.capstone.meetingmap.board.dto.BoardCreateResponseDto;
+import com.capstone.meetingmap.board.dto.BoardWriteResponseDto;
+import com.capstone.meetingmap.board.dto.BoardDetailResponseDto;
 import com.capstone.meetingmap.board.dto.BoardResponseDto;
+import com.capstone.meetingmap.board.dto.BoardWriteRequestDto;
 import com.capstone.meetingmap.board.service.BoardService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -26,7 +28,7 @@ public class BoardController {
 
     //게시글 상세보기
     @GetMapping("/{boardNo}")
-    public ResponseEntity<BoardResponseDto> viewDetail(@PathVariable("boardNo") Integer boardNo) {
+    public ResponseEntity<BoardDetailResponseDto> viewDetail(@PathVariable("boardNo") Integer boardNo) {
         return ResponseEntity.ok(boardService.searchByBoardNo(boardNo));
     }
 
@@ -42,13 +44,14 @@ public class BoardController {
     }
 
     //게시글 추가
-    @PostMapping("/create")
-    public ResponseEntity<BoardCreateResponseDto> apiCreate(@RequestBody BoardCreateRequestDto boardCreateRequestDto) {
+    @PostMapping
+    public ResponseEntity<BoardWriteResponseDto> write(@Valid @RequestBody BoardWriteRequestDto boardWriteRequestDto) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-        BoardCreateResponseDto boardCreateResponseDto = boardService.create(boardCreateRequestDto, userId);
 
-        log.info("post added: {}", boardCreateRequestDto.getBoardTitle());
+        BoardWriteResponseDto boardWriteResponseDto = boardService.write(boardWriteRequestDto, userId);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(boardCreateResponseDto);
+        log.info("Post added: '{}'", boardWriteRequestDto.getBoardTitle());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(boardWriteResponseDto);
     }
 }

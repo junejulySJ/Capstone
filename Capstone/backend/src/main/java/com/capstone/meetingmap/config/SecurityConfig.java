@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -26,10 +27,12 @@ public class  SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil) {
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil = jwtUtil;
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
     }
 
     @Bean
@@ -83,7 +86,9 @@ public class  SecurityConfig {
         //경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/", "/api/auth/**", "/api/user/check-id", "/api/user/register", "/api/boards", "/api/map/**", "/api/path/**", "/api/schedules/create").permitAll()
+                        .requestMatchers("/", "/api/auth/**", "/api/user/check-id", "/api/user/register", "/api/map/**", "/api/path/**", "/api/schedules/create").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/boards").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/boards").authenticated()
                         .requestMatchers("/api/user/list").hasAuthority("Admin")
                         .anyRequest().authenticated());
 
@@ -97,6 +102,12 @@ public class  SecurityConfig {
         http
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        // 로그인 필요시 응답 설정
+        http
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                );
 
         return http.build();
     }

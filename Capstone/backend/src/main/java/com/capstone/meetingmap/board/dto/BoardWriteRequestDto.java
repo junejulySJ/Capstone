@@ -3,33 +3,26 @@ package com.capstone.meetingmap.board.dto;
 import com.capstone.meetingmap.board.entity.Board;
 import com.capstone.meetingmap.category.entity.Category;
 import com.capstone.meetingmap.user.entity.User;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class BoardCreateRequestDto {
-    @NotNull
+@Builder
+@AllArgsConstructor
+public class BoardWriteRequestDto {
+    @NotBlank(message = "게시글 제목은 반드시 입력해야 합니다")
     private String boardTitle;
 
-    @NotNull
+    @NotBlank(message = "게시글 본문은 반드시 입력해야 합니다")
     private String boardContent;
 
-    @NotNull
-    private String userId;
-
-    @NotNull
+    @NotNull(message = "카테고리가 선택되어 있어야 합니다")
     private Integer categoryNo;
-
-    @Builder
-    public BoardCreateRequestDto(String boardTitle, String boardContent, String userId, Integer categoryNo) {
-        this.boardTitle = boardTitle;
-        this.boardContent = boardContent;
-        this.userId = userId;
-        this.categoryNo = categoryNo;
-    }
 
     //dto를 엔티티로 변환
     public Board toEntity(Category category, User user) {

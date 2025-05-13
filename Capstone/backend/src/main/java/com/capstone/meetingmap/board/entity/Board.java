@@ -35,4 +35,8 @@ public class Board extends BoardTime {
         this.user = user;
         this.category = category;
     }
+
+    public void increaseViewCount() {
+        this.boardViewCount += 1;
+    }
 }

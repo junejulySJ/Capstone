@@ -12,9 +12,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class BoardResponseDto {
+public class BoardDetailResponseDto {
     private Integer boardNo;
     private String boardTitle;
+    private String boardContent;
     private Integer boardViewCount;
     private LocalDateTime boardWriteDate;
     private LocalDateTime boardUpdateDate;
@@ -23,10 +24,11 @@ public class BoardResponseDto {
     private String categoryName;
 
     //엔티티를 dto로 변환
-    public static BoardResponseDto fromEntity(Board board) {
-        return BoardResponseDto.builder()
+    public static BoardDetailResponseDto fromEntity(Board board) {
+        return BoardDetailResponseDto.builder()
                 .boardNo(board.getBoardNo())
                 .boardTitle(board.getBoardTitle())
+                .boardContent(board.getBoardContent())
                 .boardViewCount(board.getBoardViewCount())
                 .boardWriteDate(board.getBoardWriteDate())
                 .boardUpdateDate(board.getBoardUpdateDate())

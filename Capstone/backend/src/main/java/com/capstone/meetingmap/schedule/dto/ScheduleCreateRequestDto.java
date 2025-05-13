@@ -2,9 +2,7 @@ package com.capstone.meetingmap.schedule.dto;
 
 import com.capstone.meetingmap.schedule.validator.ValidSelectedPlaceCondition;
 import com.capstone.meetingmap.schedule.validator.ValidTransportType;
-import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +17,8 @@ import java.util.List;
 @AllArgsConstructor
 @ValidSelectedPlaceCondition
 public class ScheduleCreateRequestDto {
+    @NotEmpty(message = "장소는 반드시 1개 이상 선택해야 합니다")
+    @Size(min = 1, message = "장소는 반드시 1개 이상 선택해야 합니다")
     private List<SelectedPlace> selectedPlace;
 
     @NotBlank(message = "스케줄 이름은 반드시 입력해야 합니다")

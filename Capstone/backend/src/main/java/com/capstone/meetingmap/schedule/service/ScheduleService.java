@@ -209,85 +209,46 @@ public class ScheduleService {
 
             List<PlaceResponseDto> mergedResponse = new ArrayList<>();
 
-            // "A05"로 시작하는 cat3가 하나도 없는 경우(음식점을 1개도 고르지 않은 경우) 처리
-            if (dto.getSelectedPlace().stream().noneMatch(place -> place.getCat3() != null && place.getCat3().startsWith("A05"))) {
-                if (dto.getTheme().equals("date")) {
-                    List<PlaceResponseDto> response = mapService.getAllPlaces("user_ratings_total_dsc", null, startPlace.getLatitude(), startPlace.getLongitude(), "6", "A05", "A0502", "A05020900");
-                    // 점심식사만 가능한 시간
-                    if (dto.getScheduleStartTime().toLocalTime().isBefore(LocalTime.of(11, 30)) && dto.getScheduleEndTime().toLocalTime().isBefore(LocalTime.of(17, 30))) {
-                        mergedResponse.add(response.get(0));
-                        remainingCount = remainingCount - 1;
-                    }
-                    // 저녁식사만 가능한 시간
-                    if (dto.getScheduleStartTime().toLocalTime().isAfter(LocalTime.of(13, 30)) && dto.getScheduleEndTime().toLocalTime().isAfter(LocalTime.of(19, 30))) {
-                        mergedResponse.add(response.get(0));
-                        remainingCount = remainingCount - 1;
-                    }
-                    // 둘다 가능한 시간
-                    if (dto.getScheduleStartTime().toLocalTime().isBefore(LocalTime.of(11, 30)) && dto.getScheduleEndTime().toLocalTime().isAfter(LocalTime.of(19, 30))) {
-                        mergedResponse.add(response.get(0));
-                        mergedResponse.add(response.get(1));
-                        remainingCount = remainingCount - 2;
-                    }
-                } else {
-                    List<PlaceResponseDto> response = mapService.getAllPlaces("user_ratings_total_dsc", null, startPlace.getLatitude(), startPlace.getLongitude(), "6", null, null, null);
-                    // 점심식사만 가능한 시간
-                    if (dto.getScheduleStartTime().toLocalTime().isBefore(LocalTime.of(11, 30)) && dto.getScheduleEndTime().toLocalTime().isBefore(LocalTime.of(17, 30))) {
-                        mergedResponse.add(response.get(0));
-                        remainingCount = remainingCount - 1;
-                    }
-                    // 저녁식사만 가능한 시간
-                    if (dto.getScheduleStartTime().toLocalTime().isAfter(LocalTime.of(13, 30)) && dto.getScheduleEndTime().toLocalTime().isAfter(LocalTime.of(19, 30))) {
-                        mergedResponse.add(response.get(0));
-                        remainingCount = remainingCount - 1;
-                    }
-                    // 둘다 가능한 시간
-                    if (dto.getScheduleStartTime().toLocalTime().isBefore(LocalTime.of(11, 30)) && dto.getScheduleEndTime().toLocalTime().isAfter(LocalTime.of(19, 30))) {
-                        mergedResponse.add(response.get(0));
-                        mergedResponse.add(response.get(1));
-                        remainingCount = remainingCount - 2;
-                    }
+            // 음식점을 1개도 고르지 않은 경우 처리
+            if (dto.getSelectedPlace().stream().noneMatch(place -> place.getCategory() != null && place.getCategory().startsWith("food-"))) {
+                System.out.println("이거 실행되야함");
+                List<PlaceResponseDto> response = mapService.getAllPlaces("user_ratings_total_dsc", startPlace.getLatitude(), startPlace.getLongitude(), "food");
+                // 점심식사 가능한 시간
+                if (dto.getScheduleStartTime().toLocalTime().isBefore(LocalTime.of(11, 30)) && dto.getScheduleEndTime().toLocalTime().isAfter(LocalTime.of(13, 30))) {
+                    mergedResponse.add(response.get(0));
+                    remainingCount = remainingCount - 1;
                 }
+                // 저녁식사 가능한 시간
+                if (dto.getScheduleStartTime().toLocalTime().isBefore(LocalTime.of(17, 30)) && dto.getScheduleEndTime().toLocalTime().isAfter(LocalTime.of(19, 30))) {
+                    mergedResponse.add(response.get(1));
+                    remainingCount = remainingCount - 1;
+                }
+                System.out.println("mergedResponse.size=!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + mergedResponse.size());
             }
-            String typeCode = null;
-            String cat1 = null;
-            String cat2 = null;
-            String cat3 = null;
+            String category = null;
             switch (dto.getTheme()) {
-                case "tour" -> typeCode = "1";
+                case "tour" -> category = "tour";
                 case "nature" -> {
-                    typeCode = "1";
-                    cat1 = "A01";
+                    category = "tour-nature";
                 }
                 case "history" -> {
-                    typeCode = "1";
-                    cat1 = "A02";
-                    cat2 = "A0201";
+                    category = "tour-tradition";
                 }
                 case "food" -> {
-                    typeCode = "6";
-                    cat1 = "A05";
+                    category = "food";
                 }
                 case "shopping" -> {
-                    typeCode = "5";
-                    cat1 = "A04";
-                }
-                case "activity" -> {
-                    typeCode = "4";
-                    cat1 = "A03";
+                    category = "shopping";
                 }
                 case "date" -> {
-                    typeCode = "1";
-                    cat1 = "A02";
-                    cat2 = "A0201";
-                    cat3 = "A02010100";
+                    category = "tour-park";
                 }
             }
-            List<PlaceResponseDto> response = mapService.getAllPlaces("user_ratings_total_dsc", null, startPlace.getLatitude(), startPlace.getLongitude(), typeCode, cat1, cat2, cat3);
-            if (dto.getTheme().equals("date")) {
-                List<PlaceResponseDto> response2 = mapService.getAllPlaces("user_ratings_total_dsc", null, startPlace.getLatitude(), startPlace.getLongitude(), "1", "A02", "A0202", "A02020700");
+            List<PlaceResponseDto> response = mapService.getAllPlaces("user_ratings_total_dsc", startPlace.getLatitude(), startPlace.getLongitude(), category);
+            if (dto.getTheme().equals("date")) { // 데이트 테마인 경우 추가 검색
+                List<PlaceResponseDto> response2 = mapService.getAllPlaces("user_ratings_total_dsc", startPlace.getLatitude(), startPlace.getLongitude(), "cafe");
                 response.addAll(response2);
-                List<PlaceResponseDto> response3 = mapService.getAllPlaces("user_ratings_total_dsc", null, startPlace.getLatitude(), startPlace.getLongitude(), "1", "A02", "A0205", "A02050600");
+                List<PlaceResponseDto> response3 = mapService.getAllPlaces("user_ratings_total_dsc", startPlace.getLatitude(), startPlace.getLongitude(), "tour-theme-park");
                 response.addAll(response3);
             }
             response.sort(Comparator.comparing(PlaceResponseDto::getUserRatingsTotal));
@@ -360,17 +321,17 @@ public class ScheduleService {
                     }
 
                     if (isLunchTime && !hadLunch) { // 점심시간이면 음식점 추가
-                        if (List.of("A05020100", "A05020200", "A05020300", "A05020400", "A05020700").contains(place.getCat3())) {
+                        if (place.getCategory().startsWith("food-")) {
                             candidates.add(place);
                             hadLunch = true;
                         }
                     } else if (isDinnerTime && !hadDinner) { // 저녁시간이면 음식점 추가
-                        if (List.of("A05020100", "A05020200", "A05020300", "A05020400", "A05020700").contains(place.getCat3())) {
+                        if (place.getCategory().startsWith("food-")) {
                             candidates.add(place);
                             hadDinner = true;
                         }
                     } else { // 그 외 시간이면 음식점을 제외하고 추가
-                        if (!List.of("A05020100", "A05020200", "A05020300", "A05020400", "A05020700").contains(place.getCat3())) {
+                        if (!place.getCategory().startsWith("food-")) {
                             candidates.add(place);
                         }
                     }

@@ -15,6 +15,6 @@ public class SelectedPlace {
     private String name;
     private String latitude;
     private String longitude;
-    private String cat3;
+    private String category;
     private Integer stayMinutes;
 }

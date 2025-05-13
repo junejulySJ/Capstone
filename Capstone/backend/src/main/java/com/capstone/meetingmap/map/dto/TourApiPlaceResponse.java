@@ -1,8 +1,7 @@
 package com.capstone.meetingmap.map.dto;
 
-import com.capstone.meetingmap.map.dto.tourapi.AreaBasedListItem;
 import com.capstone.meetingmap.map.dto.tourapi.LocationBasedListItem;
-import com.capstone.meetingmap.map.entity.ContentType;
+import com.capstone.meetingmap.map.entity.PlaceCategoryDetail;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,42 +15,19 @@ public class TourApiPlaceResponse {
     private String address;
     private String sigunguCode;
     private String contentId;
-    private String typeCode;
-    private String cat1;
-    private String cat2;
-    private String cat3;
+    private String category;
     private String firstImage;
     private String firstImage2;
     private String latitude;
     private String longitude;
     private String name;
 
-    public static TourApiPlaceResponse fromAreaBasedListItem(AreaBasedListItem item, ContentType contentType) {
+    public static TourApiPlaceResponse fromLocationBasedListItem(LocationBasedListItem item, PlaceCategoryDetail placeCategoryDetail) {
         return TourApiPlaceResponse.builder()
                 .address((item.getAddr1() == null ? "" : item.getAddr1()) + " " + (item.getAddr2() == null ? "" : item.getAddr2()).trim())
                 .sigunguCode(item.getSigungucode())
                 .contentId(item.getContentid())
-                .typeCode(String.valueOf(contentType.getContentTypeNo()))
-                .cat1(item.getCat1())
-                .cat2(item.getCat2())
-                .cat3(item.getCat3())
-                .firstImage(item.getFirstimage())
-                .firstImage2(item.getFirstimage2())
-                .latitude(item.getMapy())
-                .longitude(item.getMapx())
-                .name(item.getTitle())
-                .build();
-    }
-
-    public static TourApiPlaceResponse fromLocationBasedListItem(LocationBasedListItem item, ContentType contentType) {
-        return TourApiPlaceResponse.builder()
-                .address((item.getAddr1() == null ? "" : item.getAddr1()) + " " + (item.getAddr2() == null ? "" : item.getAddr2()).trim())
-                .sigunguCode(item.getSigungucode())
-                .contentId(item.getContentid())
-                .typeCode(String.valueOf(contentType.getContentTypeNo()))
-                .cat1(item.getCat1())
-                .cat2(item.getCat2())
-                .cat3(item.getCat3())
+                .category(placeCategoryDetail.getPlaceCategoryDetailCode())
                 .firstImage(item.getFirstimage())
                 .firstImage2(item.getFirstimage2())
                 .latitude(item.getMapy())

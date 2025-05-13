@@ -24,62 +24,45 @@
 ## API 목록
 
 <details>
-<summary>스케줄 생성</summary>
+<summary>스케줄 생성 ✏️</summary>
 
 **POST** `/schedule/create`
 
-> 사용자로부터 입력받은 데이터를 통해 스케줄을 생성합니다.
+> 사용자로부터 입력받은 데이터를 통해 스케줄을 생성합니다.  
+> theme 종류는 다음과 같습니다.
+
+| theme    | 설명   | 카테고리                             |
+|----------|------|----------------------------------|
+| tour     | 관광   | tour                             |
+| nature   | 자연힐링 | tour-nature                      |
+| history  | 역사탐방 | tour-tradition                   |
+| food     | 음식투어 | food                             |
+| shopping | 쇼핑   | shopping                         |
+| date     | 데이트  | tour-park, tour-theme-park, cafe |
 
 #### 요청 바디
 ```json
 {
   "selectedPlace": [
     {
-      "contentId": "127269",
-      "address": "서울특별시 강남구 청담동 66",
-      "title": "청담근린공원",
-      "latitude": "37.5213524935",
-      "longitude": "127.0526155502",
-      "cat3": "A02020700",
-      "stayMinutes": 60
-    },
-    {
-      "contentId": "2994661",
-      "address": "서울특별시 강남구 강남대로 426 (역삼동) ",
-      "title": "일상비일상의틈",
-      "latitude": "37.5006405461",
-      "longitude": "127.0267851551",
-      "cat3": "A02030400",
-      "stayMinutes": 60
-    },
-    {
-      "contentId": "2867691",
-      "address": "대한민국 서울특별시 강남구 봉은사로 524",
-      "title": "메가박스 코엑스",
-      "latitude": "37.5126572",
-      "longitude": "127.0586523",
-      "cat3": "A02020200",
-      "stayMinutes": 60
-    },
-    {
-      "contentId": "2867691",
-      "address": "서울특별시 강남구 압구정로42길 25-10 1~2층",
-      "title": "우텐더",
-      "latitude": "37.5270487520",
-      "longitude": "127.0358085855",
-      "cat3": "A05020100",
+      "contentId": "1945693",
+      "address": "서울특별시 종로구 인사동10길 11-4",
+      "name": "전통다원",
+      "latitude": "37.5745839959",
+      "longitude": "126.9857145803",
+      "category": "cafe",
       "stayMinutes": 60
     }
   ],
   "scheduleName": "test",
   "scheduleAbout": "testabout",
-  "scheduleStartTime": "2025-05-07T10:00:00",
-  "scheduleEndTime": "2025-05-07T16:00:00",
-  "startContentId": "2994661",
+  "scheduleStartTime": "2025-05-14T10:00:00",
+  "scheduleEndTime": "2025-05-14T18:00:00",
+  "startContentId": "1945693",
   "transport": "자동차",
   "additionalRecommendation": true,
-  "totalPlaceCount": 5,
-  "theme": "tour",
+  "totalPlaceCount": 4,
+  "theme": "date",
   "stayMinutesMean": 60
 }
 ```
@@ -91,44 +74,36 @@
   "scheduleAbout": "testabout",
   "details": [
     {
-      "scheduleContent": "일상비일상의틈 방문",
-      "scheduleAddress": "서울특별시 강남구 강남대로 426 (역삼동) ",
-      "latitude": 37.5006405461,
-      "longitude": 127.0267851551,
+      "scheduleContent": "전통다원 방문",
+      "scheduleAddress": "서울특별시 종로구 인사동10길 11-4",
+      "latitude": 37.5745839959,
+      "longitude": 126.9857145803,
       "scheduleStartTime": "2025-05-14T10:00:00",
       "scheduleEndTime": "2025-05-14T11:00:00"
     },
     {
-      "scheduleContent": "강남 방문",
-      "scheduleAddress": "서울특별시 강남구 역삼동 (역삼동)",
-      "latitude": 37.4970465429,
-      "longitude": 127.0281573537,
+      "scheduleContent": "다동커피집 방문",
+      "scheduleAddress": "중구 다동길 24-8",
+      "latitude": 37.5673387,
+      "longitude": 126.9806302,
       "scheduleStartTime": "2025-05-14T11:30:00",
       "scheduleEndTime": "2025-05-14T12:30:00"
     },
     {
-      "scheduleContent": "우텐더 방문",
-      "scheduleAddress": "서울특별시 강남구 압구정로42길 25-10 1~2층",
-      "latitude": 37.5270487520,
-      "longitude": 127.0358085855,
+      "scheduleContent": "진옥화할매원조닭한마리 방문",
+      "scheduleAddress": "서울특별시 종로구 종로40가길 18 (종로5가) ",
+      "latitude": 37.5704292825,
+      "longitude": 127.0057128756,
       "scheduleStartTime": "2025-05-14T13:00:00",
-      "scheduleEndTime": "2025-05-14T13:20:00"
+      "scheduleEndTime": "2025-05-14T14:00:00"
     },
     {
-      "scheduleContent": "청담근린공원 방문",
-      "scheduleAddress": "서울특별시 강남구 청담동 66",
-      "latitude": 37.5213524935,
-      "longitude": 127.0526155502,
-      "scheduleStartTime": "2025-05-14T13:50:00",
-      "scheduleEndTime": "2025-05-14T14:50:00"
-    },
-    {
-      "scheduleContent": "메가박스 코엑스 방문",
-      "scheduleAddress": "대한민국 서울특별시 강남구 봉은사로 524",
-      "latitude": 37.5126572,
-      "longitude": 127.0586523,
-      "scheduleStartTime": "2025-05-14T15:20:00",
-      "scheduleEndTime": "2025-05-14T16:20:00"
+      "scheduleContent": "장충단공원 방문",
+      "scheduleAddress": "서울특별시 중구 동호로 261 (장충동2가) ",
+      "latitude": 37.5588195041,
+      "longitude": 127.0048160637,
+      "scheduleStartTime": "2025-05-14T14:30:00",
+      "scheduleEndTime": "2025-05-14T15:30:00"
     }
   ]
 }

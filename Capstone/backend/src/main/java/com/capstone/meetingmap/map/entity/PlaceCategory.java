@@ -9,17 +9,16 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 @Builder
-public class ContentType {
-
+@AllArgsConstructor
+public class PlaceCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer contentTypeNo;
+    private Integer placeCategoryNo;
 
-    @Column(length = 2)
-    private String contentTypeId;
+    @Column(length = 20)
+    private String placeCategoryCode;
 
-    @Column(length = 30)
-    private String contentTypeName;
+    @Column(length = 20)
+    private String placeCategoryName;
 }

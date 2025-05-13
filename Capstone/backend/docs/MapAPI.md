@@ -9,9 +9,6 @@
 
 # MAP API
 주요 기능:
-- 시군구 코드 반환
-- 타입 코드 반환
-- 분류 코드 반환
 - 지도 출력
 - 장소 세부 정보 출력
 - 장소명 자동완성
@@ -21,228 +18,48 @@
 ## API 목록
 
 <details>
-<summary>시군구 코드 반환</summary>
-
-**GET** `/map/region`
-
-> 시군구 코드를 반환합니다.
-
-#### 요청 코드
-```javascript
-axios
-    .get(`${API_BASE_URL}/map/region`)
-```
-#### 응답 바디
-```json
-[
-  {
-    "code": "1",
-    "name": "강남구"
-  },
-  {
-    "code": "2",
-    "name": "강동구"
-  },
-  {
-    "code": "3",
-    "name": "강북구"
-  },
-  {
-    "code": "4",
-    "name": "강서구"
-  }
-]
-```
-</details>
-
----
-
-<details>
-<summary>타입 코드 반환</summary>
-
-**GET** `/map/type`
-
-> 타입 코드를 반환합니다.
-
-#### 요청 코드
-```javascript
-axios
-    .get(`${API_BASE_URL}/map/type`)
-```
-#### 응답 바디
-```json
-[
-  {
-    "code": "1",
-    "name": "관광지"
-  },
-  {
-    "code": "2",
-    "name": "문화시설"
-  },
-  {
-    "code": "3",
-    "name": "행사/공연/축제"
-  },
-  {
-    "code": "4",
-    "name": "레포츠"
-  },
-  {
-    "code": "5",
-    "name": "쇼핑"
-  },
-  {
-    "code": "6",
-    "name": "음식점"
-  }
-]
-```
-</details>
-
----
-
-<details>
-<summary>분류 코드 반환</summary>
-
-**GET** `/map/category`
-
-> 대/중/소분류 코드를 반환합니다.  
-> typeCode 파라미터는 필수 파라미터입니다.  
-> cat1과 cat2를 파라미터에 포함시키지 않으면 typeCode에 맞는 대분류(cat1),  
-> cat1만 파라미터에 포함시키면 typeCode에 맞는 중분류(cat2),  
-> cat1과 cat2를 파라미터에 포함시키면 소분류(cat3)를 반환합니다.
-
-#### 요청 코드 1
-```javascript
-axios
-    .get(`${API_BASE_URL}/map/category?typeCode=1`)
-```
-#### 응답 바디 1
-```json
-[
-  {
-    "code": "A01",
-    "name": "자연"
-  },
-  {
-    "code": "A02",
-    "name": "인문(문화/예술/역사)"
-  }
-]
-```
-
-#### 요청 코드 2
-```javascript
-axios
-    .get(`${API_BASE_URL}/map/category?typeCode=1&cat1=A05&cat2=A0502`)
-```
-#### 응답 바디 2
-```json
-[
-  {
-    "code": "A05020100",
-    "name": "한식"
-  },
-  {
-    "code": "A05020200",
-    "name": "서양식"
-  },
-  {
-    "code": "A05020300",
-    "name": "일식"
-  },
-  {
-    "code": "A05020400",
-    "name": "중식"
-  },
-  {
-    "code": "A05020700",
-    "name": "이색음식점"
-  },
-  {
-    "code": "A05020900",
-    "name": "카페/전통찻집"
-  },
-  {
-    "code": "A05021000",
-    "name": "클럽"
-  }
-]
-```
-</details>
-
----
-
-<details>
-<summary>지도 출력</summary>
+<summary>지도 출력 ✏️</summary>
 
 **GET** `/map`
 
 > 사용자가 선택한 방법으로 주변의 장소를 조회합니다.  
-> 파라미터 종류는 다음과 같습니다.  
+> 쿼리 파라미터 종류는 다음과 같습니다.  
 
-| 파라미터        | 설명                                                  | 값 예시                                                                                        |
-|-------------|-----------------------------------------------------|---------------------------------------------------------------------------------------------|
-| search      | 장소 선택 방법                                            | area(지역구), location(위치), address(주소), middle-point(2)(중간지점)                                 |
-| sort        | 정렬 방법                                               | title_asc(가나다순 오름차순 정렬), rating_asc(평점순 오름차순 정렬), user_ratings_total_dsc(총 평점 개수 내림차순 정렬) 등 |
-| sigunguCode | 시군구 코드(search=area일 때만 필요)                          | 1(강남구), 2(강동구) 등                                                                            |
-| latitude    | 위도(search=location일 때만 필요)                          | 37.6092635094031                                                                            |
-| longitude   | 경도(search=location일 때만 필요)                          | 127.06471287129368                                                                          |
-| address     | 주소(search=address, middle-point(2)일 때만 필요, 여러 개 가능) | 서울특별시 관악구 보라매로 62, 서울특별시 동대문구 답십리로56길 105 등                                                 |
-| typeCode    | 타입 종류(필수X)                                          | 1(관광지), 2(문화시설), 3(행사/공연/축제), 4(레포츠), 5(쇼핑), 6(음식점)                                         |
-| cat1        | 대분류(필수X)                                            | A05(음식)                                                                                     |
-| cat2        | 중분류(필수X)                                            | A0502(음식점)                                                                                  |
-| cat3        | 소분류(필수X)                                            | A05020900(카페/전통찻집)                                                                          |
+| 파라미터      | 설명                                                     | 값 예시                                                                                        |
+|-----------|--------------------------------------------------------|---------------------------------------------------------------------------------------------|
+| search    | 장소 선택 방법                                               | location(위치), destination(도착지), middle-point(중간지점)                                          |
+| sort      | 정렬 방법                                                  | title_asc(가나다순 오름차순 정렬), rating_asc(평점순 오름차순 정렬), user_ratings_total_dsc(총 평점 개수 내림차순 정렬) 등 |
+| latitude  | 위도(search=location일 때만 필요)                             | 37.6092635094031                                                                            |
+| longitude | 경도(search=location일 때만 필요)                             | 127.06471287129368                                                                          |
+| name      | 장소 이름(search=destination이면 1개, middle-point이면 여러 개 필요) | 시청역, 올림픽공원 등                                                                                |
+| category  | 카테고리(필수X)                                              | 아래 참조                                                                                       |
 
-### 1. 지역구를 기반으로 조회할 경우
-#### 요청 코드
-```javascript
-axios
-    .get(`${API_BASE_URL}/map?search=area&sort=rating_dsc&sigunguCode=${sigunguCode}&theme=${theme}`)
-```
+> 카테고리 종류는 다음과 같습니다.
 
-#### 응답 바디
-```json
-[
-  {
-    "addr": "서울특별시 강남구 압구정로42길 25-10 1~2층",
-    "areaCode": "1",
-    "sigunguCode": "1",
-    "contentId": "2867691",
-    "typeCode": "6",
-    "cat1": "A05",
-    "cat2": "A0502",
-    "cat3": "A05020100",
-    "firstImage": "http://tong.visitkorea.or.kr/cms/resource/81/2867681_image2_1.jpg",
-    "firstImage2": "http://tong.visitkorea.or.kr/cms/resource/81/2867681_image3_1.jpg",
-    "mapX": "127.0358085855",
-    "mapY": "37.5270487520",
-    "title": "우텐더",
-    "rating": "4.5",
-    "userRatingsTotal": "313"
-  },
-  {
-    "addr": "서울특별시 강남구 도산대로45길 15 (신사동) 지하 1층",
-    "areaCode": "1",
-    "sigunguCode": "1",
-    "contentId": "2870076",
-    "typeCode": "6",
-    "cat1": "A05",
-    "cat2": "A0502",
-    "cat3": "A05020200",
-    "firstImage": "http://tong.visitkorea.or.kr/cms/resource/62/3096562_image2_1.jpg",
-    "firstImage2": "http://tong.visitkorea.or.kr/cms/resource/62/3096562_image3_1.jpg",
-    "mapX": "127.0351337538",
-    "mapY": "37.5232825107",
-    "title": "파시0914",
-    "rating": "4.4",
-    "userRatingsTotal": "75"
-  }
-]
-```
+| 카테고리 코드                   | 설명    | 부모 카테고리  |
+|---------------------------|-------|----------|
+| tour                      | 관광지   | X        |
+| tour-nature               | 자연    | tour     |
+| tour-tradition            | 역사    | tour     |
+| tour-park                 | 공원    | tour     |
+| tour-theme-park           | 테마파크  | tour     |
+| food                      | 음식점   | X        |
+| food-korean               | 한식    | food     |
+| food-western              | 양식    | food     |
+| food-japanese             | 일식    | food     |
+| food-chinese              | 중식    | food     |
+| food-other                | 기타    | food     |
+| cafe                      | 카페    | X        |
+| convenience-store         | 편의점   | X        |
+| shopping                  | 쇼핑    | X        |
+| shopping-permanent-market | 상설시장  | shopping |
+| shopping-department-store | 백화점   | shopping |
+| culture                   | 문화시설  | X        |
+| event                     | 공연/행사 | X        |
+| other                     | 기타    | X        |
 
-### 2. 현재 위치를 기반으로 조회할 경우
+
+### 1. 현재 위치를 기반으로 조회할 경우
 #### 요청 코드
 ```javascript
 axios
@@ -253,160 +70,131 @@ axios
 ```json
 [
   {
-    "addr": "중랑구 상봉로 131",
-    "areaCode": "1",
-    "sigunguCode": "25",
-    "contentId": "google_ChIJrU-lPSy7fDUR6SoM24EYR40",
-    "typeCode": "2",
-    "cat1": "A02",
-    "cat2": "A0202",
-    "cat3": "A02020200",
-    "firstImage": "https://lh3.googleusercontent.com/place-photos/AJnk2cwNU6qD0ikELv-0pzImIJMdDbfqjoc3iJuE4khvF6id9rw6PthEm8peVnwCzXjbdmIFUpU0XqYCa2_um7tE6WYRVgLa7c6Ry1lAjzhYbwuSgwQKt1QJ48Xyrqya7dNNLcEj6sD4D1_5kI8h=s1600-w800",
-    "firstImage2": "https://lh3.googleusercontent.com/place-photos/AJnk2cwNU6qD0ikELv-0pzImIJMdDbfqjoc3iJuE4khvF6id9rw6PthEm8peVnwCzXjbdmIFUpU0XqYCa2_um7tE6WYRVgLa7c6Ry1lAjzhYbwuSgwQKt1QJ48Xyrqya7dNNLcEj6sD4D1_5kI8h=s1600-w200",
-    "mapX": "127.0923835",
-    "mapY": "37.5977689",
-    "title": "CGV 상봉",
-    "rating": "4.1",
-    "userRatingsTotal": "2488"
+    "address": "서울특별시 중구 남대문로 52-5 (명동2가) ",
+    "sigunguCode": "24",
+    "contentId": "134746",
+    "category": "food-chinese",
+    "firstImage": "http://tong.visitkorea.or.kr/cms/resource/96/3474896_image2_1.jpg",
+    "firstImage2": "http://tong.visitkorea.or.kr/cms/resource/96/3474896_image3_1.jpg",
+    "latitude": "37.5621214856",
+    "longitude": "126.9818402861",
+    "name": "개화",
+    "rating": "3.9",
+    "userRatingsTotal": "867"
   },
   {
-    "addr": "서울특별시 강북구 월계로 173 (번동) 북서울꿈의숲",
-    "areaCode": "1",
-    "sigunguCode": "3",
-    "contentId": "3114696",
-    "typeCode": "3",
-    "cat1": "A02",
-    "cat2": "A0207",
-    "cat3": "A02070200",
-    "firstImage": "http://tong.visitkorea.or.kr/cms/resource/55/3487455_image2_1.jpg",
-    "firstImage2": "http://tong.visitkorea.or.kr/cms/resource/55/3487455_image3_1.jpg",
-    "mapX": "127.0445440464",
-    "mapY": "37.6197242510",
-    "title": "강북구 어린이날 대축제",
-    "rating": "5.0",
-    "userRatingsTotal": "2"
+    "address": "서울특별시 중구 무교로 24 (무교동) 2층",
+    "sigunguCode": "24",
+    "contentId": "133276",
+    "category": "food-korean",
+    "firstImage": "http://tong.visitkorea.or.kr/cms/resource/18/3474918_image2_1.jpg",
+    "firstImage2": "http://tong.visitkorea.or.kr/cms/resource/18/3474918_image3_1.jpg",
+    "latitude": "37.5681540761",
+    "longitude": "126.9794958849",
+    "name": "곰국시집",
+    "rating": "4.1",
+    "userRatingsTotal": "849"
   }
 ]
 ```
 
-### 3. 특정 주소를 기반으로 조회할 경우
+### 3. 도착지를 기반으로 조회할 경우
 #### 요청 코드
 ```javascript
 axios
-    .get(`${API_BASE_URL}/map?search=address&sort=user_ratings_total_dsc&address=${address}`)
+    .get(`${API_BASE_URL}/map?search=destination&sort=user_ratings_total_dsc&name=${placeName}`)
 ```
 
 #### 응답 바디
 ```json
 [
   {
-    "addr": "서울특별시 동작구 장승배기로 94 (노량진동)",
-    "areaCode": "1",
-    "sigunguCode": "12",
-    "contentId": "130770",
-    "typeCode": "2",
-    "cat1": "A02",
-    "cat2": "A0206",
-    "cat3": "A02060900",
-    "firstImage": "http://tong.visitkorea.or.kr/cms/resource/53/3488953_image2_1.jpg",
-    "firstImage2": "http://tong.visitkorea.or.kr/cms/resource/53/3488953_image3_1.jpg",
-    "mapX": "126.9405206377",
-    "mapY": "37.5059328296",
-    "title": "서울특별시교육청 동작도서관",
-    "rating": "4.4",
-    "userRatingsTotal": "114"
+    "address": "서울특별시 종로구 인사동10길 11-4 ",
+    "sigunguCode": "23",
+    "contentId": "1945693",
+    "category": "cafe",
+    "firstImage": "http://tong.visitkorea.or.kr/cms/resource/52/3474852_image2_1.jpg",
+    "firstImage2": "http://tong.visitkorea.or.kr/cms/resource/52/3474852_image3_1.jpg",
+    "latitude": "37.5745839959",
+    "longitude": "126.9857145803",
+    "name": "전통다원",
+    "rating": "4.3",
+    "userRatingsTotal": "454"
   },
   {
-    "addr": "서울특별시 영등포구 신길로 275 (영등포동)",
-    "areaCode": "1",
-    "sigunguCode": "20",
-    "contentId": "1603237",
-    "typeCode": "1",
-    "cat1": "A02",
-    "cat2": "A0202",
-    "cat3": "A02020700",
-    "firstImage": "http://tong.visitkorea.or.kr/cms/resource/51/1567951_image2_1.jpg",
-    "firstImage2": "http://tong.visitkorea.or.kr/cms/resource/51/1567951_image3_1.jpg",
-    "mapX": "126.9108425219",
-    "mapY": "37.5153173200",
-    "title": "영등포근린공원",
-    "rating": "4.3",
-    "userRatingsTotal": "10"
+    "address": "서울특별시 종로구 사직로9길 22 (필운동) ",
+    "sigunguCode": "23",
+    "contentId": "2783352",
+    "category": "cafe",
+    "firstImage": "http://tong.visitkorea.or.kr/cms/resource/84/2790084_image2_1.jpg",
+    "firstImage2": "http://tong.visitkorea.or.kr/cms/resource/84/2790084_image3_1.jpg",
+    "latitude": "37.5774250096",
+    "longitude": "126.9677078075",
+    "name": "스태픽스",
+    "rating": "4.2",
+    "userRatingsTotal": "412"
   }
 ]
 ```
 
-### 4. 중간 위치를 기반으로 조회할 경우(좌표 평균 알고리즘 / 그라함 스캔(Graham Scan)과 무게 중심 알고리즘)
-#### 요청 코드(좌표 평균 알고리즘)
+### 4. 중간 위치를 기반으로 조회할 경우
+#### 요청 코드
 ```javascript
 axios
-    .get(`${API_BASE_URL}/map?search=middle-point&sort=rating_dsc&address=${address1}&address=${address2}&address=${address3}`)
+    .get(`${API_BASE_URL}/map?search=middle-point&sort=rating_dsc&name=${placeName1}&name=${placeName2}&name=${placeName3}`)
 ```
-#### 요청 코드(그라함 스캔(Graham Scan)과 무게 중심 알고리즘)
-```javascript
-axios
-    .get(`${API_BASE_URL}/map?search=middle-point2&sort=rating_dsc&address=${address1}&address=${address2}&address=${address3}`)
-```
-※address 파라미터는 여러 개 가능합니다.
+※name 파라미터는 여러 개 가능합니다.
 
 #### 응답 바디
 ```json
 {
-  "addresses": [
-    "서울 동작구 보라매로5길 28",
-    "서울특별시 은평구 통일로 684",
-    "서울특별시 송파구 올림픽로 424"
+  "names": [
+    "동작구민회관",
+    "녹번동근린공원",
+    "올림픽공원"
   ],
   "coordinates": [
     {
-      "x": "126.922659687269",
-      "y": "37.4938817761934"
+      "x": "126.922743463895",
+      "y": "37.4938972382326"
     },
     {
-      "x": "126.934953878791",
-      "y": "37.6094070491111"
+      "x": "126.93185185285346",
+      "y": "37.60353994592752"
     },
     {
-      "x": "127.115517876627",
-      "y": "37.5203396980951"
+      "x": "127.120812783275",
+      "y": "37.5205340628851"
     }
   ],
-  "middleX": "126.99104381422902",
-  "middleY": "37.54120950779987",
+  "middleX": "126.99180270000781",
+  "middleY": "37.53932374901508",
   "list": [
     {
-      "addr": "서울특별시 중구 회현동1가 100-115",
-      "areaCode": "1",
+      "address": "서울특별시 중구 명동8나길 28 (충무로1가) ",
       "sigunguCode": "24",
-      "contentId": "129418",
-      "typeCode": "1",
-      "cat1": "A02",
-      "cat2": "A0205",
-      "cat3": "A02050400",
-      "firstImage": "http://tong.visitkorea.or.kr/cms/resource/66/2947266_image2_1.jpg",
-      "firstImage2": "http://tong.visitkorea.or.kr/cms/resource/66/2947266_image3_1.jpg",
-      "mapX": "126.9798156648",
-      "mapY": "37.5552528034",
-      "title": "백범 김구 선생 동상",
-      "rating": "4.9",
-      "userRatingsTotal": "11"
+      "contentId": "1489369",
+      "category": "food-korean",
+      "firstImage": "http://tong.visitkorea.or.kr/cms/resource/38/3474938_image2_1.jpg",
+      "firstImage2": "http://tong.visitkorea.or.kr/cms/resource/38/3474938_image3_1.jpg",
+      "latitude": "37.5614854780",
+      "longitude": "126.9834734887",
+      "name": "오다리집",
+      "rating": "4.7",
+      "userRatingsTotal": "3915"
     },
     {
-      "addr": "서울특별시 중구 다산로 101-3 (신당동) ",
-      "areaCode": "1",
+      "address": "서울특별시 중구 세종대로 76 ",
       "sigunguCode": "24",
-      "contentId": "3463600",
-      "typeCode": "1",
-      "cat1": "A02",
-      "cat2": "A0203",
-      "cat3": "A02030400",
-      "firstImage": "http://tong.visitkorea.or.kr/cms/resource/64/3463464_image2_1.jpg",
-      "firstImage2": "http://tong.visitkorea.or.kr/cms/resource/64/3463464_image3_1.jpg",
-      "mapX": "127.0092047089",
-      "mapY": "37.5533202222",
-      "title": "춘풍양조장",
-      "rating": "4.9",
-      "userRatingsTotal": "33"
+      "contentId": "398344",
+      "category": "food-korean",
+      "firstImage": "http://tong.visitkorea.or.kr/cms/resource/75/1290675_image2_1.jpg",
+      "firstImage2": "http://tong.visitkorea.or.kr/cms/resource/75/1290675_image3_1.jpg",
+      "latitude": "37.5629101933",
+      "longitude": "126.9768490516",
+      "name": "현대칼국수",
+      "rating": "4.4",
+      "userRatingsTotal": "337"
     }
   ]
 }
@@ -420,7 +208,8 @@ axios
 
 **GET** `/map/detail`
 
-> 특정한 장소의 세부 정보를 출력합니다.
+> 특정한 장소의 세부 정보를 출력합니다.  
+> 현재 구글 지도로 검색한 지역은 출력이 되지 않습니다.
 
 #### 요청 코드
 ```javascript

@@ -1,7 +1,6 @@
 package com.capstone.meetingmap.map.dto;
 
 import com.capstone.meetingmap.map.dto.tourapi.CodeItem;
-import com.capstone.meetingmap.map.entity.ContentType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,13 +19,6 @@ public class CodeResponseDto {
         return CodeResponseDto.builder()
                 .code(item.getCode())
                 .name(item.getName())
-                .build();
-    }
-
-    public static CodeResponseDto fromContentType(ContentType contentType) {
-        return CodeResponseDto.builder()
-                .code(String.valueOf(contentType.getContentTypeNo()))
-                .name(contentType.getContentTypeName())
                 .build();
     }
 }

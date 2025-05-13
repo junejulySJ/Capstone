@@ -1,10 +1,12 @@
 package com.capstone.meetingmap.map.service;
 
 import com.capstone.meetingmap.GoogleApiProperties;
-import com.capstone.meetingmap.map.dto.*;
+import com.capstone.meetingmap.map.dto.PlaceResponseDto;
+import com.capstone.meetingmap.map.dto.RatingResponse;
+import com.capstone.meetingmap.map.dto.TourApiPlaceResponse;
 import com.capstone.meetingmap.map.dto.googleapi.GoogleApiResponse;
 import com.capstone.meetingmap.map.dto.googleapi.GooglePlaceResult;
-import com.capstone.meetingmap.map.mapper.ContentTypeMapper;
+import com.capstone.meetingmap.map.repository.PlaceCategoryDetailRepository;
 import com.capstone.meetingmap.util.AddressUtil;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -15,7 +17,7 @@ import reactor.core.publisher.Mono;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -25,8 +27,9 @@ public class GoogleMapService {
     private final WebClient webClient;
     private final GoogleApiProperties googleApiProperties;
     private final TourApiMapService tourApiMapService;
+    private final PlaceCategoryDetailRepository placeCategoryDetailRepository;
 
-    public GoogleMapService(GoogleApiProperties googleApiProperties, TourApiMapService tourApiMapService) {
+    public GoogleMapService(GoogleApiProperties googleApiProperties, TourApiMapService tourApiMapService, PlaceCategoryDetailRepository placeCategoryDetailRepository) {
         this.googleApiProperties = googleApiProperties;
         DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory(googleApiProperties.getBaseUrl());
         factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY);
@@ -36,6 +39,7 @@ public class GoogleMapService {
                 .uriBuilderFactory(factory) // URI 빌더 팩토리 설정
                 .build();
         this.tourApiMapService = tourApiMapService;
+        this.placeCategoryDetailRepository = placeCategoryDetailRepository;
     }
 
     // Google Places API를 webClient로 호출(변경X)
@@ -71,82 +75,16 @@ public class GoogleMapService {
         return RatingResponse.fromGoogleApiResponse(response.getResults().get(0));
     }
 
-    // textsearch API 호출
-    private List<PlaceResponseDto> getPlaceListByTextSearch(String sigunguCode, Map<String, String> placeKeywords, int count) {
-        String sigungu = tourApiMapService.findSigunguNameByCode(sigunguCode);
-        List<PlaceResponseDto> allResults = new ArrayList<>();
-
-        for (Map.Entry<String, String> entry : placeKeywords.entrySet()) {
-            GoogleApiResponse<GooglePlaceResult> response = fetchFromApi(
-                    "/place/textsearch/json",
-                    new ParameterizedTypeReference<>() {},
-                    builder -> builder.queryParam("query", URLEncoder.encode(sigungu + " " + entry.getValue(), StandardCharsets.UTF_8))
-                            .queryParam("language", "ko")
-            );
-
-            if (response == null || response.getResults().isEmpty()) continue;
-
-            List<PlaceResponseDto> filtered = response.getResults()
-                    .stream()
-                    .filter(result -> result.getPhotos() != null && !result.getPhotos().isEmpty() &&
-                            result.getRating() != null && result.getUser_ratings_total() > 0 &&
-                            result.getTypes() != null && result.getTypes().contains(entry.getKey())) // 이미지와 평점이 존재하고 타입이 특정 값인 경우만 가져오기)
-                    .map(result -> PlaceResponseDto.fromGooglePlaceResultTextSearch(
-                            result,
-                            sigunguCode,
-                            ContentTypeMapper.mapTypesToCat(result.getTypes()),
-                            getPlaceImageUrl(result.getPhotos().get(0).getPhoto_reference(), 800),
-                            getPlaceImageUrl(result.getPhotos().get(0).getPhoto_reference(), 200)
-                    ))
-                    .limit(count)
-                    .toList();
-
-            allResults.addAll(filtered);
-        }
-
-        return allResults;
-    }
-
     // nearbysearch api 호출
-    private List<PlaceResponseDto> getPlaceListByNearbySearch(String longitude, String latitude, String cat1, String cat2, String cat3, int count) {
+    private List<PlaceResponseDto> getPlaceListByNearbySearch(String longitude, String latitude, String searchType, int count) {
         GoogleApiResponse<GooglePlaceResult> response = fetchFromApi(
                 "/place/nearbysearch/json",
                 new ParameterizedTypeReference<>() {},
                 builder -> {
                     builder.queryParam("location", latitude + "," + longitude)
                             .queryParam("radius", "3000")
-                            .queryParam("language", "ko");
-
-                    if (cat1 == null || "A02".equals(cat1)) {
-                        // cat1이 "A02"일 경우
-                        if (cat2 == null && cat3 == null) {
-                            builder.queryParam("type", "movie_theater");  // cat2, cat3 모두 null일 경우 영화관
-                        } else if ("A0202".equals(cat2) && cat3 == null) {
-                            builder.queryParam("type", "movie_theater");  // cat2만 "A0202"일 경우 영화관
-                        } else if ("A0202".equals(cat2) && "A02020200".equals(cat3)) {
-                            builder.queryParam("type", "movie_theater");  // cat2가 "A0202", cat3가 "A02020200"일 때경우 영화관
-                        }
-                    }
-                    if (cat1 == null || "A04".equals(cat1)) {
-                        // cat1이 "A04"일 경우
-                        if (cat2 == null && cat3 == null) {
-                            builder.queryParam("type", "convenience_store");  // cat2, cat3 모두 null일 경우 편의점
-                        } else if ("A0401".equals(cat2) && cat3 == null) {
-                            builder.queryParam("type", "convenience_store");  // cat2만 "A0401"일 경우 편의점
-                        } else if ("A0401".equals(cat2) && "A040101000".equals(cat3)) {
-                            builder.queryParam("type", "convenience_store");  // cat2가 "A0401", cat3가 "A040101000"일 경우 편의점
-                        }
-                    }
-                    if (cat1 == null || "A05".equals(cat1)) {
-                        // cat1이 "A05"일 경우
-                        if (cat2 == null && cat3 == null) {
-                            builder.queryParam("type", "cafe");  // cat2, cat3 모두 null일 경우 카페
-                        } else if ("A0502".equals(cat2) && cat3 == null) {
-                            builder.queryParam("type", "cafe");  // cat2만 "A0502"일 경우 카페
-                        } else if ("A0502".equals(cat2) && "A050200900".equals(cat3)) {
-                            builder.queryParam("type", "cafe");  // cat2가 "A0502", cat3가 "A050200900"일 경우 카페
-                        }
-                    }
+                            .queryParam("language", "ko")
+                            .queryParam("type", searchType);
                 }
         );
 
@@ -161,7 +99,8 @@ public class GoogleMapService {
                 .map(result -> PlaceResponseDto.fromGooglePlaceResultNearBySearch(
                         result,
                         tourApiMapService.findSigunguCodeByName(AddressUtil.extractGu(result.getVicinity())),
-                        ContentTypeMapper.mapTypesToCat(result.getTypes()),
+                        placeCategoryDetailRepository.findBySearchType(searchType)
+                                        .orElseThrow(),
                         getPlaceImageUrl(result.getPhotos().get(0).getPhoto_reference(), 800),
                         getPlaceImageUrl(result.getPhotos().get(0).getPhoto_reference(), 200)
                 ))
@@ -178,10 +117,7 @@ public class GoogleMapService {
                             .address(place.getAddress())
                             .sigunguCode(place.getSigunguCode())
                             .contentId(place.getContentId())
-                            .typeCode(place.getTypeCode())
-                            .cat1(place.getCat1())
-                            .cat2(place.getCat2())
-                            .cat3(place.getCat3())
+                            .category(place.getCategory())
                             .firstImage(place.getFirstImage())
                             .firstImage2(place.getFirstImage2())
                             .latitude(place.getLatitude())
@@ -195,7 +131,7 @@ public class GoogleMapService {
     }
 
     // 지역구 기반 추가 검색
-    public List<PlaceResponseDto> getPlaceListByArea(String sigunguCode, String cat1, String cat2, String cat3, int count) {
+    /*public List<PlaceResponseDto> getPlaceListByArea(String sigunguCode, String searchType, int count) {
 
         Map<String, String> placeKeywords = new HashMap<>();
 
@@ -229,11 +165,11 @@ public class GoogleMapService {
         }
 
         return getPlaceListByTextSearch(sigunguCode, placeKeywords, count);
-    }
+    }*/
 
     // 위치 기반 추가 검색
-    public List<PlaceResponseDto> getPlaceListByLocation(String longitude, String latitude, String cat1, String cat2, String cat3, int count) {
-        return getPlaceListByNearbySearch(longitude, latitude, cat1, cat2, cat3, count);
+    public List<PlaceResponseDto> getPlaceListByLocation(String longitude, String latitude, String searchType, int count) {
+        return getPlaceListByNearbySearch(longitude, latitude, searchType, count);
     }
 
     //구글 지도로 검색한 장소 이미지 주소 제공

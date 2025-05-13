@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class SelectedPlace {
     private String contentId;
     private String address;
-    private String title;
+    private String name;
     private String latitude;
     private String longitude;
     private String cat3;

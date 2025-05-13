@@ -3,7 +3,7 @@ package com.capstone.meetingmap.map.service;
 import com.capstone.meetingmap.TourApiProperties;
 import com.capstone.meetingmap.map.dto.CodeResponseDto;
 import com.capstone.meetingmap.map.dto.DetailCommonResponseDto;
-import com.capstone.meetingmap.map.dto.PlaceResponse;
+import com.capstone.meetingmap.map.dto.TourApiPlaceResponse;
 import com.capstone.meetingmap.map.dto.tourapi.AreaBasedListItem;
 import com.capstone.meetingmap.map.dto.tourapi.CommonTourApiResponse;
 import com.capstone.meetingmap.map.dto.tourapi.DetailCommonItem;
@@ -96,8 +96,8 @@ public class TourApiMapService {
     }
 
     // webClient로 호출한 response 검증 및 dto로 매핑(변경X)
-    private static <T> List<PlaceResponse> getResultDtoList(
-            Function<T, PlaceResponse> mapper,
+    private static <T> List<TourApiPlaceResponse> getResultDtoList(
+            Function<T, TourApiPlaceResponse> mapper,
             CommonTourApiResponse<T> response,
             String cat1, String cat2, String cat3
     ) {
@@ -110,15 +110,15 @@ public class TourApiMapService {
         return response.getResponse().getBody().getItems().getItem()
                 .stream()
                 .map(mapper)
-                .filter(placeResponse -> {       // 필터링 조건 추가
+                .filter(tourApiPlaceResponse -> {       // 필터링 조건 추가
                     // cat1, cat2, cat3이 null이 아니고 해당 조건을 만족하는지 체크
-                    if (cat1 != null && !cat1.equals(placeResponse.getCat1())) {
+                    if (cat1 != null && !cat1.equals(tourApiPlaceResponse.getCat1())) {
                         return false; // cat1이 일치하지 않으면 필터링
                     }
-                    if (cat2 != null && !cat2.equals(placeResponse.getCat2())) {
+                    if (cat2 != null && !cat2.equals(tourApiPlaceResponse.getCat2())) {
                         return false; // cat2가 일치하지 않으면 필터링
                     }
-                    if (cat3 != null && !cat3.equals(placeResponse.getCat3())) {
+                    if (cat3 != null && !cat3.equals(tourApiPlaceResponse.getCat3())) {
                         return false; // cat3이 일치하지 않으면 필터링
                     }
                     return true; // 조건을 만족하면 true
@@ -172,7 +172,7 @@ public class TourApiMapService {
     }
 
     //장소 정보를 fetchFromApi로 검색(변경X)
-    private <T> List<PlaceResponse> searchPlaces(
+    private <T> List<TourApiPlaceResponse> searchPlaces(
             String path,
             String areaCode,
             String sigunguCode,
@@ -182,7 +182,7 @@ public class TourApiMapService {
             String contentTypeId,
             int count,
             ParameterizedTypeReference<CommonTourApiResponse<T>> responseType,
-            Function<T, PlaceResponse> mapper,
+            Function<T, TourApiPlaceResponse> mapper,
             String cat1,
             String cat2,
             String cat3
@@ -301,12 +301,12 @@ public class TourApiMapService {
     }
 
     //지역/좌표(중간위치 포함)/도착지별 장소 조회
-    public List<PlaceResponse> getPlaceList(String sigunguCode, String x, String y, String contentTypeId, int count, String cat1, String cat2, String cat3) {
+    public List<TourApiPlaceResponse> getPlaceList(String sigunguCode, String x, String y, String contentTypeId, int count, String cat1, String cat2, String cat3) {
         //지역 기반 장소 조회
         if (sigunguCode != null && !sigunguCode.isEmpty()) {
-            List<PlaceResponse> places = searchPlaces("/areaBasedList1", "1", sigunguCode, null, null, null, contentTypeId, count,
+            List<TourApiPlaceResponse> places = searchPlaces("/areaBasedList1", "1", sigunguCode, null, null, null, contentTypeId, count,
                     new ParameterizedTypeReference<CommonTourApiResponse<AreaBasedListItem>>() {},
-                    item -> PlaceResponse.fromAreaBasedListItem(
+                    item -> TourApiPlaceResponse.fromAreaBasedListItem(
                             item,
                             contentTypeRepository.findByContentTypeId(item.getContenttypeid()) //contentTypeId가 null일때 전체 검색을 할 때 검색되는 content_type 테이블에 없는 contentTypeId는 제거를 위해 0으로 변환
                                     .orElse(new ContentType(0, item.getContenttypeid(), "미분류"))
@@ -315,9 +315,9 @@ public class TourApiMapService {
                     .filter(place -> !place.getTypeCode().equals("0")) //contentTypeId가 0일때 제거
                     .collect(Collectors.toList());
         } else { //좌표 기반 장소 조회(3km 반경)
-            List<PlaceResponse> places = searchPlaces("/locationBasedList1", null, null, x, y, "3000", contentTypeId, count,
+            List<TourApiPlaceResponse> places = searchPlaces("/locationBasedList1", null, null, x, y, "3000", contentTypeId, count,
                     new ParameterizedTypeReference<CommonTourApiResponse<LocationBasedListItem>>() {},
-                    item -> PlaceResponse.fromLocationBasedListItem(
+                    item -> TourApiPlaceResponse.fromLocationBasedListItem(
                             item,
                             contentTypeRepository.findByContentTypeId(item.getContenttypeid()) //contentTypeId가 null일때 전체 검색을 할 때 검색되는 content_type 테이블에 없는 contentTypeId는 제거를 위해 0으로 변환
                                     .orElse(new ContentType(0, item.getContenttypeid(), "미분류"))

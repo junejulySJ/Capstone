@@ -1,8 +1,12 @@
 package com.capstone.meetingmap.api.kakao.service;
 
 import com.capstone.meetingmap.api.kakao.dto.AddressFromKeywordResponse;
+import org.locationtech.jts.geom.Coordinate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class KakaoApiService {
@@ -22,5 +26,16 @@ public class KakaoApiService {
                         .build())
                 .retrieve()
                 .body(AddressFromKeywordResponse.class);
+    }
+
+    // search=middle-point에 대한 알고리즘을 사용하기 위한 변환
+    public List<Coordinate> getCoordList(List<String> names) {
+        List<Coordinate> coordList = new ArrayList<>();
+        // 각 주소에 대해 좌표 검색 후 리스트에 저장
+        for (String name : names) {
+            AddressFromKeywordResponse response = getAddressFromKeyword(name);
+            coordList.add(new Coordinate(Double.parseDouble(response.getDocuments().get(0).getX()), Double.parseDouble(response.getDocuments().get(0).getY())));
+        }
+        return coordList;
     }
 }

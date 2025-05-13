@@ -12,9 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class PlaceResponse {
-    private String addr;
-    private String areaCode;
+public class TourApiPlaceResponse {
+    private String address;
     private String sigunguCode;
     private String contentId;
     private String typeCode;
@@ -23,14 +22,13 @@ public class PlaceResponse {
     private String cat3;
     private String firstImage;
     private String firstImage2;
-    private String mapX;
-    private String mapY;
-    private String title;
+    private String latitude;
+    private String longitude;
+    private String name;
 
-    public static PlaceResponse fromAreaBasedListItem(AreaBasedListItem item, ContentType contentType) {
-        return PlaceResponse.builder()
-                .addr((item.getAddr1() == null ? "" : item.getAddr1()) + " " + (item.getAddr2() == null ? "" : item.getAddr2()).trim())
-                .areaCode(item.getAreacode())
+    public static TourApiPlaceResponse fromAreaBasedListItem(AreaBasedListItem item, ContentType contentType) {
+        return TourApiPlaceResponse.builder()
+                .address((item.getAddr1() == null ? "" : item.getAddr1()) + " " + (item.getAddr2() == null ? "" : item.getAddr2()).trim())
                 .sigunguCode(item.getSigungucode())
                 .contentId(item.getContentid())
                 .typeCode(String.valueOf(contentType.getContentTypeNo()))
@@ -39,16 +37,15 @@ public class PlaceResponse {
                 .cat3(item.getCat3())
                 .firstImage(item.getFirstimage())
                 .firstImage2(item.getFirstimage2())
-                .mapX(item.getMapx())
-                .mapY(item.getMapy())
-                .title(item.getTitle())
+                .latitude(item.getMapy())
+                .longitude(item.getMapx())
+                .name(item.getTitle())
                 .build();
     }
 
-    public static PlaceResponse fromLocationBasedListItem(LocationBasedListItem item, ContentType contentType) {
-        return PlaceResponse.builder()
-                .addr((item.getAddr1() == null ? "" : item.getAddr1()) + " " + (item.getAddr2() == null ? "" : item.getAddr2()).trim())
-                .areaCode(item.getAreacode())
+    public static TourApiPlaceResponse fromLocationBasedListItem(LocationBasedListItem item, ContentType contentType) {
+        return TourApiPlaceResponse.builder()
+                .address((item.getAddr1() == null ? "" : item.getAddr1()) + " " + (item.getAddr2() == null ? "" : item.getAddr2()).trim())
                 .sigunguCode(item.getSigungucode())
                 .contentId(item.getContentid())
                 .typeCode(String.valueOf(contentType.getContentTypeNo()))
@@ -57,9 +54,9 @@ public class PlaceResponse {
                 .cat3(item.getCat3())
                 .firstImage(item.getFirstimage())
                 .firstImage2(item.getFirstimage2())
-                .mapX(item.getMapx())
-                .mapY(item.getMapy())
-                .title(item.getTitle())
+                .latitude(item.getMapy())
+                .longitude(item.getMapx())
+                .name(item.getTitle())
                 .build();
     }
 }

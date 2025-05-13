@@ -264,9 +264,18 @@ public class ScheduleService {
                     cat1 = "A02";
                     cat2 = "A0201";
                 }
-                case "food" -> typeCode = "6";
-                case "shopping" -> typeCode = "5";
-                case "activity" -> typeCode = "4";
+                case "food" -> {
+                    typeCode = "6";
+                    cat1 = "A05";
+                }
+                case "shopping" -> {
+                    typeCode = "5";
+                    cat1 = "A04";
+                }
+                case "activity" -> {
+                    typeCode = "4";
+                    cat1 = "A03";
+                }
                 case "date" -> {
                     typeCode = "1";
                     cat1 = "A02";
@@ -314,7 +323,7 @@ public class ScheduleService {
 
         //detail dto에 반영
         detailCreateDtoList.add(ScheduleDetailCreateDto.builder()
-                .scheduleContent(currentPlace.getTitle() + " 방문")
+                .scheduleContent(currentPlace.getName() + " 방문")
                 .scheduleAddress(currentPlace.getAddress())
                 .latitude(new BigDecimal(currentPlace.getLatitude()))
                 .longitude(new BigDecimal(currentPlace.getLongitude()))
@@ -328,33 +337,42 @@ public class ScheduleService {
 
         while (true) {
 
-            // 음식점 필터: 점심 or 저녁시간이면 음식점 우선
-            boolean isLunchTime = currentTime.toLocalTime().isAfter(LocalTime.of(11, 30)) &&
-                    currentTime.toLocalTime().isBefore(LocalTime.of(13, 30));
-            boolean isDinnerTime = currentTime.toLocalTime().isAfter(LocalTime.of(17, 30)) &&
-                    currentTime.toLocalTime().isBefore(LocalTime.of(19, 30));
-
             // 방문해야 할 장소
             List<SelectedPlace> candidates = new ArrayList<>();
 
-            for (SelectedPlace place : dto.getSelectedPlace()) {
-                if (visited.contains(place)) { // 이미 방문한 장소면 continue
-                    continue;
+            if (dto.getTheme().equals("food")) {
+                for (SelectedPlace place : dto.getSelectedPlace()) {
+                    if (visited.contains(place)) { // 이미 방문한 장소면 continue
+                        continue;
+                    }
+                    candidates.add(place);
                 }
+            } else {
+                // 음식점 필터: 점심 or 저녁시간이면 음식점 우선
+                boolean isLunchTime = currentTime.toLocalTime().isAfter(LocalTime.of(11, 30)) &&
+                        currentTime.toLocalTime().isBefore(LocalTime.of(13, 30));
+                boolean isDinnerTime = currentTime.toLocalTime().isAfter(LocalTime.of(17, 30)) &&
+                        currentTime.toLocalTime().isBefore(LocalTime.of(19, 30));
 
-                if (isLunchTime && !hadLunch) { // 점심시간이면 음식점 추가
-                    if (List.of("A05020100", "A05020200", "A05020300", "A05020400", "A05020700").contains(place.getCat3())) {
-                        candidates.add(place);
-                        hadLunch = true;
+                for (SelectedPlace place : dto.getSelectedPlace()) {
+                    if (visited.contains(place)) { // 이미 방문한 장소면 continue
+                        continue;
                     }
-                } else if (isDinnerTime && !hadDinner) { // 저녁시간이면 음식점 추가
-                    if (List.of("A05020100", "A05020200", "A05020300", "A05020400", "A05020700").contains(place.getCat3())) {
-                        candidates.add(place);
-                        hadDinner = true;
-                    }
-                } else { // 그 외 시간이면 음식점을 제외하고 추가
-                    if (!List.of("A05020100", "A05020200", "A05020300", "A05020400", "A05020700").contains(place.getCat3())) {
-                        candidates.add(place);
+
+                    if (isLunchTime && !hadLunch) { // 점심시간이면 음식점 추가
+                        if (List.of("A05020100", "A05020200", "A05020300", "A05020400", "A05020700").contains(place.getCat3())) {
+                            candidates.add(place);
+                            hadLunch = true;
+                        }
+                    } else if (isDinnerTime && !hadDinner) { // 저녁시간이면 음식점 추가
+                        if (List.of("A05020100", "A05020200", "A05020300", "A05020400", "A05020700").contains(place.getCat3())) {
+                            candidates.add(place);
+                            hadDinner = true;
+                        }
+                    } else { // 그 외 시간이면 음식점을 제외하고 추가
+                        if (!List.of("A05020100", "A05020200", "A05020300", "A05020400", "A05020700").contains(place.getCat3())) {
+                            candidates.add(place);
+                        }
                     }
                 }
             }
@@ -415,7 +433,7 @@ public class ScheduleService {
 
             //detail dto에 반영
             detailCreateDtoList.add(ScheduleDetailCreateDto.builder()
-                    .scheduleContent(currentPlace.getTitle() + " 방문")
+                    .scheduleContent(currentPlace.getName() + " 방문")
                     .scheduleAddress(currentPlace.getAddress())
                     .latitude(new BigDecimal(currentPlace.getLatitude()))
                     .longitude(new BigDecimal(currentPlace.getLongitude()))

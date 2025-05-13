@@ -170,13 +170,12 @@ public class GoogleMapService {
     }
 
     // tourAPI 결과에 rating, user_ratings_total 붙여서 반환
-    public List<PlaceResponseDto> getPlaceListWithRating(List<PlaceResponse> tourApiPlaceList) {
+    public List<PlaceResponseDto> getPlaceListWithRating(List<TourApiPlaceResponse> tourApiPlaceList) {
         return tourApiPlaceList.stream()
                 .map(place -> {
-                    RatingResponse ratingResponse = searchPlace(place.getTitle());
+                    RatingResponse ratingResponse = searchPlace(place.getName());
                     return PlaceResponseDto.builder()
-                            .addr(place.getAddr())
-                            .areaCode(place.getAreaCode())
+                            .address(place.getAddress())
                             .sigunguCode(place.getSigunguCode())
                             .contentId(place.getContentId())
                             .typeCode(place.getTypeCode())
@@ -185,9 +184,9 @@ public class GoogleMapService {
                             .cat3(place.getCat3())
                             .firstImage(place.getFirstImage())
                             .firstImage2(place.getFirstImage2())
-                            .mapX(place.getMapX())
-                            .mapY(place.getMapY())
-                            .title(place.getTitle())
+                            .latitude(place.getLatitude())
+                            .longitude(place.getLongitude())
+                            .name(place.getName())
                             .rating(String.valueOf(ratingResponse.getRating()))
                             .userRatingsTotal(String.valueOf(ratingResponse.getUserRatingsTotal()))
                             .build();

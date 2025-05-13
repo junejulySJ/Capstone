@@ -1,11 +1,14 @@
 package com.capstone.meetingmap.map.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class DetailCommonResponseDto {
     private String contentid;
     private String contenttypeid;
@@ -20,21 +23,4 @@ public class DetailCommonResponseDto {
     private String addr;
     private String zipcode;
     private String overview;
-
-    @Builder
-    public DetailCommonResponseDto(String contentid, String contenttypeid, String createdtime, String homepage, String modifiedtime, String tel, String telname, String title, String firstimage, String firstimage2, String addr, String zipcode, String overview) {
-        this.contentid = contentid;
-        this.contenttypeid = contenttypeid;
-        this.createdtime = createdtime;
-        this.homepage = homepage;
-        this.modifiedtime = modifiedtime;
-        this.tel = tel;
-        this.telname = telname;
-        this.title = title;
-        this.firstimage = firstimage;
-        this.firstimage2 = firstimage2;
-        this.addr = addr;
-        this.zipcode = zipcode;
-        this.overview = overview;
-    }
 }

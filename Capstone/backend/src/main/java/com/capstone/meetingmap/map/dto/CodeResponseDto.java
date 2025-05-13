@@ -2,22 +2,19 @@ package com.capstone.meetingmap.map.dto;
 
 import com.capstone.meetingmap.map.dto.tourapi.CodeItem;
 import com.capstone.meetingmap.map.entity.ContentType;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-//프론트에 areaCode를 전달할 dto
+//프론트에 각종 코드들을 전달할 dto
 @Getter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class CodeResponseDto {
     private String code;
     private String name;
-
-    @Builder
-    public CodeResponseDto(String code, String name) {
-        this.code = code;
-        this.name = name;
-    }
 
     public static CodeResponseDto fromCodeItem(CodeItem item) {
         return CodeResponseDto.builder()

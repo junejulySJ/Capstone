@@ -41,11 +41,10 @@ public class MapService {
         List<PlaceResponseDto> mergedList = new ArrayList<>();
 
         // TourAPI로 10개 장소 검색
-        List<PlaceResponse> tourApiPlaceList = tourApiMapService.getPlaceList(sigunguCode, longitude, latitude, (contentType != null ? contentType.getContentTypeId() : null), 10, cat1, cat2, cat3);
+        List<TourApiPlaceResponse> tourApiPlaceList = tourApiMapService.getPlaceList(sigunguCode, longitude, latitude, (contentType != null ? contentType.getContentTypeId() : null), 10, cat1, cat2, cat3);
         System.out.println(tourApiPlaceList);
         // Google Places API로 10개 장소에 대해 평점 붙이기
         if (!tourApiPlaceList.isEmpty()) {
-            System.out.println(tourApiPlaceList.get(0).getTitle());
             List<PlaceResponseDto> placeListWithRating = googleMapService.getPlaceListWithRating(tourApiPlaceList);
             mergedList.addAll(placeListWithRating);
         }
@@ -76,7 +75,7 @@ public class MapService {
 
         switch (sort) {
             case "title_dsc":
-                mergedList.sort(Comparator.comparing(PlaceResponseDto::getTitle).reversed());
+                mergedList.sort(Comparator.comparing(PlaceResponseDto::getName).reversed());
                 break;
             case "rating_asc":
                 mergedList.sort(Comparator.comparing(dto -> ParseUtil.parseDoubleSafe(dto.getRating())));
@@ -92,21 +91,10 @@ public class MapService {
                 break;
             case "title_asc":
             default:
-                mergedList.sort(Comparator.comparing(PlaceResponseDto::getTitle));
+                mergedList.sort(Comparator.comparing(PlaceResponseDto::getName));
         }
 
         return mergedList;
-    }
-
-    // 기존 place dto에 중간지점 dto를 붙여줌, 위치 이동 예정
-    public MiddlePointResponseDto<List<PlaceResponseDto>> getPlacesByMiddlePoint(List<String> addresses, XYDto xyDto, List<PlaceResponseDto> placeDto) {
-        return MiddlePointResponseDto.<List<PlaceResponseDto>>builder()
-                .addresses(addresses)
-                .coordinates(xyDto.getCoordinates())
-                .middleX(String.valueOf(xyDto.getMiddleX()))
-                .middleY(String.valueOf(xyDto.getMiddleY()))
-                .list(placeDto)
-                .build();
     }
 
     // typeCode를 반환

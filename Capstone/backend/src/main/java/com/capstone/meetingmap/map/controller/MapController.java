@@ -1,7 +1,8 @@
 package com.capstone.meetingmap.map.controller;
 
+import com.capstone.meetingmap.api.kakao.dto.AddressFromKeywordResponse;
+import com.capstone.meetingmap.api.kakao.service.KakaoApiService;
 import com.capstone.meetingmap.map.dto.*;
-import com.capstone.meetingmap.map.dto.kakaoapi.KakaoAddressSearchResponse;
 import com.capstone.meetingmap.map.service.ConvexHullService;
 import com.capstone.meetingmap.map.service.KakaoMapService;
 import com.capstone.meetingmap.map.service.MapService;
@@ -25,12 +26,14 @@ public class MapController {
     private final KakaoMapService kakaoMapService;
     private final ConvexHullService convexHullService;
     private final MapService mapService;
+    private final KakaoApiService kakaoApiService;
 
-    public MapController(TourApiMapService tourApiMapService, KakaoMapService kakaoMapService, ConvexHullService convexHullService, MapService mapService) {
+    public MapController(TourApiMapService tourApiMapService, KakaoMapService kakaoMapService, ConvexHullService convexHullService, MapService mapService, KakaoApiService kakaoApiService) {
         this.tourApiMapService = tourApiMapService;
         this.kakaoMapService = kakaoMapService;
         this.convexHullService = convexHullService;
         this.mapService = mapService;
+        this.kakaoApiService = kakaoApiService;
     }
 
     //시군구 코드 반환
@@ -66,7 +69,7 @@ public class MapController {
             @RequestParam(value = "sigunguCode", required = false) String sigunguCode,
             @RequestParam(value = "latitude", required = false) Double latitude,
             @RequestParam(value = "longitude", required = false) Double longitude,
-            @RequestParam(value = "address", required = false) List<String> addresses,
+            @RequestParam(value = "name", required = false) List<String> name,
             @RequestParam(value = "typeCode", required = false) String typeCode,
             @RequestParam(value = "cat1", required = false) String cat1,
             @RequestParam(value = "cat2", required = false) String cat2,
@@ -74,30 +77,25 @@ public class MapController {
     ) {
 
         switch (search) {
-            case "area" -> { //"area"면 sigunguCode 필요
+            case "area" -> { // 지역구 기반 검색이면 sigunguCode 필요
                 return ResponseEntity.ok(mapService.getAllPlaces(sort, sigunguCode, null, null, typeCode, cat1, cat2, cat3));
             }
-            case "address" -> {//"address"면 address 필요
-                KakaoAddressSearchResponse response = kakaoMapService.getPoint(addresses.get(0));
+            case "destination" -> { // 출발지-도착지 기반 검색이면 name 1개 필요
+                AddressFromKeywordResponse response = kakaoApiService.getAddressFromKeyword(name.get(0));
                 return ResponseEntity.ok(mapService.getAllPlaces(sort, null, response.getDocuments().get(0).getY(), response.getDocuments().get(0).getX(), typeCode, cat1, cat2, cat3));
             }
-            case "location" -> { //"location"이면 latitude, longitude 필요
+            case "location" -> { // 현재 위치 기반 검색이면 latitude, longitude 필요
                 return ResponseEntity.ok(mapService.getAllPlaces(sort, null, String.valueOf(latitude), String.valueOf(longitude), typeCode, cat1, cat2, cat3));
             }
-            case "middle-point", "middle-point2" -> { //"middle-point", "middle-point2"면 address 리스트
-                XYDto xyDto;
-                if (search.equals("middle-point")) {
-                    xyDto = kakaoMapService.getMiddlePoint(addresses);
-                } else { // middle-point2
-                    List<Coordinate> coordList = kakaoMapService.getCoordList(addresses);
-                    Point middlePoint = convexHullService.calculateConvexHullCentroid(coordList);
-                    Point adjustedMiddlePoint = ClampUtil.clampPoint(middlePoint);
+            case "middle-point" -> { // 중간 위치 기반 검색이면 name 리스트 필요
+                List<Coordinate> coordList = kakaoApiService.getCoordList(name);
+                Point middlePoint = convexHullService.calculateConvexHullCentroid(coordList);
+                Point adjustedMiddlePoint = ClampUtil.clampPoint(middlePoint);
 
-                    xyDto = XYDto.buildXYDtoByGeometry(adjustedMiddlePoint, coordList);
-                }
+                XYDto xyDto = XYDto.buildXYDtoByGeometry(adjustedMiddlePoint, coordList);
 
                 List<PlaceResponseDto> places = mapService.getAllPlaces(sort, null, String.valueOf(xyDto.getMiddleY()), String.valueOf(xyDto.getMiddleX()), typeCode, cat1, cat2, cat3);
-                return ResponseEntity.ok(mapService.getPlacesByMiddlePoint(addresses, xyDto, places));
+                return ResponseEntity.ok(MiddlePointResponseDto.addMiddlePointResponse(name, xyDto, places));
             }
             default -> throw new IllegalStateException("올바르지 않은 검색 방법입니다");
         }
@@ -106,12 +104,8 @@ public class MapController {
     // 세부 정보 출력
     @GetMapping("/detail")
     public ResponseEntity<DetailCommonResponseDto> getPlaceDetail(@RequestParam(value = "contentId") String contentId) {
-        try {
-            DetailCommonResponseDto detailCommonResponseDto = tourApiMapService.getPlaceDetail(contentId);
-            return ResponseEntity.ok(detailCommonResponseDto);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        DetailCommonResponseDto detailCommonResponseDto = tourApiMapService.getPlaceDetail(contentId);
+        return ResponseEntity.ok(detailCommonResponseDto);
     }
 
     // 장소명 자동완성

@@ -1,11 +1,15 @@
 package com.capstone.meetingmap.schedule.service;
 
 import com.capstone.meetingmap.api.kakaomobility.service.KakaoMobilityDirectionService;
+import com.capstone.meetingmap.api.tmap.dto.*;
+import com.capstone.meetingmap.api.tmap.service.TMapApiService;
 import com.capstone.meetingmap.friendship.entity.FriendshipStatus;
 import com.capstone.meetingmap.friendship.repository.FriendshipRepository;
 import com.capstone.meetingmap.groupuser.entity.GroupUser;
 import com.capstone.meetingmap.groupuser.entity.GroupUserId;
 import com.capstone.meetingmap.groupuser.repository.GroupUserRepository;
+import com.capstone.meetingmap.map.dto.PlaceResponseDto;
+import com.capstone.meetingmap.map.service.MapService;
 import com.capstone.meetingmap.schedule.dto.*;
 import com.capstone.meetingmap.schedule.entity.Schedule;
 import com.capstone.meetingmap.schedule.entity.ScheduleDetail;
@@ -14,7 +18,7 @@ import com.capstone.meetingmap.schedule.repository.ScheduleRepository;
 import com.capstone.meetingmap.user.dto.UserResponseDto;
 import com.capstone.meetingmap.user.entity.User;
 import com.capstone.meetingmap.user.repository.UserRepository;
-import com.capstone.meetingmap.util.DistanceUtil;
+import com.capstone.meetingmap.util.ParseUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,28 +27,29 @@ import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class ScheduleService {
+    private final TMapApiService tMapApiService;
     private final ScheduleRepository scheduleRepository;
     private final ScheduleDetailRepository scheduleDetailRepository;
     private final UserRepository userRepository;
     private final GroupUserRepository groupUserRepository;
     private final KakaoMobilityDirectionService kakaoMobilityDirectionService;
     private final FriendshipRepository friendshipRepository;
+    private final MapService mapService;
 
-    public ScheduleService(ScheduleRepository scheduleRepository, ScheduleDetailRepository scheduleDetailRepository, UserRepository userRepository, GroupUserRepository groupUserRepository, KakaoMobilityDirectionService kakaoMobilityDirectionService, FriendshipRepository friendshipRepository) {
+    public ScheduleService(TMapApiService tMapApiService, ScheduleRepository scheduleRepository, ScheduleDetailRepository scheduleDetailRepository, UserRepository userRepository, GroupUserRepository groupUserRepository, KakaoMobilityDirectionService kakaoMobilityDirectionService, FriendshipRepository friendshipRepository, MapService mapService) {
+        this.tMapApiService = tMapApiService;
         this.scheduleRepository = scheduleRepository;
         this.scheduleDetailRepository = scheduleDetailRepository;
         this.userRepository = userRepository;
         this.groupUserRepository = groupUserRepository;
         this.kakaoMobilityDirectionService = kakaoMobilityDirectionService;
         this.friendshipRepository = friendshipRepository;
+        this.mapService = mapService;
     }
 
     // 회원이 속한 모든 스케줄 가져오기
@@ -193,32 +198,131 @@ public class ScheduleService {
         List<ScheduleDetailCreateDto> detailCreateDtoList = new ArrayList<>();
 
         if (dto.getAdditionalRecommendation()) { // 추가 추천 받기를 체크한 경우
-            // 장소 수-선택한 장소 만큼 추가 장소를 테마, 평점 기준으로 필터링해 선택(정렬은 아마도 1순위: user_ratings_total, 2순위: rating?)
-            // 아직 미구현
+            // 장소 수-선택한 장소 만큼 추가 장소를 시작 장소를 기준으로 테마, 평점 기준으로 필터링해 선택(정렬은 user_ratings_total 기준 정렬)
             int remainingCount = dto.getTotalPlaceCount() - dto.getSelectedPlace().size();
+
+            // 시작 지점 찾기
+            SelectedPlace startPlace = dto.getSelectedPlace().stream()
+                    .filter(place -> place.getContentId().equals(dto.getStartContentId()))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("시작 장소를 찾을 수 없습니다: " + dto.getStartContentId()));
+
+            List<PlaceResponseDto> mergedResponse = new ArrayList<>();
+
+            // "A05"로 시작하는 cat3가 하나도 없는 경우(음식점을 1개도 고르지 않은 경우) 처리
+            if (dto.getSelectedPlace().stream().noneMatch(place -> place.getCat3() != null && place.getCat3().startsWith("A05"))) {
+                if (dto.getTheme().equals("date")) {
+                    List<PlaceResponseDto> response = mapService.getAllPlaces("user_ratings_total_dsc", null, startPlace.getLatitude(), startPlace.getLongitude(), "6", "A05", "A0502", "A05020900");
+                    // 점심식사만 가능한 시간
+                    if (dto.getScheduleStartTime().toLocalTime().isBefore(LocalTime.of(11, 30)) && dto.getScheduleEndTime().toLocalTime().isBefore(LocalTime.of(17, 30))) {
+                        mergedResponse.add(response.get(0));
+                        remainingCount = remainingCount - 1;
+                    }
+                    // 저녁식사만 가능한 시간
+                    if (dto.getScheduleStartTime().toLocalTime().isAfter(LocalTime.of(13, 30)) && dto.getScheduleEndTime().toLocalTime().isAfter(LocalTime.of(19, 30))) {
+                        mergedResponse.add(response.get(0));
+                        remainingCount = remainingCount - 1;
+                    }
+                    // 둘다 가능한 시간
+                    if (dto.getScheduleStartTime().toLocalTime().isBefore(LocalTime.of(11, 30)) && dto.getScheduleEndTime().toLocalTime().isAfter(LocalTime.of(19, 30))) {
+                        mergedResponse.add(response.get(0));
+                        mergedResponse.add(response.get(1));
+                        remainingCount = remainingCount - 2;
+                    }
+                } else {
+                    List<PlaceResponseDto> response = mapService.getAllPlaces("user_ratings_total_dsc", null, startPlace.getLatitude(), startPlace.getLongitude(), "6", null, null, null);
+                    // 점심식사만 가능한 시간
+                    if (dto.getScheduleStartTime().toLocalTime().isBefore(LocalTime.of(11, 30)) && dto.getScheduleEndTime().toLocalTime().isBefore(LocalTime.of(17, 30))) {
+                        mergedResponse.add(response.get(0));
+                        remainingCount = remainingCount - 1;
+                    }
+                    // 저녁식사만 가능한 시간
+                    if (dto.getScheduleStartTime().toLocalTime().isAfter(LocalTime.of(13, 30)) && dto.getScheduleEndTime().toLocalTime().isAfter(LocalTime.of(19, 30))) {
+                        mergedResponse.add(response.get(0));
+                        remainingCount = remainingCount - 1;
+                    }
+                    // 둘다 가능한 시간
+                    if (dto.getScheduleStartTime().toLocalTime().isBefore(LocalTime.of(11, 30)) && dto.getScheduleEndTime().toLocalTime().isAfter(LocalTime.of(19, 30))) {
+                        mergedResponse.add(response.get(0));
+                        mergedResponse.add(response.get(1));
+                        remainingCount = remainingCount - 2;
+                    }
+                }
+            }
+            String typeCode = null;
+            String cat1 = null;
+            String cat2 = null;
+            String cat3 = null;
+            switch (dto.getTheme()) {
+                case "tour" -> typeCode = "1";
+                case "nature" -> {
+                    typeCode = "1";
+                    cat1 = "A01";
+                }
+                case "history" -> {
+                    typeCode = "1";
+                    cat1 = "A02";
+                    cat2 = "A0201";
+                }
+                case "food" -> typeCode = "6";
+                case "shopping" -> typeCode = "5";
+                case "activity" -> typeCode = "4";
+                case "date" -> {
+                    typeCode = "1";
+                    cat1 = "A02";
+                    cat2 = "A0201";
+                    cat3 = "A02010100";
+                }
+            }
+            List<PlaceResponseDto> response = mapService.getAllPlaces("user_ratings_total_dsc", null, startPlace.getLatitude(), startPlace.getLongitude(), typeCode, cat1, cat2, cat3);
+            if (dto.getTheme().equals("date")) {
+                List<PlaceResponseDto> response2 = mapService.getAllPlaces("user_ratings_total_dsc", null, startPlace.getLatitude(), startPlace.getLongitude(), "1", "A02", "A0202", "A02020700");
+                response.addAll(response2);
+                List<PlaceResponseDto> response3 = mapService.getAllPlaces("user_ratings_total_dsc", null, startPlace.getLatitude(), startPlace.getLongitude(), "1", "A02", "A0205", "A02050600");
+                response.addAll(response3);
+            }
+            response.sort(Comparator.comparing(PlaceResponseDto::getUserRatingsTotal));
+            for (int i = 0; i < remainingCount; i++) {
+                mergedResponse.add(response.get(i));
+            }
+
+            List<SelectedPlace> additionalPlaceList = new ArrayList<>();
+            for (PlaceResponseDto placeDto : mergedResponse) {
+                additionalPlaceList.add(placeDto.toSelectedPlace(dto.getStayMinutesMean()));
+            }
+            dto.getSelectedPlace().addAll(additionalPlaceList);
+
         }
-        // 알고리즘
+        // 알고리즘 변수
         Set<SelectedPlace> visited = new HashSet<>();
         LocalDateTime currentTime = dto.getScheduleStartTime();
 
         // 시작 지점 선택
-        SelectedPlace current = dto.getSelectedPlace().stream()
+        SelectedPlace currentPlace = dto.getSelectedPlace().stream()
                 .filter(p -> p.getContentId().equals(dto.getStartContentId()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("시작 장소를 찾을 수 없습니다: " + dto.getStartContentId()));
 
-        visited.add(current);
-        LocalDateTime startTime = currentTime; // 시작 시간 임시 저장
-        currentTime = currentTime.plusMinutes(current.getStayMinutes());
+        // 시작 지점 방문 처리
+        visited.add(currentPlace);
+
+        // 시작 시간 임시 저장
+        LocalDateTime startTime = currentTime;
+
+        // 시작 장소 방문 후 머문 시간을 반영해 변경
+        currentTime = currentTime.plusMinutes(currentPlace.getStayMinutes());
+
+        //detail dto에 반영
         detailCreateDtoList.add(ScheduleDetailCreateDto.builder()
-                .scheduleContent(current.getTitle() + " 방문")
-                .scheduleAddress(current.getAddress())
-                .latitude(new BigDecimal(current.getLatitude()))
-                .longitude(new BigDecimal(current.getLongitude()))
+                .scheduleContent(currentPlace.getTitle() + " 방문")
+                .scheduleAddress(currentPlace.getAddress())
+                .latitude(new BigDecimal(currentPlace.getLatitude()))
+                .longitude(new BigDecimal(currentPlace.getLongitude()))
                 .scheduleStartTime(startTime)
                 .scheduleEndTime(currentTime)
                 .build());
 
+        // 식사 여부
         boolean hadLunch = false;
         boolean hadDinner = false;
 
@@ -230,51 +334,91 @@ public class ScheduleService {
             boolean isDinnerTime = currentTime.toLocalTime().isAfter(LocalTime.of(17, 30)) &&
                     currentTime.toLocalTime().isBefore(LocalTime.of(19, 30));
 
+            // 방문해야 할 장소
             List<SelectedPlace> candidates = new ArrayList<>();
+
             for (SelectedPlace place : dto.getSelectedPlace()) {
-                if (visited.contains(place)) {
+                if (visited.contains(place)) { // 이미 방문한 장소면 continue
                     continue;
                 }
 
-                if (isLunchTime && !hadLunch) { // 점심 or 저녁시간이면 음식점 추가
+                if (isLunchTime && !hadLunch) { // 점심시간이면 음식점 추가
                     if (List.of("A05020100", "A05020200", "A05020300", "A05020400", "A05020700").contains(place.getCat3())) {
                         candidates.add(place);
                         hadLunch = true;
                     }
-                } else if (isDinnerTime && !hadDinner) {
+                } else if (isDinnerTime && !hadDinner) { // 저녁시간이면 음식점 추가
                     if (List.of("A05020100", "A05020200", "A05020300", "A05020400", "A05020700").contains(place.getCat3())) {
                         candidates.add(place);
                         hadDinner = true;
                     }
-                } else {
+                } else { // 그 외 시간이면 음식점을 제외하고 추가
                     if (!List.of("A05020100", "A05020200", "A05020300", "A05020400", "A05020700").contains(place.getCat3())) {
                         candidates.add(place);
                     }
                 }
             }
 
+            // 방문해야 할 장소가 없으면 반복 종료
             if (candidates.isEmpty()) break;
 
             // NN 알고리즘: 가장 가까운 장소 선택
-            NearestInfo nearestInfo = DistanceUtil.findNearest(current, candidates);
+            // 도보거나 자동차이면 tmap api로 거리/시간 계산
+            List<RouteResponse> routeResponseList = new ArrayList<>();
+            if (dto.getTransport().equals("도보")) {
+                for (SelectedPlace candidate : candidates) {
+                    RouteResponse routeResponse = tMapApiService.getPedestrianRoutes(PedestrianRouteRequest.builder()
+                            .startX(ParseUtil.parseDoubleSafe(currentPlace.getLongitude()))
+                            .startY(ParseUtil.parseDoubleSafe(currentPlace.getLatitude()))
+                            .endX(ParseUtil.parseDoubleSafe(candidate.getLongitude()))
+                            .endY(ParseUtil.parseDoubleSafe(candidate.getLatitude()))
+                            .build());
+                    routeResponseList.add(routeResponse);
+                }
+            } else if (dto.getTransport().equals("자동차")) {
+                for (SelectedPlace candidate : candidates) {
+                    RouteResponse routeResponse = tMapApiService.getCarRoutes(CarRouteRequest.builder()
+                            .startX(ParseUtil.parseDoubleSafe(currentPlace.getLongitude()))
+                            .startY(ParseUtil.parseDoubleSafe(currentPlace.getLatitude()))
+                            .endX(ParseUtil.parseDoubleSafe(candidate.getLongitude()))
+                            .endY(ParseUtil.parseDoubleSafe(candidate.getLatitude()))
+                            .build());
+                    routeResponseList.add(routeResponse);
+                }
+            }
+            // 다음 장소 결정
+            NearestInfo nearestInfo = tMapApiService.findNearest(routeResponseList, candidates);
             SelectedPlace next = nearestInfo.getNearest();
-            int travelMinutes = DistanceUtil.estimateTravelTime(nearestInfo.getMinDistance(), 4.0);
-            //kakaoMobilityDirectionService.getDistanceAndDuration(current, candidates); 미구현
 
+            // 이동 시간 결정(30분 단위로 올림)
+            int travelMinutes = ((nearestInfo.getMinTime() + 29) / 30) * 30;
+
+            // 이동 후 머문 시간이 종료 시간을 넘으면 반복 종료
             if (currentTime.plusMinutes(travelMinutes + next.getStayMinutes()).isAfter(dto.getScheduleEndTime())) {
-                break; // 시간 초과
+                break;
             }
 
+            // 이동 시간 반영
             currentTime = currentTime.plusMinutes(travelMinutes);
+
+            // 방문 처리
             visited.add(next);
-            current = next;
-            LocalDateTime startTime2 = currentTime; // 시작 시간 임시 저장
-            currentTime = currentTime.plusMinutes(current.getStayMinutes());
+
+            // 현재 장소를 변경
+            currentPlace = next;
+
+            // 시간 임시 저장
+            LocalDateTime startTime2 = currentTime;
+
+            // 장소 방문 후 머문 시간을 반영해 변경
+            currentTime = currentTime.plusMinutes(currentPlace.getStayMinutes());
+
+            //detail dto에 반영
             detailCreateDtoList.add(ScheduleDetailCreateDto.builder()
-                    .scheduleContent(current.getTitle() + " 방문")
-                    .scheduleAddress(current.getAddress())
-                    .latitude(new BigDecimal(current.getLatitude()))
-                    .longitude(new BigDecimal(current.getLongitude()))
+                    .scheduleContent(currentPlace.getTitle() + " 방문")
+                    .scheduleAddress(currentPlace.getAddress())
+                    .latitude(new BigDecimal(currentPlace.getLatitude()))
+                    .longitude(new BigDecimal(currentPlace.getLongitude()))
                     .scheduleStartTime(startTime2)
                     .scheduleEndTime(currentTime)
                     .build());

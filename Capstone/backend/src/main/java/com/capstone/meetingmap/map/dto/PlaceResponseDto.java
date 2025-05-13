@@ -2,6 +2,7 @@ package com.capstone.meetingmap.map.dto;
 
 import com.capstone.meetingmap.map.dto.googleapi.GooglePlaceResult;
 import com.capstone.meetingmap.map.mapper.ContentTypeMapper;
+import com.capstone.meetingmap.schedule.dto.SelectedPlace;
 import lombok.*;
 
 @Getter
@@ -65,6 +66,19 @@ public class PlaceResponseDto {
                 .title(result.getName())
                 .rating(String.valueOf(result.getRating()))
                 .userRatingsTotal(String.valueOf(result.getUser_ratings_total()))
+                .build();
+    }
+
+    // SelectedPlace로 변환
+    public SelectedPlace toSelectedPlace(Integer stayMinutesMean) {
+        return SelectedPlace.builder()
+                .contentId(contentId)
+                .address(addr)
+                .title(title)
+                .latitude(mapY)
+                .longitude(mapX)
+                .cat3(cat3)
+                .stayMinutes(stayMinutesMean)
                 .build();
     }
 }

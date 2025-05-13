@@ -4,6 +4,7 @@ import com.capstone.meetingmap.groupuser.service.GroupUserService;
 import com.capstone.meetingmap.schedule.dto.*;
 import com.capstone.meetingmap.schedule.service.ScheduleService;
 import com.capstone.meetingmap.user.dto.UserResponseDto;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +35,7 @@ public class ScheduleController {
         return scheduleService.getScheduleDetails(scheduleNo);
     }
 
-    // 등록
+    // 스케줄 저장
     @PostMapping
     public ResponseEntity<?> saveSchedule(@RequestBody ScheduleSaveRequestDto request) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -43,7 +44,7 @@ public class ScheduleController {
         return ResponseEntity.ok("일정 등록 성공");
     }
 
-    // 삭제
+    // 스케줄 삭제
     @DeleteMapping("/{scheduleNo}")
     public ResponseEntity<?> deleteSchedule(@PathVariable Integer scheduleNo) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -52,7 +53,7 @@ public class ScheduleController {
         return ResponseEntity.ok("일정 삭제 성공");
     }
 
-    // 수정
+    // 스케줄 수정
     @PutMapping("/{scheduleNo}")
     public ResponseEntity<?> updateSchedule(@PathVariable Integer scheduleNo, @RequestBody ScheduleUpdateRequestDto request) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -62,7 +63,7 @@ public class ScheduleController {
 
     // 사용자로부터 입력받은 데이터를 통해 스케줄 생성
     @PostMapping("/create")
-    public ResponseEntity<?> createSchedule(@RequestBody ScheduleCreateRequestDto scheduleCreateRequestDto) {
+    public ResponseEntity<?> createSchedule(@Valid @RequestBody ScheduleCreateRequestDto scheduleCreateRequestDto) {
         ScheduleCreateResponseDto scheduleCreateResponseDto = scheduleService.createSchedule(scheduleCreateRequestDto);
         return ResponseEntity.ok(scheduleCreateResponseDto);
     }

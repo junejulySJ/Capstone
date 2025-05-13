@@ -20,7 +20,7 @@
 ## API 목록
 
 <details>
-<summary>시군구 코드 반환 ✏️</summary>
+<summary>시군구 코드 반환</summary>
 
 **GET** `/map/region`
 
@@ -57,7 +57,7 @@ axios
 ---
 
 <details>
-<summary>타입 코드 반환 ✏️</summary>
+<summary>타입 코드 반환</summary>
 
 **GET** `/map/type`
 
@@ -102,7 +102,7 @@ axios
 ---
 
 <details>
-<summary>분류 코드 반환 ✏️</summary>
+<summary>분류 코드 반환</summary>
 
 **GET** `/map/category`
 
@@ -174,7 +174,7 @@ axios
 ---
 
 <details>
-<summary>지도 출력 ✏️</summary>
+<summary>지도 출력</summary>
 
 **GET** `/map`
 
@@ -195,13 +195,13 @@ axios
 | cat3        | 소분류(필수X)                                            | A05020900(카페/전통찻집)                                                                          |
 
 ### 1. 지역구를 기반으로 조회할 경우
-#### 요청 코드 ✏️
+#### 요청 코드
 ```javascript
 axios
     .get(`${API_BASE_URL}/map?search=area&sort=rating_dsc&sigunguCode=${sigunguCode}&theme=${theme}`)
 ```
 
-#### 응답 바디 ✏️
+#### 응답 바디
 ```json
 [
   {
@@ -242,13 +242,13 @@ axios
 ```
 
 ### 2. 현재 위치를 기반으로 조회할 경우
-#### 요청 코드 ✏️
+#### 요청 코드
 ```javascript
 axios
     .get(`${API_BASE_URL}/map?search=location&sort=title_asc&latitude=${latitude}&longitude=${longitude}`)
 ```
 
-#### 응답 바디 ✏️
+#### 응답 바디
 ```json
 [
   {
@@ -288,7 +288,7 @@ axios
 ]
 ```
 
-### 3. 특정 주소를 기반으로 조회할 경우 ✏️
+### 3. 특정 주소를 기반으로 조회할 경우
 #### 요청 코드
 ```javascript
 axios
@@ -336,12 +336,12 @@ axios
 ```
 
 ### 4. 중간 위치를 기반으로 조회할 경우(좌표 평균 알고리즘 / 그라함 스캔(Graham Scan)과 무게 중심 알고리즘)
-#### 요청 코드(좌표 평균 알고리즘) ✏️
+#### 요청 코드(좌표 평균 알고리즘)
 ```javascript
 axios
     .get(`${API_BASE_URL}/map?search=middle-point&sort=rating_dsc&address=${address1}&address=${address2}&address=${address3}`)
 ```
-#### 요청 코드(그라함 스캔(Graham Scan)과 무게 중심 알고리즘) ✏️
+#### 요청 코드(그라함 스캔(Graham Scan)과 무게 중심 알고리즘)
 ```javascript
 axios
     .get(`${API_BASE_URL}/map?search=middle-point2&sort=rating_dsc&address=${address1}&address=${address2}&address=${address3}`)

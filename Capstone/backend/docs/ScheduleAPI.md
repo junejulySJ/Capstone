@@ -76,49 +76,61 @@
   "scheduleStartTime": "2025-05-07T10:00:00",
   "scheduleEndTime": "2025-05-07T16:00:00",
   "startContentId": "2994661",
-  "additionalRecommendation": false
+  "transport": "자동차",
+  "additionalRecommendation": true,
+  "totalPlaceCount": 5,
+  "theme": "tour",
+  "stayMinutesMean": 60
 }
 ```
 
 #### 응답 바디
 ```json
 {
-    "scheduleName": "test",
-    "scheduleAbout": "testabout",
-    "details": [
-        {
-            "scheduleContent": "일상비일상의틈 방문",
-            "scheduleAddress": "서울특별시 강남구 강남대로 426 (역삼동) ",
-            "latitude": 37.5006405461,
-            "longitude": 127.0267851551,
-            "scheduleStartTime": "2025-05-07T10:00:00",
-            "scheduleEndTime": "2025-05-07T11:00:00"
-        },
-        {
-            "scheduleContent": "메가박스 코엑스 방문",
-            "scheduleAddress": "대한민국 서울특별시 강남구 봉은사로 524",
-            "latitude": 37.5126572,
-            "longitude": 127.0586523,
-            "scheduleStartTime": "2025-05-07T11:47:00",
-            "scheduleEndTime": "2025-05-07T12:47:00"
-        },
-        {
-            "scheduleContent": "우텐더 방문",
-            "scheduleAddress": "서울특별시 강남구 압구정로42길 25-10 1~2층",
-            "latitude": 37.5270487520,
-            "longitude": 127.0358085855,
-            "scheduleStartTime": "2025-05-07T13:26:00",
-            "scheduleEndTime": "2025-05-07T14:26:00"
-        },
-        {
-            "scheduleContent": "청담근린공원 방문",
-            "scheduleAddress": "서울특별시 강남구 청담동 66",
-            "latitude": 37.5213524935,
-            "longitude": 127.0526155502,
-            "scheduleStartTime": "2025-05-07T14:50:00",
-            "scheduleEndTime": "2025-05-07T15:50:00"
-        }
-    ]
+  "scheduleName": "test",
+  "scheduleAbout": "testabout",
+  "details": [
+    {
+      "scheduleContent": "일상비일상의틈 방문",
+      "scheduleAddress": "서울특별시 강남구 강남대로 426 (역삼동) ",
+      "latitude": 37.5006405461,
+      "longitude": 127.0267851551,
+      "scheduleStartTime": "2025-05-14T10:00:00",
+      "scheduleEndTime": "2025-05-14T11:00:00"
+    },
+    {
+      "scheduleContent": "강남 방문",
+      "scheduleAddress": "서울특별시 강남구 역삼동 (역삼동)",
+      "latitude": 37.4970465429,
+      "longitude": 127.0281573537,
+      "scheduleStartTime": "2025-05-14T11:30:00",
+      "scheduleEndTime": "2025-05-14T12:30:00"
+    },
+    {
+      "scheduleContent": "우텐더 방문",
+      "scheduleAddress": "서울특별시 강남구 압구정로42길 25-10 1~2층",
+      "latitude": 37.5270487520,
+      "longitude": 127.0358085855,
+      "scheduleStartTime": "2025-05-14T13:00:00",
+      "scheduleEndTime": "2025-05-14T13:20:00"
+    },
+    {
+      "scheduleContent": "청담근린공원 방문",
+      "scheduleAddress": "서울특별시 강남구 청담동 66",
+      "latitude": 37.5213524935,
+      "longitude": 127.0526155502,
+      "scheduleStartTime": "2025-05-14T13:50:00",
+      "scheduleEndTime": "2025-05-14T14:50:00"
+    },
+    {
+      "scheduleContent": "메가박스 코엑스 방문",
+      "scheduleAddress": "대한민국 서울특별시 강남구 봉은사로 524",
+      "latitude": 37.5126572,
+      "longitude": 127.0586523,
+      "scheduleStartTime": "2025-05-14T15:20:00",
+      "scheduleEndTime": "2025-05-14T16:20:00"
+    }
+  ]
 }
 ```
 </details>

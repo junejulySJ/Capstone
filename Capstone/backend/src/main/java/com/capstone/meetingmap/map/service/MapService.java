@@ -1,5 +1,7 @@
 package com.capstone.meetingmap.map.service;
 
+import com.capstone.meetingmap.api.kakao.dto.AddressFromKeywordResponse;
+import com.capstone.meetingmap.api.kakao.service.KakaoApiService;
 import com.capstone.meetingmap.map.dto.*;
 import com.capstone.meetingmap.map.entity.ContentType;
 import com.capstone.meetingmap.map.repository.ContentTypeRepository;
@@ -19,11 +21,13 @@ public class MapService {
     private final TourApiMapService tourApiMapService;
     private final GoogleMapService googleMapService;
     private final ContentTypeRepository contentTypeRepository;
+    private final KakaoApiService kakaoApiService;
 
-    public MapService(TourApiMapService tourApiMapService, GoogleMapService googleMapService, ContentTypeRepository contentTypeRepository) {
+    public MapService(TourApiMapService tourApiMapService, GoogleMapService googleMapService, ContentTypeRepository contentTypeRepository, KakaoApiService kakaoApiService) {
         this.tourApiMapService = tourApiMapService;
         this.googleMapService = googleMapService;
         this.contentTypeRepository = contentTypeRepository;
+        this.kakaoApiService = kakaoApiService;
     }
 
     // TourAPI 결과와 Google Places API 결과를 합쳐서 출력
@@ -105,10 +109,17 @@ public class MapService {
                 .build();
     }
 
+    // typeCode를 반환
     public List<CodeResponseDto> getTypeCodes() {
         List<ContentType> contentTypeList = contentTypeRepository.findAll();
         return contentTypeList.stream()
                 .map(CodeResponseDto::fromContentType)
                 .collect(Collectors.toList());
+    }
+
+    // 장소명 자동완성
+    public List<AddressAutocompleteDto> getAddressAutocomplete(String keyword) {
+        AddressFromKeywordResponse response = kakaoApiService.getAddressFromKeyword(keyword);
+        return AddressAutocompleteDto.fromKakaoApiResponse(response);
     }
 }

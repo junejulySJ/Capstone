@@ -1,6 +1,6 @@
 package com.capstone.meetingmap.map.service;
 
-import com.capstone.meetingmap.KakaoApiProperties;
+import com.capstone.meetingmap.api.kakao.properties.KakaoApiProperties;
 import com.capstone.meetingmap.map.dto.kakaoapi.KakaoAddressSearchResponse;
 import com.capstone.meetingmap.map.dto.kakaoapi.KakaoCoordinateSearchResponse;
 import com.capstone.meetingmap.map.dto.XYCoordinate;

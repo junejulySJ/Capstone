@@ -1,9 +1,6 @@
 package com.capstone.meetingmap.map.controller;
 
-import com.capstone.meetingmap.map.dto.CodeResponseDto;
-import com.capstone.meetingmap.map.dto.DetailCommonResponseDto;
-import com.capstone.meetingmap.map.dto.PlaceResponseDto;
-import com.capstone.meetingmap.map.dto.XYDto;
+import com.capstone.meetingmap.map.dto.*;
 import com.capstone.meetingmap.map.dto.kakaoapi.KakaoAddressSearchResponse;
 import com.capstone.meetingmap.map.service.ConvexHullService;
 import com.capstone.meetingmap.map.service.KakaoMapService;
@@ -43,14 +40,14 @@ public class MapController {
         return ResponseEntity.ok(codeResponseDtoList);
     }
 
-    //타입 코드 반환
+    // 타입 코드 반환
     @GetMapping("/type")
     public ResponseEntity<List<CodeResponseDto>> getTypeCodes() {
         List<CodeResponseDto> codeResponseDtoList = mapService.getTypeCodes();
         return ResponseEntity.ok(codeResponseDtoList);
     }
 
-    //분류 코드 반환
+    // 분류 코드 반환
     @GetMapping("/category")
     public ResponseEntity<List<CodeResponseDto>> getCategoryCodes(
             @RequestParam(value = "typeCode") String typeCode,
@@ -61,7 +58,7 @@ public class MapController {
         return ResponseEntity.ok(codeResponseDtoList);
     }
 
-    //지도 출력
+    // 지도 출력
     @GetMapping
     public ResponseEntity<?> getMap(
             @RequestParam(value = "search") String search, //장소 선택 방법
@@ -106,7 +103,7 @@ public class MapController {
         }
     }
 
-    //세부 정보 출력
+    // 세부 정보 출력
     @GetMapping("/detail")
     public ResponseEntity<DetailCommonResponseDto> getPlaceDetail(@RequestParam(value = "contentId") String contentId) {
         try {
@@ -115,5 +112,12 @@ public class MapController {
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    // 장소명 자동완성
+    @GetMapping("/autocomplete")
+    public ResponseEntity<?> getAddressAutoComplete(@RequestParam(value = "name") String name) {
+        List<AddressAutocompleteDto> addressAutocompleteDtoList = mapService.getAddressAutocomplete(name);
+        return ResponseEntity.ok(addressAutocompleteDtoList);
     }
 }

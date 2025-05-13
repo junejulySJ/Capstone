@@ -1,4 +1,4 @@
-package com.capstone.meetingmap;
+package com.capstone.meetingmap.api.kakao.properties;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -50,8 +50,8 @@ public class TransitPathResponseDto {
     public static class Detail {
         private String mode;
         private String timeline;
-        private Integer time;
         private Integer distance;
+        private Integer time;
         private String routeColor;
         private String routeStyle;
         private List<List<Double>> coordinates;

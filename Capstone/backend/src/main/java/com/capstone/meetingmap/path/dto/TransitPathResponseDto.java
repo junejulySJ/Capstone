@@ -78,8 +78,8 @@ public class TransitPathResponseDto {
         for (TransitRouteResponse.Itinerary itinerary : transitRouteResponse.getMetaData().getPlan().getItineraries()) {
             planList.add(TransitPathResponseDto.Plan.builder()
                     .totalDistance(itinerary.getTotalDistance())
-                    .totalTime(itinerary.getTotalTime())
-                    .totalWalkTime(itinerary.getTotalWalkTime())
+                    .totalTime(itinerary.getTotalTime() / 60)
+                    .totalWalkTime(itinerary.getTotalWalkTime() / 60)
                     .transferCount(itinerary.getTransferCount())
                     .fare(itinerary.getFare().getRegular().getTotalFare())
                     .pathType(itinerary.getPathType())

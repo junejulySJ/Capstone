@@ -31,7 +31,6 @@ public class TourApiMapService {
 
     private final WebClient webClient;
     private final TourApiProperties tourApiProperties;
-    private final PlaceCategoryDetailRepository placeCategoryDetailRepository;
     private final PlaceCategoryDetailService placeCategoryDetailService;
 
     public TourApiMapService(TourApiProperties tourApiProperties, PlaceCategoryDetailRepository placeCategoryDetailRepository, PlaceCategoryDetailService placeCategoryDetailService) {
@@ -43,7 +42,6 @@ public class TourApiMapService {
                 .baseUrl(tourApiProperties.getBaseUrl())
                 .uriBuilderFactory(factory) // URI 빌더 팩토리 설정
                 .build();
-        this.placeCategoryDetailRepository = placeCategoryDetailRepository;
         this.placeCategoryDetailService = placeCategoryDetailService;
     }
 

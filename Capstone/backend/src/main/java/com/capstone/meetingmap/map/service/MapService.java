@@ -3,16 +3,20 @@ package com.capstone.meetingmap.map.service;
 import com.capstone.meetingmap.api.kakao.dto.AddressFromKeywordResponse;
 import com.capstone.meetingmap.api.kakao.service.KakaoApiService;
 import com.capstone.meetingmap.map.dto.AddressAutocompleteDto;
+import com.capstone.meetingmap.map.dto.CodeResponseDto;
 import com.capstone.meetingmap.map.dto.PlaceResponseDto;
 import com.capstone.meetingmap.map.dto.TourApiPlaceResponse;
+import com.capstone.meetingmap.map.entity.PlaceCategory;
 import com.capstone.meetingmap.map.entity.PlaceCategoryDetail;
 import com.capstone.meetingmap.map.repository.PlaceCategoryDetailRepository;
+import com.capstone.meetingmap.map.repository.PlaceCategoryRepository;
 import com.capstone.meetingmap.util.ParseUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class MapService {
@@ -21,12 +25,29 @@ public class MapService {
     private final GoogleMapService googleMapService;
     private final KakaoApiService kakaoApiService;
     private final PlaceCategoryDetailRepository placeCategoryDetailRepository;
+    private final PlaceCategoryRepository placeCategoryRepository;
 
-    public MapService(TourApiMapService tourApiMapService, GoogleMapService googleMapService, KakaoApiService kakaoApiService, PlaceCategoryDetailRepository placeCategoryDetailRepository) {
+    public MapService(TourApiMapService tourApiMapService, GoogleMapService googleMapService, KakaoApiService kakaoApiService, PlaceCategoryDetailRepository placeCategoryDetailRepository, PlaceCategoryRepository placeCategoryRepository) {
         this.tourApiMapService = tourApiMapService;
         this.googleMapService = googleMapService;
         this.kakaoApiService = kakaoApiService;
         this.placeCategoryDetailRepository = placeCategoryDetailRepository;
+        this.placeCategoryRepository = placeCategoryRepository;
+    }
+
+    // 카테고리를 반환
+    public List<CodeResponseDto> getCategoryCodes(String category) {
+        if (category == null || category.isEmpty()) {
+            List<PlaceCategory> placeCategoryList = placeCategoryRepository.findByPlaceCategoryCodeNot("other");
+            return placeCategoryList.stream()
+                    .map(CodeResponseDto::fromPlaceCategory)
+                    .collect(Collectors.toList());
+        } else {
+            List<PlaceCategoryDetail> placeCategoryDetailList = placeCategoryDetailRepository.findByPlaceCategoryDetailCodeStartingWith(category + "-");
+            return placeCategoryDetailList.stream()
+                    .map(CodeResponseDto::fromPlaceCategoryDetail)
+                    .collect(Collectors.toList());
+        }
     }
 
     // TourAPI 결과와 Google Places API 결과를 합쳐서 출력

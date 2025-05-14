@@ -33,16 +33,11 @@ public class MapController {
         this.kakaoApiService = kakaoApiService;
     }
 
-    // 분류 코드 반환
+    // 카테고리 코드 반환
     @GetMapping("/category")
-    public ResponseEntity<?> getCategoryCodes(
-            @RequestParam(value = "typeCode") String typeCode,
-            @RequestParam(value = "cat1", required = false) String cat1,
-            @RequestParam(value = "cat2", required = false) String cat2
-    ) {
-        return ResponseEntity.ok().build();
-        /*List<CodeResponseDto> codeResponseDtoList = tourApiMapService.getCategoryCodes(typeCode, cat1, cat2);
-        return ResponseEntity.ok(codeResponseDtoList);*/
+    public ResponseEntity<?> getCategoryCodes(@RequestParam(value = "category", required = false) String category) {
+        List<CodeResponseDto> codeResponseDtoList = mapService.getCategoryCodes(category);
+        return ResponseEntity.ok(codeResponseDtoList);
     }
 
     // 지도 출력

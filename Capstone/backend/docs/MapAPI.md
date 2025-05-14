@@ -15,25 +15,12 @@
 
 ---
 
-## API 목록
-
 <details>
-<summary>지도 출력 ✏️</summary>
+<summary>카테고리 조회 ✏️</summary>
 
-**GET** `/map`
-
-> 사용자가 선택한 방법으로 주변의 장소를 조회합니다.  
-> 쿼리 파라미터 종류는 다음과 같습니다.  
-
-| 파라미터      | 설명                                                     | 값 예시                                                                                        |
-|-----------|--------------------------------------------------------|---------------------------------------------------------------------------------------------|
-| search    | 장소 선택 방법                                               | location(위치), destination(도착지), middle-point(중간지점)                                          |
-| sort      | 정렬 방법                                                  | title_asc(가나다순 오름차순 정렬), rating_asc(평점순 오름차순 정렬), user_ratings_total_dsc(총 평점 개수 내림차순 정렬) 등 |
-| latitude  | 위도(search=location일 때만 필요)                             | 37.6092635094031                                                                            |
-| longitude | 경도(search=location일 때만 필요)                             | 127.06471287129368                                                                          |
-| name      | 장소 이름(search=destination이면 1개, middle-point이면 여러 개 필요) | 시청역, 올림픽공원 등                                                                                |
-| category  | 카테고리(필수X)                                              | 아래 참조                                                                                       |
-
+**GET** `/map/category`
+> 카테고리 목록을 조회합니다.  
+> 세부 카테고리는 퀴리 파라미터에 카테고리 코드를 넣어서 조회할 수 있습니다.  
 > 카테고리 종류는 다음과 같습니다.
 
 | 카테고리 코드                   | 설명    | 부모 카테고리  |
@@ -56,7 +43,37 @@
 | shopping-department-store | 백화점   | shopping |
 | culture                   | 문화시설  | X        |
 | event                     | 공연/행사 | X        |
-| other                     | 기타    | X        |
+
+#### 요청 코드
+```javascript
+axios
+    .get(`${API_BASE_URL}/map/category?category=${categoryCode}`)
+```
+
+</details>
+
+---
+
+## API 목록
+
+<details>
+<summary>지도 출력 ✏️</summary>
+
+**GET** `/map`
+
+> 사용자가 선택한 방법으로 주변의 장소를 조회합니다.  
+> 쿼리 파라미터 종류는 다음과 같습니다.  
+
+| 파라미터      | 설명                                                     | 값 예시                                                                                        |
+|-----------|--------------------------------------------------------|---------------------------------------------------------------------------------------------|
+| search    | 장소 선택 방법                                               | location(위치), destination(도착지), middle-point(중간지점)                                          |
+| sort      | 정렬 방법                                                  | title_asc(가나다순 오름차순 정렬), rating_asc(평점순 오름차순 정렬), user_ratings_total_dsc(총 평점 개수 내림차순 정렬) 등 |
+| latitude  | 위도(search=location일 때만 필요)                             | 37.6092635094031                                                                            |
+| longitude | 경도(search=location일 때만 필요)                             | 127.06471287129368                                                                          |
+| name      | 장소 이름(search=destination이면 1개, middle-point이면 여러 개 필요) | 시청역, 올림픽공원 등                                                                                |
+| category  | 카테고리(필수X)                                              | 아래 참조                                                                                       |
+
+
 
 
 ### 1. 현재 위치를 기반으로 조회할 경우
@@ -98,7 +115,7 @@ axios
 ]
 ```
 
-### 3. 도착지를 기반으로 조회할 경우
+### 2. 도착지를 기반으로 조회할 경우
 #### 요청 코드
 ```javascript
 axios
@@ -137,7 +154,7 @@ axios
 ]
 ```
 
-### 4. 중간 위치를 기반으로 조회할 경우
+### 3. 중간 위치를 기반으로 조회할 경우
 #### 요청 코드
 ```javascript
 axios

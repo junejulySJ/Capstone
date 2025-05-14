@@ -1,7 +1,9 @@
 package com.capstone.meetingmap.schedule.service;
 
-import com.capstone.meetingmap.api.kakaomobility.service.KakaoMobilityDirectionService;
-import com.capstone.meetingmap.api.tmap.dto.*;
+import com.capstone.meetingmap.api.tmap.dto.PedestrianRouteRequest;
+import com.capstone.meetingmap.api.tmap.dto.RouteRequest;
+import com.capstone.meetingmap.api.tmap.dto.RouteResponse;
+import com.capstone.meetingmap.api.tmap.dto.SimpleTransitRouteResponse;
 import com.capstone.meetingmap.api.tmap.service.TMapApiService;
 import com.capstone.meetingmap.friendship.entity.FriendshipStatus;
 import com.capstone.meetingmap.friendship.repository.FriendshipRepository;
@@ -37,17 +39,15 @@ public class ScheduleService {
     private final ScheduleDetailRepository scheduleDetailRepository;
     private final UserRepository userRepository;
     private final GroupUserRepository groupUserRepository;
-    private final KakaoMobilityDirectionService kakaoMobilityDirectionService;
     private final FriendshipRepository friendshipRepository;
     private final MapService mapService;
 
-    public ScheduleService(TMapApiService tMapApiService, ScheduleRepository scheduleRepository, ScheduleDetailRepository scheduleDetailRepository, UserRepository userRepository, GroupUserRepository groupUserRepository, KakaoMobilityDirectionService kakaoMobilityDirectionService, FriendshipRepository friendshipRepository, MapService mapService) {
+    public ScheduleService(TMapApiService tMapApiService, ScheduleRepository scheduleRepository, ScheduleDetailRepository scheduleDetailRepository, UserRepository userRepository, GroupUserRepository groupUserRepository, FriendshipRepository friendshipRepository, MapService mapService) {
         this.tMapApiService = tMapApiService;
         this.scheduleRepository = scheduleRepository;
         this.scheduleDetailRepository = scheduleDetailRepository;
         this.userRepository = userRepository;
         this.groupUserRepository = groupUserRepository;
-        this.kakaoMobilityDirectionService = kakaoMobilityDirectionService;
         this.friendshipRepository = friendshipRepository;
         this.mapService = mapService;
     }
@@ -211,7 +211,6 @@ public class ScheduleService {
 
             // 음식점을 1개도 고르지 않은 경우 처리
             if (dto.getSelectedPlace().stream().noneMatch(place -> place.getCategory() != null && place.getCategory().startsWith("food-"))) {
-                System.out.println("이거 실행되야함");
                 List<PlaceResponseDto> response = mapService.getAllPlaces("user_ratings_total_dsc", startPlace.getLatitude(), startPlace.getLongitude(), "food");
                 // 점심식사 가능한 시간
                 if (dto.getScheduleStartTime().toLocalTime().isBefore(LocalTime.of(11, 30)) && dto.getScheduleEndTime().toLocalTime().isAfter(LocalTime.of(13, 30))) {
@@ -223,7 +222,6 @@ public class ScheduleService {
                     mergedResponse.add(response.get(1));
                     remainingCount = remainingCount - 1;
                 }
-                System.out.println("mergedResponse.size=!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + mergedResponse.size());
             }
             String category = null;
             switch (dto.getTheme()) {
@@ -343,8 +341,9 @@ public class ScheduleService {
 
             // NN 알고리즘: 가장 가까운 장소 선택
             // 도보거나 자동차이면 tmap api로 거리/시간 계산
-            List<RouteResponse> routeResponseList = new ArrayList<>();
+            NearestInfo nearestInfo;
             if (dto.getTransport().equals("도보")) {
+                List<RouteResponse> routeResponseList = new ArrayList<>();
                 for (SelectedPlace candidate : candidates) {
                     RouteResponse routeResponse = tMapApiService.getPedestrianRoutes(PedestrianRouteRequest.builder()
                             .startX(ParseUtil.parseDoubleSafe(currentPlace.getLongitude()))
@@ -354,9 +353,11 @@ public class ScheduleService {
                             .build());
                     routeResponseList.add(routeResponse);
                 }
+                nearestInfo = tMapApiService.findNearest(routeResponseList, candidates); // 다음 장소 결정
             } else if (dto.getTransport().equals("자동차")) {
+                List<RouteResponse> routeResponseList = new ArrayList<>();
                 for (SelectedPlace candidate : candidates) {
-                    RouteResponse routeResponse = tMapApiService.getCarRoutes(CarRouteRequest.builder()
+                    RouteResponse routeResponse = tMapApiService.getCarRoutes(RouteRequest.builder()
                             .startX(ParseUtil.parseDoubleSafe(currentPlace.getLongitude()))
                             .startY(ParseUtil.parseDoubleSafe(currentPlace.getLatitude()))
                             .endX(ParseUtil.parseDoubleSafe(candidate.getLongitude()))
@@ -364,9 +365,22 @@ public class ScheduleService {
                             .build());
                     routeResponseList.add(routeResponse);
                 }
+                nearestInfo = tMapApiService.findNearest(routeResponseList, candidates); // 다음 장소 결정
+            } else if (dto.getTransport().equals("대중교통")) {
+                List<SimpleTransitRouteResponse> simpleTransitRouteResponseList = new ArrayList<>();
+                for (SelectedPlace candidate : candidates) {
+                    SimpleTransitRouteResponse response = tMapApiService.getSimpleTransitRoutes(RouteRequest.builder()
+                            .startX(ParseUtil.parseDoubleSafe(currentPlace.getLongitude()))
+                            .startY(ParseUtil.parseDoubleSafe(currentPlace.getLatitude()))
+                            .endX(ParseUtil.parseDoubleSafe(candidate.getLongitude()))
+                            .endY(ParseUtil.parseDoubleSafe(candidate.getLatitude()))
+                            .build());
+                    simpleTransitRouteResponseList.add(response);
+                }
+                nearestInfo = tMapApiService.findNearestTransit(simpleTransitRouteResponseList, candidates); // 다음 장소 결정
+            } else {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "이동 수단을 찾지 못했습니다");
             }
-            // 다음 장소 결정
-            NearestInfo nearestInfo = tMapApiService.findNearest(routeResponseList, candidates);
             SelectedPlace next = nearestInfo.getNearest();
 
             // 이동 시간 결정(30분 단위로 올림)

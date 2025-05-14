@@ -8,13 +8,6 @@ import org.springframework.web.client.RestClient;
 
 @Configuration
 public class RestClientConfig {
-    @Bean
-    public RestClient kakaoMobilityRestClient(KakaoApiProperties kakaoApiProperties) {
-        return RestClient.builder()
-                .baseUrl(kakaoApiProperties.getMobilityBaseUrl())
-                .defaultHeader("Authorization", "KakaoAK " + kakaoApiProperties.getRestApiKey())
-                .build();
-    }
 
     @Bean
     public RestClient kakaoRestClient(KakaoApiProperties kakaoApiProperties) {

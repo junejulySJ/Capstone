@@ -1,6 +1,6 @@
 package com.capstone.meetingmap.path.controller;
 
-import com.capstone.meetingmap.api.kakaomobility.service.KakaoMobilityDirectionService;
+import com.capstone.meetingmap.path.service.PathService;
 import com.capstone.meetingmap.schedule.dto.ScheduleDetailCreateDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,15 +13,27 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/path")
 public class PathController {
-    private final KakaoMobilityDirectionService kakaoMobilityDirectionService;
+    private final PathService pathService;
 
-    public PathController(KakaoMobilityDirectionService kakaoMobilityDirectionService) {
-        this.kakaoMobilityDirectionService = kakaoMobilityDirectionService;
+    public PathController(PathService pathService) {
+        this.pathService = pathService;
     }
 
-    @PostMapping
-    public ResponseEntity<?> path(@RequestBody List<ScheduleDetailCreateDto> dtoList) {
-        System.out.println(dtoList);
-        return ResponseEntity.ok(kakaoMobilityDirectionService.getPath(dtoList));
+    // 보행자 길찾기
+    @PostMapping("/pedestrian")
+    public ResponseEntity<?> pedestrianPath(@RequestBody List<ScheduleDetailCreateDto> dtoList) {
+        return ResponseEntity.ok(pathService.getPedestrianPath(dtoList));
+    }
+
+    // 자동차 길찾기
+    @PostMapping("/car")
+    public ResponseEntity<?> carPath(@RequestBody List<ScheduleDetailCreateDto> dtoList) {
+        return ResponseEntity.ok(pathService.getCarPath(dtoList));
+    }
+
+    // 대중교통 길찾기
+    @PostMapping("/transit")
+    public ResponseEntity<?> transitPath(@RequestBody List<ScheduleDetailCreateDto> dtoList) {
+        return ResponseEntity.ok(pathService.getTransitPath(dtoList));
     }
 }

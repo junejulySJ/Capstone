@@ -33,13 +33,33 @@ public class TMapApiService {
     }
 
     // 자동차 경로 안내 api 호출
-    public RouteResponse getCarRoutes(CarRouteRequest request) {
+    public RouteResponse getCarRoutes(RouteRequest request) {
         return tMapRestClient.post()
                 .uri("/tmap/routes")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)
                 .retrieve()
                 .body(RouteResponse.class);
+    }
+
+    // 대중교통 경로 안내 api 호출
+    public TransitRouteResponse getTransitRoutes(RouteRequest request) {
+        return tMapRestClient.post()
+                .uri("/transit/routes")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(request)
+                .retrieve()
+                .body(TransitRouteResponse.class);
+    }
+
+    // 대중교통 요약정보 안내 api 호출
+    public SimpleTransitRouteResponse getSimpleTransitRoutes(RouteRequest request) {
+        return tMapRestClient.post()
+                .uri("/transit/routes/sub")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(request)
+                .retrieve()
+                .body(SimpleTransitRouteResponse.class);
     }
 
     // 최소거리의 장소와 거리, 시간 반환
@@ -57,4 +77,21 @@ public class TMapApiService {
                         .build())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "최소 거리의 장소를 찾지 못했습니다"));
     }
+
+    // 최소거리의 장소와 거리, 시간 반환
+    public NearestInfo findNearestTransit(List<SimpleTransitRouteResponse> routeResponseList, List<SelectedPlace> candidates) {
+        return IntStream.range(0, routeResponseList.size())
+                .boxed()
+                .flatMap(i -> routeResponseList.get(i).getMetaData().getPlan().getItineraries().stream()
+                        .map(f -> new AbstractMap.SimpleEntry<>(i, f)))
+                .min(Comparator.comparingInt(e -> e.getValue().getTotalDistance()))
+                .map(entry -> NearestInfo.builder()
+                        .nearest(candidates.get(entry.getKey()))
+                        .minDistance(entry.getValue().getTotalDistance())
+                        .minTime(entry.getValue().getTotalTime() / 60)
+                        .build())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "최소 거리의 장소를 찾지 못했습니다"));
+    }
+
+
 }

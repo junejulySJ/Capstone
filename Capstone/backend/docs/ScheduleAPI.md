@@ -29,6 +29,22 @@
 **POST** `/schedule/create`
 
 > 사용자로부터 입력받은 데이터를 통해 스케줄을 생성합니다.  
+> 쿼리 파라미터 종류는 다음과 같습니다.
+
+| 파라미터                     | 설명                                             | 값 예시                |
+|--------------------------|------------------------------------------------|---------------------|
+| selectedPlace            | 선택한 장소들(최소 1개 이상 필요)                           | {...}               |
+| stayMinutes              | 장소별 머무는 시간(분 단위)                               | 60                  |
+| scheduleName             | 스케줄 이름                                         | 종로구 데이트             |
+| scheduleAbout            | 스케줄 설명                                         | 종로구 데이트하기 좋은 스케줄    |
+| scheduleStartTime        | 스케줄 시작 시간(input type="datetime-local")         | 2025-06-01T10:00:00 |
+| scheduleEndTime          | 스케줄 종료 시간(input type="datetime-local")         | 2025-06-01T18:00:00 |
+| transport                | 이동 수단                                          | 도보, 자동차             |
+| additionalRecommendation | 추가 추천 여부                                       | true/false          |
+| totalPlaceCount          | (추가 추천 여부가 true면) 선택한 장소를 포함한 스케줄에 포함될 총 장소 개수 | 4                   |
+| theme                    | (추가 추천 여부가 true면) 추천에 사용될 테마                   | date 등              |
+| stayMinutesMean          | (추가 추천 여부가 true면) 추천될 장소들의 평균 머무는 시간(분 단위)     | 60                  |
+
 > theme 종류는 다음과 같습니다.
 
 | theme    | 설명   | 카테고리                             |
@@ -39,6 +55,7 @@
 | food     | 음식투어 | food                             |
 | shopping | 쇼핑   | shopping                         |
 | date     | 데이트  | tour-park, tour-theme-park, cafe |
+
 
 #### 요청 바디
 ```json

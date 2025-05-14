@@ -71,7 +71,7 @@ axios
 | latitude  | 위도(search=location일 때만 필요)                             | 37.6092635094031                                                                            |
 | longitude | 경도(search=location일 때만 필요)                             | 127.06471287129368                                                                          |
 | name      | 장소 이름(search=destination이면 1개, middle-point이면 여러 개 필요) | 시청역, 올림픽공원 등                                                                                |
-| category  | 카테고리 코드(필수X)                                           | 아래 참조                                                                                       |
+| category  | 카테고리 코드(필수X)                                           | tour, food-korean, cafe 등                                                                   |
 
 
 

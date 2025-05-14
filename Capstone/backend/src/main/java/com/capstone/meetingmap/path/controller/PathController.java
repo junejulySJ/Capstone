@@ -3,10 +3,7 @@ package com.capstone.meetingmap.path.controller;
 import com.capstone.meetingmap.path.service.PathService;
 import com.capstone.meetingmap.schedule.dto.ScheduleDetailCreateDto;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -35,5 +32,11 @@ public class PathController {
     @PostMapping("/transit")
     public ResponseEntity<?> transitPath(@RequestBody List<ScheduleDetailCreateDto> dtoList) {
         return ResponseEntity.ok(pathService.getTransitPath(dtoList));
+    }
+
+    // 장소 이름으로 대중교통 길찾기
+    @GetMapping("/transit")
+    public ResponseEntity<?> getTransitPath(@RequestParam(value = "name", required = false) List<String> name) {
+        return ResponseEntity.ok(pathService.getTransitPathByName(name));
     }
 }

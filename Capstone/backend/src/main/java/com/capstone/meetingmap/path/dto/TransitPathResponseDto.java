@@ -1,11 +1,15 @@
 package com.capstone.meetingmap.path.dto;
 
+import com.capstone.meetingmap.api.kakao.dto.AddressFromKeywordResponse;
 import com.capstone.meetingmap.api.tmap.dto.TransitRouteResponse;
+import com.capstone.meetingmap.map.dto.XYDto;
 import com.capstone.meetingmap.schedule.dto.ScheduleDetailCreateDto;
+import com.capstone.meetingmap.util.ParseUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.locationtech.jts.geom.Coordinate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,7 +61,7 @@ public class TransitPathResponseDto {
         private List<List<Double>> coordinates;
     }
 
-    public static TransitPathResponseDto fromTransitRouteResponse(TransitRouteResponse transitRouteResponse, ScheduleDetailCreateDto first, ScheduleDetailCreateDto last, List<Plan> plan) {
+    public static TransitPathResponseDto fromScheduleDetailCreateDto(ScheduleDetailCreateDto first, ScheduleDetailCreateDto last, List<Plan> plan) {
         return TransitPathResponseDto.builder()
                 .origin(Location.builder()
                         .x(first.getLongitude().doubleValue())
@@ -66,6 +70,34 @@ public class TransitPathResponseDto {
                 .destination(Location.builder()
                         .x(last.getLongitude().doubleValue())
                         .y(last.getLatitude().doubleValue())
+                        .build())
+                .plan(plan)
+                .build();
+    }
+
+    public static TransitPathResponseDto fromDocuments(AddressFromKeywordResponse.Documents first, AddressFromKeywordResponse.Documents last, List<Plan> plan) {
+        return TransitPathResponseDto.builder()
+                .origin(Location.builder()
+                        .x(ParseUtil.parseDoubleSafe(first.getX()))
+                        .y(ParseUtil.parseDoubleSafe(first.getY()))
+                        .build())
+                .destination(Location.builder()
+                        .x(ParseUtil.parseDoubleSafe(last.getY()))
+                        .y(ParseUtil.parseDoubleSafe(last.getY()))
+                        .build())
+                .plan(plan)
+                .build();
+    }
+
+    public static TransitPathResponseDto fromCoordinateAndXyDto(Coordinate first, XYDto last, List<Plan> plan) {
+        return TransitPathResponseDto.builder()
+                .origin(Location.builder()
+                        .x(first.getX())
+                        .y(first.getY())
+                        .build())
+                .destination(Location.builder()
+                        .x(last.getMiddleX())
+                        .y(last.getMiddleY())
                         .build())
                 .plan(plan)
                 .build();

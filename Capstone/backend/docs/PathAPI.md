@@ -9,9 +9,9 @@
 
 # Path API
 주요 기능:
-- 보행자 길찾기
-- 자동차 길찾기
+- 보행자, 자동차 길찾기
 - 대중교통 길찾기
+- 장소 이름으로 대중교통 길찾기
 
 ---
 
@@ -261,6 +261,171 @@ axios
   }
 ]
 ```
+
+#### 응답 바디
+```json
+[
+  {
+    "origin": {
+      "x": 126.9857145803,
+      "y": 37.5745839959
+    },
+    "destination": {
+      "x": 126.9806302,
+      "y": 37.5673387
+    },
+    "plan": [
+      {
+        "totalDistance": 1537,
+        "totalTime": 777,
+        "totalWalkTime": 446,
+        "transferCount": 0,
+        "fare": 1500,
+        "pathType": 2,
+        "detail": [
+          {
+            "mode": "도보",
+            "timeline": "조계사.종로경찰서까지 도보로 이동",
+            "time": 4,
+            "distance": 313,
+            "routeColor": "4D524C",
+            "routeStyle": "dashed",
+            "coordinates": [
+              [
+                126.985535,
+                37.574673
+              ],
+              ...
+              이하
+              생략
+            ]
+          },
+          {
+            "mode": "버스",
+            "timeline": "조계사.종로경찰서 승차 - 간선:109 - 간선:606 - 종로1가 하차",
+            "time": 5,
+            "distance": 1183,
+            "routeColor": "0068B7",
+            "routeStyle": "solid",
+            "coordinates": [
+              [
+                126.984833,
+                37.576325
+              ],
+              ...
+              이하
+              생략
+            ]
+          },
+          {
+            "mode": "도보",
+            "timeline": "도착지까지 도보로 이동",
+            "time": 2,
+            "distance": 234,
+            "routeColor": "4D524C",
+            "coordinates": [
+              [
+                126.98109,
+                37.56614
+              ],
+              ...
+              이하
+              생략
+            ]
+          },
+          ...
+          이하
+          생략
+        ]
+      },
+      {
+        "totalDistance": 2388,
+        "totalTime": 1076,
+        "totalWalkTime": 836,
+        "transferCount": 0,
+        "fare": 1400,
+        "pathType": 1,
+        "detail": [
+          {
+            "mode": "도보",
+            "timeline": "종각까지 도보로 이동",
+            "time": 8,
+            "distance": 516,
+            "routeColor": "4D524C",
+            "routeStyle": "dashed",
+            "coordinates": [
+              [
+                126.98059,
+                37.56734
+              ],
+              ...
+              이하
+              생략
+            ]
+          },
+          {
+            "mode": "지하철",
+            "timeline": "종각 승차 - 수도권1호선 - 종로5가 하차",
+            "time": 4,
+            "distance": 1659,
+            "routeColor": "0052A4",
+            "routeStyle": "solid",
+            "coordinates": [
+              [
+                126.982975,
+                37.570175
+              ],
+              ...
+              이하
+              생략
+            ]
+          },
+          {
+            "mode": "도보",
+            "timeline": "도착지까지 도보로 이동",
+            "time": 5,
+            "distance": 418,
+            "routeColor": "4D524C",
+            "routeStyle": "dashed",
+            "coordinates": [
+              [
+                127.001915,
+                37.571007
+              ],
+              ...
+              이하
+              생략
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  ...
+  이하
+  생략
+]
+```
+</details>
+
+---
+
+<details>
+<summary> 장소 이름으로 대중교통 길찾기</summary>
+
+**GET** `/path/transit`
+
+> 장소 이름들을 입력받아 대중교통 경로를 반환합니다.  
+> 장소 이름은 2개를 입력받으면 출발지부터 목적지까지의 경로,  
+> 3개 이상을 입력받으면 중간지점을 찾아 각 지점부터 중간지점까지의 경로들을 반환합니다.
+> 응답 바디 정보는 대중교통 길찾기와 같습니다.
+
+#### 요청 코드
+```javascript
+axios
+    .get(`${API_BASE_URL}/path/transit?name=${placeName1}&name=${placeName2}`)
+```
+
 
 #### 응답 바디
 ```json

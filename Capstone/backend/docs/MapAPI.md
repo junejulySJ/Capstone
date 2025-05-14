@@ -15,6 +15,8 @@
 
 ---
 
+## API 목록
+
 <details>
 <summary>카테고리 조회 ✏️</summary>
 
@@ -53,8 +55,6 @@ axios
 </details>
 
 ---
-
-## API 목록
 
 <details>
 <summary>지도 출력 ✏️</summary>

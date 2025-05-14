@@ -1,13 +1,21 @@
 package com.capstone.meetingmap.path.service;
 
+import com.capstone.meetingmap.api.kakao.dto.AddressFromKeywordResponse;
+import com.capstone.meetingmap.api.kakao.service.KakaoApiService;
 import com.capstone.meetingmap.api.tmap.dto.PedestrianRouteRequest;
 import com.capstone.meetingmap.api.tmap.dto.RouteRequest;
 import com.capstone.meetingmap.api.tmap.dto.RouteResponse;
 import com.capstone.meetingmap.api.tmap.dto.TransitRouteResponse;
 import com.capstone.meetingmap.api.tmap.service.TMapApiService;
+import com.capstone.meetingmap.map.dto.XYDto;
+import com.capstone.meetingmap.map.service.ConvexHullService;
 import com.capstone.meetingmap.path.dto.PathResponseDto;
 import com.capstone.meetingmap.path.dto.TransitPathResponseDto;
 import com.capstone.meetingmap.schedule.dto.ScheduleDetailCreateDto;
+import com.capstone.meetingmap.util.ClampUtil;
+import com.capstone.meetingmap.util.ParseUtil;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Point;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,9 +27,13 @@ import java.util.stream.Collectors;
 @Service
 public class PathService {
     private final TMapApiService tMapApiService;
+    private final KakaoApiService kakaoApiService;
+    private final ConvexHullService convexHullService;
 
-    public PathService(TMapApiService tMapApiService) {
+    public PathService(TMapApiService tMapApiService, KakaoApiService kakaoApiService, ConvexHullService convexHullService) {
         this.tMapApiService = tMapApiService;
+        this.kakaoApiService = kakaoApiService;
+        this.convexHullService = convexHullService;
     }
 
     // 보행자 경로 출력
@@ -79,10 +91,51 @@ public class PathService {
                     .endY(dtoList.get(i + 1).getLatitude().doubleValue())
                     .build());
 
-            pathResponseDtoList.add(TransitPathResponseDto.fromTransitRouteResponse(transitRouteResponse, dtoList.get(i), dtoList.get(i + 1), TransitPathResponseDto.getPlan(transitRouteResponse)));
+            pathResponseDtoList.add(TransitPathResponseDto.fromScheduleDetailCreateDto(dtoList.get(i), dtoList.get(i + 1), TransitPathResponseDto.getPlan(transitRouteResponse)));
         }
         return pathResponseDtoList;
     }
+
+    // 장소 이름으로 대중교통 경로 출력
+    public List<TransitPathResponseDto> getTransitPathByName(List<String> names) {
+        if (names.size() < 2) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "경로를 그리기 위한 장소가 너무 적습니다");
+        } else if (names.size() == 2) {
+            AddressFromKeywordResponse start = kakaoApiService.getAddressFromKeyword(names.get(0));
+            AddressFromKeywordResponse end = kakaoApiService.getAddressFromKeyword(names.get(1));
+
+            List<TransitPathResponseDto> pathResponseDtoList = new ArrayList<>();
+            TransitRouteResponse transitRouteResponse = tMapApiService.getTransitRoutes(RouteRequest.builder()
+                    .startX(ParseUtil.parseDoubleSafe(start.getDocuments().get(0).getX()))
+                    .startY(ParseUtil.parseDoubleSafe(start.getDocuments().get(0).getY()))
+                    .endX(ParseUtil.parseDoubleSafe(end.getDocuments().get(0).getX()))
+                    .endY(ParseUtil.parseDoubleSafe(end.getDocuments().get(0).getY()))
+                    .build());
+
+            pathResponseDtoList.add(TransitPathResponseDto.fromDocuments(start.getDocuments().get(0), end.getDocuments().get(0), TransitPathResponseDto.getPlan(transitRouteResponse)));
+            return pathResponseDtoList;
+        } else {
+            List<Coordinate> coordList = kakaoApiService.getCoordList(names);
+            Point middlePoint = convexHullService.calculateConvexHullCentroid(coordList);
+            Point adjustedMiddlePoint = ClampUtil.clampPoint(middlePoint);
+
+            XYDto xyDto = XYDto.buildXYDtoByGeometry(adjustedMiddlePoint, coordList);
+
+            List<TransitPathResponseDto> pathResponseDtoList = new ArrayList<>();
+            for (Coordinate coordinate : coordList) {
+                TransitRouteResponse transitRouteResponse = tMapApiService.getTransitRoutes(RouteRequest.builder()
+                        .startX(ParseUtil.parseDoubleSafe(String.valueOf(coordinate.getX())))
+                        .startY(ParseUtil.parseDoubleSafe(String.valueOf(coordinate.getY())))
+                        .endX(ParseUtil.parseDoubleSafe(String.valueOf(xyDto.getMiddleX())))
+                        .endY(ParseUtil.parseDoubleSafe(String.valueOf(xyDto.getMiddleY())))
+                        .build());
+
+                pathResponseDtoList.add(TransitPathResponseDto.fromCoordinateAndXyDto(coordinate, xyDto, TransitPathResponseDto.getPlan(transitRouteResponse)));
+            }
+            return pathResponseDtoList;
+        }
+    }
+
 
     // 경로 좌표 변환
     public static List<List<Double>> getCoordinates(RouteResponse routeResponse) {

@@ -6,6 +6,7 @@ import dummyPosts from "../data/dummyPosts";
 import freeBoardPosts from "../data/freeBoardPosts";
 import blogPosts from "../data/blogPosts";
 import qaPosts from "../data/qaPosts";
+import { savePostToLocal } from '../utils/storage';
 
 const Board = () => {
   const [activeTab, setActiveTab] = useState("main");
@@ -89,13 +90,29 @@ const Board = () => {
         </div>
 
         {selectedPost ? (
-          <div className="post-detail">
-            <button className="back-btn" onClick={handleBack}>← 뒤로가기</button>
-            <h2>{selectedPost.title}</h2>
-            <p className="description">{selectedPost.description}</p>
-            <p className="timestamp">{selectedPost.writer} · {selectedPost.time}</p>
-            <div className="content">{selectedPost.content}</div>
-          </div>
+  <div className="post-detail">
+    <button className="back-btn" onClick={handleBack}>← 뒤로가기</button>
+    <h2>{selectedPost.title}</h2>
+    <p className="description">{selectedPost.description}</p>
+    <p className="timestamp">{selectedPost.writer} · {selectedPost.time}</p>
+    <div className="content">{selectedPost.content}</div>
+
+    {/* ✅ 좋아요/저장 버튼 추가 */}
+    <div className="post-actions" style={{ marginTop: '1rem' }}>
+      <button
+        className="like-btn"
+        onClick={() => savePostToLocal("like", selectedPost)}
+      >
+        ❤️ 좋아요
+      </button>
+      <button
+        className="save-btn"
+        onClick={() => savePostToLocal("save", selectedPost)}
+      >
+        📌 저장하기
+      </button>
+    </div>
+  </div>
         ) : (
           activeTab === "main" ? (
             <>

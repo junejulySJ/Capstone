@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Mypage.css';
+import { myPosts } from "../data/myPosts";
+import { getPostsFromLocal, removePostFromLocal } from '../utils/storage';
 
 const mockUser = {
   id: '홍길동',
@@ -11,6 +13,8 @@ const Mypage = () => {
   const [view, setView] = useState('home');
   const [avatar, setAvatar] = useState(mockUser.avatarUrl); // 상태로 관리
   const navigate = useNavigate();
+  const [likedPosts, setLikedPosts] = useState(getPostsFromLocal("like"));
+  const [savedPosts, setSavedPosts] = useState(getPostsFromLocal("save"));
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
@@ -25,6 +29,16 @@ const Mypage = () => {
       navigate('/');
     }
   };
+
+const handleDeleteLiked = (postId) => {
+  removePostFromLocal("like", postId);
+  setLikedPosts(getPostsFromLocal("like"));
+};
+
+const handleDeleteSaved = (postId) => {
+  removePostFromLocal("save", postId);
+  setSavedPosts(getPostsFromLocal("save"));
+};
 
   return (
     <div className="mypage-container">
@@ -55,8 +69,72 @@ const Mypage = () => {
             {mockUser.id}님 반갑습니다!
           </div>
         )}
-        {view === 'posts' && <div>내 게시물 화면 구성</div>}
-        {view === 'liked' && <div>좋아요/저장한 글 화면 구성</div>}
+        {view === 'posts' && (
+          <div>
+            <h2>내 게시물</h2>
+              <div className="post-list">
+                {myPosts.map((post) => (
+                  <div key={post.id} className="post-card" onClick={() => navigate(`/board?postId=${post.id}`)}>
+                    <img src={post.image} alt={post.title} className="post-thumb" />
+                      <div className="post-info">
+                        <h3>{post.title}</h3>
+                        <p>{post.category} · {post.time}</p>
+                        <p>조회수 {post.views} · 좋아요 {post.likes}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          {view === 'liked' && (
+  <div className="liked-saved-wrapper">
+    <h2>📌 좋아요/저장한 글</h2>
+
+    {/* 좋아요 섹션 */}
+    <section className="liked-saved-section">
+      <h3 className="section-subtitle">📌 좋아요한 글</h3>
+      {likedPosts.length === 0 ? (
+        <p className="empty-text">좋아요한 글이 없습니다.</p>
+      ) : (
+        <ul className="liked-posts-list">
+          {likedPosts.map((post) => (
+            <li key={post.id} className="liked-post-item">
+              <img src={post.image} alt={post.title} />
+              <div>
+                <h3>{post.title}</h3>
+                <p>{post.category} · {post.time}</p>
+                <button onClick={() => handleDeleteLiked(post.id)}>삭제</button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+
+    {/* 저장한 글 섹션 */}
+    <section className="liked-saved-section">
+      <h3 className="section-subtitle">📌 저장한 글</h3>
+      {savedPosts.length === 0 ? (
+        <p className="empty-text">저장한 글이 없습니다.</p>
+      ) : (
+        <ul className="liked-posts-list">
+          {savedPosts.map((post) => (
+            <li key={post.id} className="liked-post-item">
+              <img src={post.image} alt={post.title} />
+              <div>
+                <h3>{post.title}</h3>
+                <p>{post.category} · {post.time}</p>
+                <button onClick={() => handleDeleteSaved(post.id)}>삭제</button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  </div>
+)}
+
+
         {view === 'friends' && <div>친구목록 화면 구성</div>}
         {view === 'schedules' && <div>일정 화면 구성</div>}
         {view === 'settings' && <div>설정 화면 구성</div>}

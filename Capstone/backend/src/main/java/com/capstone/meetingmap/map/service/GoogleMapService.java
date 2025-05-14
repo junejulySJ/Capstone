@@ -101,8 +101,7 @@ public class GoogleMapService {
                         tourApiMapService.findSigunguCodeByName(AddressUtil.extractGu(result.getVicinity())),
                         placeCategoryDetailRepository.findBySearchType(searchType)
                                         .orElseThrow(),
-                        getPlaceImageUrl(result.getPhotos().get(0).getPhoto_reference(), 800),
-                        getPlaceImageUrl(result.getPhotos().get(0).getPhoto_reference(), 200)
+                        getPlaceImageUrl(result.getPhotos().get(0).getPhoto_reference(), 800)
                 ))
                 .limit(count)  // 원하는 개수만큼 자르기
                 .collect(Collectors.toList());
@@ -118,8 +117,7 @@ public class GoogleMapService {
                             .sigunguCode(place.getSigunguCode())
                             .contentId(place.getContentId())
                             .category(place.getCategory())
-                            .firstImage(place.getFirstImage())
-                            .firstImage2(place.getFirstImage2())
+                            .thumbnail(place.getThumbnail())
                             .latitude(place.getLatitude())
                             .longitude(place.getLongitude())
                             .name(place.getName())
@@ -129,43 +127,6 @@ public class GoogleMapService {
                 })
                 .collect(Collectors.toList());
     }
-
-    // 지역구 기반 추가 검색
-    /*public List<PlaceResponseDto> getPlaceListByArea(String sigunguCode, String searchType, int count) {
-
-        Map<String, String> placeKeywords = new HashMap<>();
-
-        if ("A02".equals(cat1)) {
-            // cat1이 "A02"일 경우
-            if (cat2 == null && cat3 == null) {
-                placeKeywords.put("movie_theater", "영화관");  // cat2, cat3 모두 null일 경우 영화관
-            } else if ("A0202".equals(cat2) && cat3 == null) {
-                placeKeywords.put("movie_theater", "영화관");  // cat2만 "A0202"일 경우 영화관
-            } else if ("A0202".equals(cat2) && "A02020200".equals(cat3)) {
-                placeKeywords.put("movie_theater", "영화관");  // cat2가 "A0202", cat3가 "A02020200"일 때경우 영화관
-            }
-        } else if ("A04".equals(cat1)) {
-            // cat1이 "A04"일 경우
-            if (cat2 == null && cat3 == null) {
-                placeKeywords.put("convenience_store", "편의점");  // cat2, cat3 모두 null일 경우 편의점
-            } else if ("A0401".equals(cat2) && cat3 == null) {
-                placeKeywords.put("convenience_store", "편의점");  // cat2만 "A0401"일 경우 편의점
-            } else if ("A0401".equals(cat2) && "A040101000".equals(cat3)) {
-                placeKeywords.put("convenience_store", "편의점");  // cat2가 "A0401", cat3가 "A040101000"일 경우 편의점
-            }
-        } else if ("A05".equals(cat1)) {
-            // cat1이 "A05"일 경우
-            if (cat2 == null && cat3 == null) {
-                placeKeywords.put("cafe", "카페");  // cat2, cat3 모두 null일 경우 카페
-            } else if ("A0502".equals(cat2) && cat3 == null) {
-                placeKeywords.put("cafe", "카페");  // cat2만 "A0502"일 경우 카페
-            } else if ("A0502".equals(cat2) && "A050200900".equals(cat3)) {
-                placeKeywords.put("cafe", "카페");  // cat2가 "A0502", cat3가 "A050200900"일 경우 카페
-            }
-        }
-
-        return getPlaceListByTextSearch(sigunguCode, placeKeywords, count);
-    }*/
 
     // 위치 기반 추가 검색
     public List<PlaceResponseDto> getPlaceListByLocation(String longitude, String latitude, String searchType, int count) {

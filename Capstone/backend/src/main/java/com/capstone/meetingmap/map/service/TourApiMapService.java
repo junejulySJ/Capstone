@@ -7,7 +7,6 @@ import com.capstone.meetingmap.map.dto.TourApiPlaceResponse;
 import com.capstone.meetingmap.map.dto.tourapi.CommonTourApiResponse;
 import com.capstone.meetingmap.map.dto.tourapi.DetailCommonItem;
 import com.capstone.meetingmap.map.dto.tourapi.LocationBasedListItem;
-import com.capstone.meetingmap.map.repository.PlaceCategoryDetailRepository;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,7 +32,7 @@ public class TourApiMapService {
     private final TourApiProperties tourApiProperties;
     private final PlaceCategoryDetailService placeCategoryDetailService;
 
-    public TourApiMapService(TourApiProperties tourApiProperties, PlaceCategoryDetailRepository placeCategoryDetailRepository, PlaceCategoryDetailService placeCategoryDetailService) {
+    public TourApiMapService(TourApiProperties tourApiProperties, PlaceCategoryDetailService placeCategoryDetailService) {
         this.tourApiProperties = tourApiProperties;
         DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory(tourApiProperties.getBaseUrl());
         factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY);
@@ -135,31 +134,18 @@ public class TourApiMapService {
                 .collect(Collectors.toList());
     }
 
-    //지역코드, 시군구코드, 대/중/소분류코드를 fetchFromApi로 검색(변경X)
+    //시군구코드를 fetchFromApi로 검색(변경X)
     private <T> List<CodeResponseDto> searchCodes(
-            String path,
-            String areaCode,
-            String cat1,
-            String cat2,
-            int count,
             ParameterizedTypeReference<CommonTourApiResponse<T>> responseType,
             Function<T, CodeResponseDto> mapper
     ) {
         CommonTourApiResponse<T> response = fetchFromApi(
-                path,
+                "/areaCode1",
                 responseType,
                 builder -> {
-                    builder.queryParam("numOfRows", count)
-                            .queryParam("pageNo", 1);
-                    if (areaCode != null && !areaCode.isBlank()) {
-                        builder.queryParam("areaCode", areaCode); //지역코드 적용
-                    }
-                    if (cat1 != null && !cat1.isBlank()) {
-                        builder.queryParam("cat1", cat1); //대분류 적용
-                    }
-                    if (cat2 != null && !cat2.isBlank()) {
-                        builder.queryParam("cat2", cat2); //중분류 적용
-                    }
+                    builder.queryParam("numOfRows", 40)
+                            .queryParam("pageNo", 1)
+                            .queryParam("areaCode", "1");
                 }
         );
         return getResultDtoList(mapper, response);
@@ -167,9 +153,6 @@ public class TourApiMapService {
 
     //장소 정보를 fetchFromApi로 검색(변경X)
     private <T> List<TourApiPlaceResponse> searchPlaces(
-            String path,
-            String areaCode,
-            String sigunguCode,
             String mapX,
             String mapY,
             String radius,
@@ -177,25 +160,16 @@ public class TourApiMapService {
             int count,
             ParameterizedTypeReference<CommonTourApiResponse<T>> responseType,
             Function<T, TourApiPlaceResponse> mapper,
-            String cat1,
-            String cat2,
-            String cat3,
             String category
     ) {
         CommonTourApiResponse<T> response = fetchFromApi(
-                path,
+                "/locationBasedList1",
                 responseType,
                 builder -> {
                     builder.queryParam("numOfRows", count)
                             .queryParam("pageNo", 1)
                             .queryParam("listYN", "Y")
                             .queryParam("arrange", "Q");
-                    if (areaCode != null && !areaCode.isBlank()) {
-                        builder.queryParam("areaCode", areaCode); //지역코드 적용
-                    }
-                    if (sigunguCode != null && !sigunguCode.isBlank()) {
-                        builder.queryParam("sigunguCode", sigunguCode); //시군구코드 적용
-                    }
                     if (mapX != null && !mapX.isBlank()) {
                         builder.queryParam("mapX", mapX); //x좌표 적용
                     }
@@ -208,34 +182,24 @@ public class TourApiMapService {
                     if (contentTypeId != null && !contentTypeId.isBlank()) {
                         builder.queryParam("contentTypeId", contentTypeId); //타입 ID 적용(관광지: 12, 숙박: 32, 쇼핑: 38, 음식점: 39, ...)
                     }
-                    if (areaCode != null && !areaCode.isBlank() && cat1 != null && !cat1.isBlank()) {
-                        builder.queryParam("cat1", cat1);
-                    }
-                    if (areaCode != null && !areaCode.isBlank() && cat2 != null && !cat2.isBlank()) {
-                        builder.queryParam("cat2", cat2);
-                    }
-                    if (areaCode != null && !areaCode.isBlank() && cat3 != null && !cat3.isBlank()) {
-                        builder.queryParam("cat3", cat3);
-                    }
                 }
         );
         return getResultDtoList(mapper, response, category);
     }
 
-    //지역코드/시군구코드를 조회
+    //시군구코드를 조회
     public List<CodeResponseDto> getRegionCodes() {
-        return searchCodes("/areaCode1", "1", null, null, 40,
-                new ParameterizedTypeReference<>() {}, CodeResponseDto::fromCodeItem);
+        return searchCodes(new ParameterizedTypeReference<>() {}, CodeResponseDto::fromCodeItem);
     }
 
-    //지역/좌표(중간위치 포함)/도착지별 장소 조회
-    public List<TourApiPlaceResponse> getPlaceList(String x, String y, String contentTypeId, int count, String cat1, String cat2, String cat3, String category) {
+    //좌표(중간위치 포함)/도착지별 장소 조회
+    public List<TourApiPlaceResponse> getPlaceList(String x, String y, String contentTypeId, int count, String category) {
         //좌표 기반 장소 조회(3km 반경)
-        List<TourApiPlaceResponse> places = searchPlaces("/locationBasedList1", null, null, x, y, "3000", contentTypeId, count,
+        List<TourApiPlaceResponse> places = searchPlaces(x, y, "3000", contentTypeId, count,
                 new ParameterizedTypeReference<CommonTourApiResponse<LocationBasedListItem>>() {},
                 item -> TourApiPlaceResponse.fromLocationBasedListItem(item,
                         placeCategoryDetailService.searchPlaceCategoryDetail(item.getContenttypeid(), item.getCat1(), item.getCat2(), item.getCat3())
-                ), cat1, cat2, cat3, category);
+                ), category);
         return places.stream()
                 .filter(place -> !place.getCategory().equals("other")) //contentTypeId가 0일때 제거
                 .collect(Collectors.toList());
@@ -288,15 +252,5 @@ public class TourApiMapService {
                 .map(CodeResponseDto::getCode)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("시군구명 없음: " + name));
-    }
-
-    // 시군구 코드로 시군구명 찾기
-    public String findSigunguNameByCode(String code) {
-        return getRegionCodes()
-                .stream()
-                .filter(dto -> dto.getCode().equals(code))
-                .map(CodeResponseDto::getName)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("시군구코드 없음: " + code));
     }
 }

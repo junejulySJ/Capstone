@@ -15,8 +15,7 @@ public class PlaceResponseDto {
     private String sigunguCode;
     private String contentId;
     private String category;
-    private String firstImage;
-    private String firstImage2;
+    private String thumbnail;
     private String latitude;
     private String longitude;
     private String name;
@@ -24,14 +23,13 @@ public class PlaceResponseDto {
     private String userRatingsTotal;
 
     // Google Places API nearbySearch로 가져온 장소 정보를 TourAPI 장소 형태로 변환
-    public static PlaceResponseDto fromGooglePlaceResultNearBySearch(GooglePlaceResult result, String sigunguCode, PlaceCategoryDetail placeCategoryDetail, String imageUrl1, String imageUrl2) {
+    public static PlaceResponseDto fromGooglePlaceResultNearBySearch(GooglePlaceResult result, String sigunguCode, PlaceCategoryDetail placeCategoryDetail, String imageUrl) {
         return PlaceResponseDto.builder()
                 .address(result.getVicinity())
                 .sigunguCode(sigunguCode)
                 .contentId("google_" + result.getPlace_id())
                 .category(placeCategoryDetail.getPlaceCategoryDetailCode())
-                .firstImage(imageUrl1)
-                .firstImage2(imageUrl2)
+                .thumbnail(imageUrl)
                 .latitude(String.valueOf(result.getGeometry().getLocation().getLat()))
                 .longitude(String.valueOf(result.getGeometry().getLocation().getLng()))
                 .name(result.getName())

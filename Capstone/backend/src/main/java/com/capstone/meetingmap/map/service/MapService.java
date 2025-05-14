@@ -76,7 +76,7 @@ public class MapService {
 
                 if (categoryDetail.getContentTypeId() != null) {
                     // TourAPI로 장소 검색
-                    List<TourApiPlaceResponse> tourApiPlaceList = tourApiMapService.getPlaceList(longitude, latitude, categoryDetail.getContentTypeId(), count, categoryDetail.getCat1(), categoryDetail.getCat2(), categoryDetail.getCat3(), categoryDetail.getPlaceCategoryDetailCode());
+                    List<TourApiPlaceResponse> tourApiPlaceList = tourApiMapService.getPlaceList(longitude, latitude, categoryDetail.getContentTypeId(), count, categoryDetail.getPlaceCategoryDetailCode());
                     // Google Places API로 장소에 대해 평점 붙이기
                     if (!tourApiPlaceList.isEmpty()) {
                         List<PlaceResponseDto> placeListWithRating = googleMapService.getPlaceListWithRating(tourApiPlaceList);
@@ -94,8 +94,8 @@ public class MapService {
                 }
             }
         } else { // 전체 검색을 선택한 경우
-            // TourAPI로 15개 장소 검색
-            List<TourApiPlaceResponse> tourApiPlaceList = tourApiMapService.getPlaceList(longitude, latitude, null, 10, null, null, null, null);
+            // TourAPI로 10개 장소 검색
+            List<TourApiPlaceResponse> tourApiPlaceList = tourApiMapService.getPlaceList(longitude, latitude, null, 10, null);
             // Google Places API로 10개 장소에 대해 평점 붙이기
             if (!tourApiPlaceList.isEmpty()) {
                 List<PlaceResponseDto> placeListWithRating = googleMapService.getPlaceListWithRating(tourApiPlaceList);

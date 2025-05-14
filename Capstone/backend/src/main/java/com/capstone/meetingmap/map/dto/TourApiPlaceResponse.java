@@ -16,8 +16,7 @@ public class TourApiPlaceResponse {
     private String sigunguCode;
     private String contentId;
     private String category;
-    private String firstImage;
-    private String firstImage2;
+    private String thumbnail;
     private String latitude;
     private String longitude;
     private String name;
@@ -28,8 +27,7 @@ public class TourApiPlaceResponse {
                 .sigunguCode(item.getSigungucode())
                 .contentId(item.getContentid())
                 .category(placeCategoryDetail.getPlaceCategoryDetailCode())
-                .firstImage(item.getFirstimage())
-                .firstImage2(item.getFirstimage2())
+                .thumbnail(item.getFirstimage())
                 .latitude(item.getMapy())
                 .longitude(item.getMapx())
                 .name(item.getTitle())

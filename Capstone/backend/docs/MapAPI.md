@@ -71,7 +71,7 @@ axios
 | latitude  | 위도(search=location일 때만 필요)                             | 37.6092635094031                                                                            |
 | longitude | 경도(search=location일 때만 필요)                             | 127.06471287129368                                                                          |
 | name      | 장소 이름(search=destination이면 1개, middle-point이면 여러 개 필요) | 시청역, 올림픽공원 등                                                                                |
-| category  | 카테고리(필수X)                                              | 아래 참조                                                                                       |
+| category  | 카테고리 코드(필수X)                                           | 아래 참조                                                                                       |
 
 
 
@@ -83,7 +83,7 @@ axios
     .get(`${API_BASE_URL}/map?search=location&sort=title_asc&latitude=${latitude}&longitude=${longitude}`)
 ```
 
-#### 응답 바디
+#### 응답 바디 ✏️
 ```json
 [
   {
@@ -91,8 +91,7 @@ axios
     "sigunguCode": "24",
     "contentId": "134746",
     "category": "food-chinese",
-    "firstImage": "http://tong.visitkorea.or.kr/cms/resource/96/3474896_image2_1.jpg",
-    "firstImage2": "http://tong.visitkorea.or.kr/cms/resource/96/3474896_image3_1.jpg",
+    "thumbnail": "http://tong.visitkorea.or.kr/cms/resource/96/3474896_image2_1.jpg",
     "latitude": "37.5621214856",
     "longitude": "126.9818402861",
     "name": "개화",
@@ -104,8 +103,7 @@ axios
     "sigunguCode": "24",
     "contentId": "133276",
     "category": "food-korean",
-    "firstImage": "http://tong.visitkorea.or.kr/cms/resource/18/3474918_image2_1.jpg",
-    "firstImage2": "http://tong.visitkorea.or.kr/cms/resource/18/3474918_image3_1.jpg",
+    "thumbnail": "http://tong.visitkorea.or.kr/cms/resource/18/3474918_image2_1.jpg",
     "latitude": "37.5681540761",
     "longitude": "126.9794958849",
     "name": "곰국시집",
@@ -122,7 +120,7 @@ axios
     .get(`${API_BASE_URL}/map?search=destination&sort=user_ratings_total_dsc&name=${placeName}`)
 ```
 
-#### 응답 바디
+#### 응답 바디 ✏️
 ```json
 [
   {
@@ -130,8 +128,7 @@ axios
     "sigunguCode": "23",
     "contentId": "1945693",
     "category": "cafe",
-    "firstImage": "http://tong.visitkorea.or.kr/cms/resource/52/3474852_image2_1.jpg",
-    "firstImage2": "http://tong.visitkorea.or.kr/cms/resource/52/3474852_image3_1.jpg",
+    "thumbnail": "http://tong.visitkorea.or.kr/cms/resource/52/3474852_image2_1.jpg",
     "latitude": "37.5745839959",
     "longitude": "126.9857145803",
     "name": "전통다원",
@@ -143,8 +140,7 @@ axios
     "sigunguCode": "23",
     "contentId": "2783352",
     "category": "cafe",
-    "firstImage": "http://tong.visitkorea.or.kr/cms/resource/84/2790084_image2_1.jpg",
-    "firstImage2": "http://tong.visitkorea.or.kr/cms/resource/84/2790084_image3_1.jpg",
+    "thumbnail": "http://tong.visitkorea.or.kr/cms/resource/84/2790084_image2_1.jpg",
     "latitude": "37.5774250096",
     "longitude": "126.9677078075",
     "name": "스태픽스",
@@ -192,8 +188,7 @@ axios
       "sigunguCode": "24",
       "contentId": "1489369",
       "category": "food-korean",
-      "firstImage": "http://tong.visitkorea.or.kr/cms/resource/38/3474938_image2_1.jpg",
-      "firstImage2": "http://tong.visitkorea.or.kr/cms/resource/38/3474938_image3_1.jpg",
+      "thumbnail": "http://tong.visitkorea.or.kr/cms/resource/38/3474938_image2_1.jpg",
       "latitude": "37.5614854780",
       "longitude": "126.9834734887",
       "name": "오다리집",
@@ -205,8 +200,7 @@ axios
       "sigunguCode": "24",
       "contentId": "398344",
       "category": "food-korean",
-      "firstImage": "http://tong.visitkorea.or.kr/cms/resource/75/1290675_image2_1.jpg",
-      "firstImage2": "http://tong.visitkorea.or.kr/cms/resource/75/1290675_image3_1.jpg",
+      "thumbnail": "http://tong.visitkorea.or.kr/cms/resource/75/1290675_image2_1.jpg",
       "latitude": "37.5629101933",
       "longitude": "126.9768490516",
       "name": "현대칼국수",

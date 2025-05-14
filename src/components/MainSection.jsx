@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './MainSection.css';
+import dummyPosts from '../data/dummyPosts';
 
 const images = [
   '/images/bg1.jpg',
@@ -8,16 +10,6 @@ const images = [
   '/images/bg4.jpg'
 ];
 
-// 샘플 게시글 데이터
-const samplePosts = [
-  { id: 1, title: '서울 핫플 탐방기', views: 150, likes: 30 },
-  { id: 2, title: '부산 해운대 맛집 추천', views: 120, likes: 40 },
-  { id: 3, title: '제주도 힐링 여행 후기', views: 300, likes: 80 },
-  { id: 4, title: '대구 시내 야경 명소', views: 90, likes: 20 },
-  { id: 5, title: '강릉 카페 투어', views: 200, likes: 50 },
-];
-
-// 랜덤 장소 후보
 const randomPlaces = [
   '남산타워',
   '경복궁',
@@ -44,6 +36,26 @@ const placeBackgrounds = {
   '올림픽공원': '/images/placeBG/10.jpg'
 };
 
+function seededShuffle(array, seed) {
+  const result = [...array];
+  let currentIndex = result.length, temporaryValue, randomIndex;
+
+  const random = () => {
+    const x = Math.sin(seed++) * 10000;
+    return x - Math.floor(x);
+  };
+
+  while (0 !== currentIndex) {
+    randomIndex = Math.floor(random() * currentIndex);
+    currentIndex -= 1;
+    temporaryValue = result[currentIndex];
+    result[currentIndex] = result[randomIndex];
+    result[randomIndex] = temporaryValue;
+  }
+
+  return result;
+}
+
 export default function MainSection() {
   const [currentImage, setCurrentImage] = useState(0);
   const [mode, setMode] = useState('midpoint');
@@ -51,6 +63,8 @@ export default function MainSection() {
   const [departure, setDeparture] = useState('');
   const [destination, setDestination] = useState('');
   const [randomPlace, setRandomPlace] = useState('');
+  const [dailyPosts, setDailyPosts] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -61,6 +75,17 @@ export default function MainSection() {
 
   useEffect(() => {
     pickRandomPlace();
+    const placeInterval = setInterval(() => {
+      pickRandomPlace();
+    }, 5000);
+    return () => clearInterval(placeInterval);
+  }, []);
+
+  useEffect(() => {
+    const today = new Date().toDateString();
+    const seed = today.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const shuffled = seededShuffle(dummyPosts, seed);
+    setDailyPosts(shuffled.slice(0, 3));
   }, []);
 
   const goToImage = (index) => setCurrentImage(index);
@@ -89,10 +114,9 @@ export default function MainSection() {
     setRandomPlace(random);
   };
 
-  // 인기 많은 게시글 상위 3개 추출
-  const topPosts = [...samplePosts]
-    .sort((a, b) => (b.views + b.likes * 2) - (a.views + a.likes * 2))
-    .slice(0, 3);
+  const handlePostClick = (postId) => {
+    navigate(`/board?postId=${postId}`);
+  };
 
   return (
     <div className="page-container">
@@ -164,48 +188,45 @@ export default function MainSection() {
       </section>
 
       <section className="recommend-section">
-  <div className="recommend-left">
-    <h2>#오늘의 추천</h2>
-    <div className="card-row">
-      {topPosts.map((post) => (
-        <div key={post.id} className="recommend-card">
-          <img src={`/images/sample${post.id}.jpg`} alt={post.title} className="card-image" />
-          <div className="card-content">
-            <h3>{post.title}</h3>
-            <p>조회수 {post.views} | 좋아요 {post.likes}</p>
+        <div className="recommend-left">
+          <h2>#오늘의 추천</h2>
+          <div className="card-row">
+            {dailyPosts.map((post, index) => (
+              <div key={index} className="recommend-card" onClick={() => handlePostClick(post.id)}>
+                <img src={`/images/${post.image}`} alt={post.title} className="card-image" />
+
+
+                <div className="card-content">
+                  <h3>{post.title}</h3>
+                  <p>조회수 {post.views || 0} | 좋아요 {post.likes || 0}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      ))}
-    </div>
-  </div>
 
-  <div className="recommend-right">
-  <h2>#랜덤 장소 추천</h2>
-  <div className="card-grid">
-    <div
-      className="recommend-card big-card"
-      style={{
-        backgroundImage: `url(${placeBackgrounds[randomPlace] || ''})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        position: 'relative',
-        overflow: 'hidden'
-      }}
-    >
-      {/* 반투명 오버레이 추가 */}
-      <div className="overlay"></div>
-
-      {/* 텍스트 및 버튼 */}
-      <div className="card-content">
-        <h3>{randomPlace}</h3>
-        <button className="action-btn" onClick={pickRandomPlace}>다시 추천받기</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-</section>
-
+        <div className="recommend-right">
+          <h2>#랜덤 장소 추천</h2>
+          <div className="card-grid">
+            <div
+              className="recommend-card big-card"
+              style={{
+                backgroundImage: `url(${placeBackgrounds[randomPlace] || ''})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+            >
+              <div className="overlay"></div>
+              <div className="card-content">
+                <h3>{randomPlace}</h3>
+                <button className="action-btn" onClick={pickRandomPlace}>다시 추천받기</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

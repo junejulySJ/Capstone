@@ -17,8 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @ValidSelectedPlaceCondition
 public class ScheduleCreateRequestDto {
-    @NotEmpty(message = "장소는 반드시 1개 이상 선택해야 합니다")
-    @Size(min = 1, message = "장소는 반드시 1개 이상 선택해야 합니다")
+    // additionalRecommendation가 false면 반드시 1개 이상 작성 필요
     private List<SelectedPlace> selectedPlace;
 
     @NotBlank(message = "스케줄 이름은 반드시 입력해야 합니다")
@@ -35,7 +34,6 @@ public class ScheduleCreateRequestDto {
     @FutureOrPresent(message = "스케줄 종료 시간은 현재 시간 이후만 가능합니다")
     private LocalDateTime scheduleEndTime;
 
-    @NotBlank(message = "스케줄 시작 장소는 반드시 입력해야 합니다")
     private String startContentId;
 
     @NotBlank(message = "이동 수단은 반드시 선택해야 합니다")

@@ -34,6 +34,18 @@ public class PathController {
         return ResponseEntity.ok(pathService.getTransitPath(dtoList));
     }
 
+    // 장소 이름으로 보행자 길찾기
+    @GetMapping("/pedestrian")
+    public ResponseEntity<?> getPedestrianPath(@RequestParam(value = "name", required = false) List<String> name) {
+        return ResponseEntity.ok(pathService.getPedestrianPathByName(name));
+    }
+
+    // 장소 이름으로 자동차 길찾기
+    @GetMapping("/car")
+    public ResponseEntity<?> getCarPath(@RequestParam(value = "name", required = false) List<String> name) {
+        return ResponseEntity.ok(pathService.getCarPathByName(name));
+    }
+
     // 장소 이름으로 대중교통 길찾기
     @GetMapping("/transit")
     public ResponseEntity<?> getTransitPath(@RequestParam(value = "name", required = false) List<String> name) {

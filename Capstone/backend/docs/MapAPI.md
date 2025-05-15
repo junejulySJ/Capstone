@@ -76,81 +76,58 @@ axios
 
 
 
-### 1. 현재 위치를 기반으로 조회할 경우
+### 1. 출발지-도착지를 기반으로 조회할 경우
 #### 요청 코드
 ```javascript
 axios
-    .get(`${API_BASE_URL}/map?search=location&sort=title_asc&latitude=${latitude}&longitude=${longitude}`)
+    .get(`${API_BASE_URL}/map?search=destination&sort=user_ratings_total_dsc&start=${placeName}&end=${placeName}`)
 ```
 
 #### 응답 바디 ✏️
 ```json
-[
-  {
-    "address": "서울특별시 중구 남대문로 52-5 (명동2가) ",
-    "sigunguCode": "24",
-    "contentId": "134746",
-    "category": "food-chinese",
-    "thumbnail": "http://tong.visitkorea.or.kr/cms/resource/96/3474896_image2_1.jpg",
-    "latitude": "37.5621214856",
-    "longitude": "126.9818402861",
-    "name": "개화",
-    "rating": "3.9",
-    "userRatingsTotal": "867"
+{
+  "start": {
+    "name": "한성대학교",
+    "address": "서울 성북구 삼선교로16길 116",
+    "latitude": "37.5825624632779",
+    "longitude": "127.010225523923"
   },
-  {
-    "address": "서울특별시 중구 무교로 24 (무교동) 2층",
-    "sigunguCode": "24",
-    "contentId": "133276",
-    "category": "food-korean",
-    "thumbnail": "http://tong.visitkorea.or.kr/cms/resource/18/3474918_image2_1.jpg",
-    "latitude": "37.5681540761",
-    "longitude": "126.9794958849",
-    "name": "곰국시집",
-    "rating": "4.1",
-    "userRatingsTotal": "849"
-  }
-]
-```
-
-### 2. 도착지를 기반으로 조회할 경우
-#### 요청 코드
-```javascript
-axios
-    .get(`${API_BASE_URL}/map?search=destination&sort=user_ratings_total_dsc&name=${placeName}`)
-```
-
-#### 응답 바디 ✏️
-```json
-[
-  {
-    "address": "서울특별시 종로구 인사동10길 11-4 ",
-    "sigunguCode": "23",
-    "contentId": "1945693",
-    "category": "cafe",
-    "thumbnail": "http://tong.visitkorea.or.kr/cms/resource/52/3474852_image2_1.jpg",
-    "latitude": "37.5745839959",
-    "longitude": "126.9857145803",
-    "name": "전통다원",
-    "rating": "4.3",
-    "userRatingsTotal": "454"
+  "end": {
+    "name": "명신당필방",
+    "address": "서울 종로구 인사동길 34",
+    "latitude": "37.57356831591039",
+    "longitude": "126.9856982140611"
   },
-  {
-    "address": "서울특별시 종로구 사직로9길 22 (필운동) ",
-    "sigunguCode": "23",
-    "contentId": "2783352",
-    "category": "cafe",
-    "thumbnail": "http://tong.visitkorea.or.kr/cms/resource/84/2790084_image2_1.jpg",
-    "latitude": "37.5774250096",
-    "longitude": "126.9677078075",
-    "name": "스태픽스",
-    "rating": "4.2",
-    "userRatingsTotal": "412"
-  }
-]
+  "list": [
+    {
+      "address": "서울특별시 중구 남대문로 52-5 (명동2가) ",
+      "sigunguCode": "24",
+      "contentId": "134746",
+      "category": "food-chinese",
+      "thumbnail": "http://tong.visitkorea.or.kr/cms/resource/96/3474896_image2_1.jpg",
+      "latitude": "37.5621214856",
+      "longitude": "126.9818402861",
+      "name": "개화",
+      "rating": "3.9",
+      "userRatingsTotal": "867"
+    },
+    {
+      "address": "서울특별시 중구 무교로 24 (무교동) 2층",
+      "sigunguCode": "24",
+      "contentId": "133276",
+      "category": "food-korean",
+      "thumbnail": "http://tong.visitkorea.or.kr/cms/resource/18/3474918_image2_1.jpg",
+      "latitude": "37.5681540761",
+      "longitude": "126.9794958849",
+      "name": "곰국시집",
+      "rating": "4.1",
+      "userRatingsTotal": "849"
+    }
+  ]
+}
 ```
 
-### 3. 중간 위치를 기반으로 조회할 경우
+### 2. 중간 위치를 기반으로 조회할 경우
 #### 요청 코드
 ```javascript
 axios
@@ -161,27 +138,31 @@ axios
 #### 응답 바디
 ```json
 {
-  "names": [
-    "동작구민회관",
-    "녹번동근린공원",
-    "올림픽공원"
-  ],
-  "coordinates": [
+  "start": [
     {
-      "x": "126.922743463895",
-      "y": "37.4938972382326"
+      "name": "동작구민회관",
+      "address": "서울 동작구 보라매로5길 28",
+      "latitude": "37.4938972382326",
+      "longitude": "126.922743463895"
     },
     {
-      "x": "126.93185185285346",
-      "y": "37.60353994592752"
+      "name": "녹번동근린공원",
+      "address": "",
+      "latitude": "37.60353994592752",
+      "longitude": "126.93185185285346"
     },
     {
-      "x": "127.120812783275",
-      "y": "37.5205340628851"
+      "name": "올림픽공원",
+      "address": "서울 송파구 올림픽로 424",
+      "latitude": "37.5205340628851",
+      "longitude": "127.120812783275"
     }
   ],
-  "middleX": "126.99180270000781",
-  "middleY": "37.53932374901508",
+  "middlePoint": {
+    "address": "서울 용산구 이태원동 212-27",
+    "latitude": "126.99180270000781",
+    "longitude": "37.53932374901508"
+  },
   "list": [
     {
       "address": "서울특별시 중구 명동8나길 28 (충무로1가) ",

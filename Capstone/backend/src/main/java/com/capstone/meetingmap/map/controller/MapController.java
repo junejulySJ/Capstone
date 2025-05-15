@@ -3,6 +3,7 @@ package com.capstone.meetingmap.map.controller;
 import com.capstone.meetingmap.api.kakao.dto.AddressFromKeywordResponse;
 import com.capstone.meetingmap.api.kakao.service.KakaoApiService;
 import com.capstone.meetingmap.map.dto.*;
+import com.capstone.meetingmap.map.dto.kakaoapi.KakaoCoordinateSearchResponse;
 import com.capstone.meetingmap.map.service.ConvexHullService;
 import com.capstone.meetingmap.map.service.MapService;
 import com.capstone.meetingmap.map.service.TourApiMapService;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -47,27 +49,39 @@ public class MapController {
             @RequestParam(value = "sort") String sort, // 정렬 방법
             @RequestParam(value = "latitude", required = false) Double latitude,
             @RequestParam(value = "longitude", required = false) Double longitude,
+            @RequestParam(value = "start", required = false) String start,
+            @RequestParam(value = "end", required = false) String end,
             @RequestParam(value = "name", required = false) List<String> name,
             @RequestParam(value = "category", required = false) String category
     ) {
 
         switch (search) {
-            case "destination" -> { // 출발지-도착지 기반 검색이면 name 1개 필요
-                AddressFromKeywordResponse response = kakaoApiService.getAddressFromKeyword(name.get(0));
-                return ResponseEntity.ok(mapService.getAllPlaces(sort, response.getDocuments().get(0).getY(), response.getDocuments().get(0).getX(), category));
+            case "destination" -> { // 출발지-도착지 기반 검색이면 start, end 필요
+                AddressFromKeywordResponse startResponse = kakaoApiService.getAddressFromKeyword(start);
+                AddressFromKeywordResponse endResponse = kakaoApiService.getAddressFromKeyword(end);
+                List<PlaceResponseDto> places = mapService.getAllPlaces(sort, endResponse.getDocuments().get(0).getY(), endResponse.getDocuments().get(0).getX(), category);
+                return ResponseEntity.ok(PointResponseDto.addDestinationResponse(startResponse, endResponse, places));
             }
             case "location" -> { // 현재 위치 기반 검색이면 latitude, longitude 필요
                 return ResponseEntity.ok(mapService.getAllPlaces(sort, String.valueOf(latitude), String.valueOf(longitude), category));
             }
             case "middle-point" -> { // 중간 위치 기반 검색이면 name 리스트 필요
+                List<AddressFromKeywordResponse> startResponseList = new ArrayList<>();
+                for (String placeName : name) {
+                    AddressFromKeywordResponse response = kakaoApiService.getAddressFromKeyword(placeName);
+                    startResponseList.add(response);
+                }
                 List<Coordinate> coordList = kakaoApiService.getCoordList(name);
                 Point middlePoint = convexHullService.calculateConvexHullCentroid(coordList);
                 Point adjustedMiddlePoint = ClampUtil.clampPoint(middlePoint);
 
                 XYDto xyDto = XYDto.buildXYDtoByGeometry(adjustedMiddlePoint, coordList);
 
+                KakaoCoordinateSearchResponse response = kakaoApiService.getAddressFromCoordinate(xyDto.getMiddleX(), xyDto.getMiddleY());
+
                 List<PlaceResponseDto> places = mapService.getAllPlaces(sort, String.valueOf(xyDto.getMiddleY()), String.valueOf(xyDto.getMiddleX()), category);
-                return ResponseEntity.ok(MiddlePointResponseDto.addMiddlePointResponse(name, xyDto, places));
+
+                return ResponseEntity.ok(MiddlePointResponseDto.addMiddlePointResponse(startResponseList, response, xyDto, places));
             }
             default -> throw new IllegalStateException("올바르지 않은 검색 방법입니다");
         }

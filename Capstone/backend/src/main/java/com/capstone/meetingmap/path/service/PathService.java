@@ -56,6 +56,45 @@ public class PathService {
         return pathResponseDtoList;
     }
 
+    // 장소 이름으로 도보 경로 출력
+    public List<PathResponseDto> getPedestrianPathByName(List<String> names) {
+        if (names.size() < 2) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "경로를 그리기 위한 장소가 너무 적습니다");
+        } else if (names.size() == 2) {
+            AddressFromKeywordResponse start = kakaoApiService.getAddressFromKeyword(names.get(0));
+            AddressFromKeywordResponse end = kakaoApiService.getAddressFromKeyword(names.get(1));
+
+            List<PathResponseDto> pathResponseDtoList = new ArrayList<>();
+            RouteResponse routeResponse = tMapApiService.getPedestrianRoutes(PedestrianRouteRequest.builder()
+                    .startX(ParseUtil.parseDoubleSafe(start.getDocuments().get(0).getX()))
+                    .startY(ParseUtil.parseDoubleSafe(start.getDocuments().get(0).getY()))
+                    .endX(ParseUtil.parseDoubleSafe(end.getDocuments().get(0).getX()))
+                    .endY(ParseUtil.parseDoubleSafe(end.getDocuments().get(0).getY()))
+                    .build());
+            pathResponseDtoList.add(PathResponseDto.fromDocuments(routeResponse, start.getDocuments().get(0), end.getDocuments().get(0), getCoordinates(routeResponse)));
+            return pathResponseDtoList;
+        } else {
+            List<Coordinate> coordList = kakaoApiService.getCoordList(names);
+            Point middlePoint = convexHullService.calculateConvexHullCentroid(coordList);
+            Point adjustedMiddlePoint = ClampUtil.clampPoint(middlePoint);
+
+            XYDto xyDto = XYDto.buildXYDtoByGeometry(adjustedMiddlePoint, coordList);
+
+            List<PathResponseDto> pathResponseDtoList = new ArrayList<>();
+            for (Coordinate coordinate : coordList) {
+                RouteResponse routeResponse = tMapApiService.getPedestrianRoutes(PedestrianRouteRequest.builder()
+                        .startX(ParseUtil.parseDoubleSafe(String.valueOf(coordinate.getX())))
+                        .startY(ParseUtil.parseDoubleSafe(String.valueOf(coordinate.getY())))
+                        .endX(ParseUtil.parseDoubleSafe(String.valueOf(xyDto.getMiddleX())))
+                        .endY(ParseUtil.parseDoubleSafe(String.valueOf(xyDto.getMiddleY())))
+                        .build());
+
+                pathResponseDtoList.add(PathResponseDto.fromCoordinateAndXyDto(routeResponse, coordinate, xyDto, getCoordinates(routeResponse)));
+            }
+            return pathResponseDtoList;
+        }
+    }
+
     // 자동차 경로 출력
     public List<PathResponseDto> getCarPath(List<ScheduleDetailCreateDto> dtoList) {
         if (dtoList.size() < 2) {
@@ -74,6 +113,45 @@ public class PathService {
             pathResponseDtoList.add(PathResponseDto.fromRouteResponse(routeResponse, dtoList.get(i), dtoList.get(i + 1), getCoordinates(routeResponse)));
         }
         return pathResponseDtoList;
+    }
+
+    // 장소 이름으로 자동차 경로 출력
+    public List<PathResponseDto> getCarPathByName(List<String> names) {
+        if (names.size() < 2) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "경로를 그리기 위한 장소가 너무 적습니다");
+        } else if (names.size() == 2) {
+            AddressFromKeywordResponse start = kakaoApiService.getAddressFromKeyword(names.get(0));
+            AddressFromKeywordResponse end = kakaoApiService.getAddressFromKeyword(names.get(1));
+
+            List<PathResponseDto> pathResponseDtoList = new ArrayList<>();
+            RouteResponse routeResponse = tMapApiService.getCarRoutes(RouteRequest.builder()
+                    .startX(ParseUtil.parseDoubleSafe(start.getDocuments().get(0).getX()))
+                    .startY(ParseUtil.parseDoubleSafe(start.getDocuments().get(0).getY()))
+                    .endX(ParseUtil.parseDoubleSafe(end.getDocuments().get(0).getX()))
+                    .endY(ParseUtil.parseDoubleSafe(end.getDocuments().get(0).getY()))
+                    .build());
+            pathResponseDtoList.add(PathResponseDto.fromDocuments(routeResponse, start.getDocuments().get(0), end.getDocuments().get(0), getCoordinates(routeResponse)));
+            return pathResponseDtoList;
+        } else {
+            List<Coordinate> coordList = kakaoApiService.getCoordList(names);
+            Point middlePoint = convexHullService.calculateConvexHullCentroid(coordList);
+            Point adjustedMiddlePoint = ClampUtil.clampPoint(middlePoint);
+
+            XYDto xyDto = XYDto.buildXYDtoByGeometry(adjustedMiddlePoint, coordList);
+
+            List<PathResponseDto> pathResponseDtoList = new ArrayList<>();
+            for (Coordinate coordinate : coordList) {
+                RouteResponse routeResponse = tMapApiService.getCarRoutes(RouteRequest.builder()
+                        .startX(ParseUtil.parseDoubleSafe(String.valueOf(coordinate.getX())))
+                        .startY(ParseUtil.parseDoubleSafe(String.valueOf(coordinate.getY())))
+                        .endX(ParseUtil.parseDoubleSafe(String.valueOf(xyDto.getMiddleX())))
+                        .endY(ParseUtil.parseDoubleSafe(String.valueOf(xyDto.getMiddleY())))
+                        .build());
+
+                pathResponseDtoList.add(PathResponseDto.fromCoordinateAndXyDto(routeResponse, coordinate, xyDto, getCoordinates(routeResponse)));
+            }
+            return pathResponseDtoList;
+        }
     }
 
     // 대중교통 경로 출력

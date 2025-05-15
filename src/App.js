@@ -9,6 +9,7 @@ import Schedule from './pages/Schedule';
 import Mypage from './pages/Mypage';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Map from './pages/Map';
 import './App.css';
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
           <Route path="/mypage" element={<Mypage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/map" element={<Map />} />
         </Routes>
       </div>
     </Router>

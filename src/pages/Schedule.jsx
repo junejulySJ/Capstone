@@ -1,28 +1,69 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import './Schedule.css';
 import CategorySidebar from '../components/CategorySidebar';
+import { themeSchedules } from '../data/scheduleDummy';
 
 const categories = ['Restaurant', 'Cafe', 'Shopping', 'Culture', 'Outdoors'];
 
 const Schedule = () => {
+  const location = useLocation();
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [departure, setDeparture] = useState('');
-  const [destination, setDestination] = useState('');
   const [estimatedTime, setEstimatedTime] = useState('');
   const [showCreateSection, setShowCreateSection] = useState(false);
   const [showRecommendSection, setShowRecommendSection] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [selectedTheme, setSelectedTheme] = useState('date');
   const [scheduleItems, setScheduleItems] = useState([
     { name: '서울숲', category: 'Outdoors' },
     { name: '카페 라떼아트', category: 'Cafe' }
   ]);
 
+  const departures = location.state?.departures || [];
+  const destinationCoord = location.state?.destinationCoord || null;
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=0bc6b6da5af871403e05922921487a1c&libraries=services&autoload=false`;
+    script.onload = () => {
+      window.kakao.maps.load(() => {
+        const container = document.getElementById('map');
+        const options = {
+          center: new window.kakao.maps.LatLng(37.5665, 126.9780),
+          level: 6
+        };
+        const map = new window.kakao.maps.Map(container, options);
+
+        const geocoder = new window.kakao.maps.services.Geocoder();
+
+        // 출발지 마커 출력
+        departures.forEach((addr) => {
+          geocoder.addressSearch(addr, (result, status) => {
+            if (status === window.kakao.maps.services.Status.OK) {
+              const coords = new window.kakao.maps.LatLng(result[0].y, result[0].x);
+              new window.kakao.maps.Marker({ map, position: coords });
+              map.setCenter(coords);
+            }
+          });
+        });
+
+        // 도착지 좌표 마커 출력
+        if (destinationCoord) {
+          const destCoords = new window.kakao.maps.LatLng(destinationCoord.lat, destinationCoord.lng);
+          new window.kakao.maps.Marker({
+            map,
+            position: destCoords,
+            title: '도착지'
+          });
+          map.setCenter(destCoords);
+        }
+      });
+    };
+    document.head.appendChild(script);
+  }, [departures, destinationCoord]);
+
   const handleEstimate = () => {
-    if (departure && destination) {
-      setEstimatedTime(`${Math.floor(Math.random() * 40) + 10}분 예상`);
-    } else {
-      setEstimatedTime('출발지와 도착지를 입력해주세요.');
-    }
+    setEstimatedTime('차량: 35분 | 대중교통: 45분');
   };
 
   const toggleSidebar = (cat) => {
@@ -58,9 +99,7 @@ const Schedule = () => {
         <h2 className="schedule-title">Schedule</h2>
         <p className="schedule-sub">카카오맵 기반 지도 화면 완성 및 딥정 추가 기능이 구현될 예정입니다.</p>
 
-        <div className="map-placeholder">
-          <img src="https://t1.daumcdn.net/mapjsapi/images/2x/base_map.png" alt="map" className="map-image" />
-        </div>
+        <div id="map" className="map-placeholder"></div>
 
         <div className="category-icons">
           {categories.map((cat) => (
@@ -74,19 +113,8 @@ const Schedule = () => {
         </div>
 
         <div className="input-group">
-          <input
-            type="text"
-            placeholder="출발지"
-            value={departure}
-            onChange={(e) => setDeparture(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="도착지"
-            value={destination}
-            onChange={(e) => setDestination(e.target.value)}
-          />
-          <button onClick={handleEstimate} className="estimate-btn">예상 시간 계산</button>
+          <label>출력 장소</label>
+          <button onClick={handleEstimate}>예상 시간 계산</button>
           <div className="estimated-time">{estimatedTime}</div>
         </div>
 
@@ -120,9 +148,20 @@ const Schedule = () => {
         {showRecommendSection && (
           <div className="section-box">
             <h3>추천 스케줄</h3>
+            <div className="theme-buttons">
+              {Object.keys(themeSchedules).map((theme) => (
+                <button
+                  key={theme}
+                  className={`theme-btn ${selectedTheme === theme ? 'active' : ''}`}
+                  onClick={() => setSelectedTheme(theme)}>
+                  {theme}
+                </button>
+              ))}
+            </div>
             <ul>
-              <li>🔹 한강 → 카페거리 → 야경 명소</li>
-              <li>🔹 박물관 → 맛집 → 공원 산책</li>
+              {themeSchedules[selectedTheme].map((item, index) => (
+                <li key={index}>🔹 {item.time} - {item.activity}</li>
+              ))}
             </ul>
           </div>
         )}

@@ -5,21 +5,25 @@ const RouteSummary = ({ routes = [], transportMode, selectedIdx, onSelect }) => 
   return (
     <div className="route-list">
       {routes.map((route, idx) => (
-        <button
-          key={idx}
-          className={`route-button ${transportMode} ${selectedIdx === idx ? 'selected' : ''}`}
-          onClick={() => onSelect(idx)}
-        >
-          {transportMode === 'transit' ? (
-            <>
-              🚇 {route.plan?.[0]?.totalTime}분 / 도보 {route.plan?.[0]?.totalWalkTime}분 / 환승 {route.plan?.[0]?.transferCount}회 / 요금 {route.plan?.[0]?.fare}원
-            </>
-          ) : (
-            <>
-              ⏱ {route.time}분 / 요금 {route.fare}원 / 거리 {route.distance}km
-            </>
-          )}
-        </button>
+        transportMode === 'transit' ? (
+          route.plan?.map((p, subIdx) => (
+            <button
+              key={`${idx}-${subIdx}`}
+              className={`route-button ${transportMode} ${selectedIdx === `${idx}-${subIdx}` ? 'selected' : ''}`}
+              onClick={() => onSelect(idx, subIdx)}
+            >
+              🚇 {p?.totalTime}분 / 도보 {p?.totalWalkTime}분 / 환승 {p?.transferCount}회 / 요금 {p?.fare}원
+            </button>
+          ))
+        ) : (
+          <button
+            key={idx}
+            className={`route-button ${transportMode} ${selectedIdx === idx ? 'selected' : ''}`}
+            onClick={() => onSelect(idx)}
+          >
+            ⏱ {route.time}분 / 요금 {route.fare}원 / 거리 {route.distance}km
+          </button>
+        )
       ))}
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import './Map.css';
 import CategorySidebar from '../components/CategorySidebar';
@@ -33,8 +33,8 @@ const categoryDetailCodes = {
 const Map = () => {
   const navigate = useNavigate();
   const [mapObj, setMapObj] = useState(null);
-  const [departure, setDeparture] = useState({ placeName: '서울역', latitude: 37.554722, longitude: 126.970833 });
-  const [destination, setDestination] = useState({ placeName: '강남역', latitude: 37.4979, longitude: 127.0276 });
+  const [departure, setDeparture] = useState(null);
+  const [destination, setDestination] = useState(null);
   const [transportMode, setTransportMode] = useState('car');
   const [routeList, setRouteList] = useState([]);
   const [selectedRouteIdx, setSelectedRouteIdx] = useState(null);
@@ -43,6 +43,13 @@ const Map = () => {
   const [categoryMarkers, setCategoryMarkers] = useState([]);
   const [selectedPlaces, setSelectedPlaces] = useState([]);
   const [addedList, setAddedList] = useState([]);
+  const location = useLocation();
+  const [sort, setSort] = useState();
+  const [search, setSearch] = useState();
+  const [departures, setDepartures] = useState([]);
+  const [start, setStart] = useState();
+  const [end, setEnd] = useState();
+  const [middlePoint, setMiddlePoint] = useState();
 
   useEffect(() => {
     const container = document.getElementById('map');
@@ -54,23 +61,90 @@ const Map = () => {
   }, []);
 
   useEffect(() => {
-    if (!mapObj || !departure || !destination) return;
-    new kakao.maps.Marker({ map: mapObj, position: new kakao.maps.LatLng(departure.latitude, departure.longitude) });
-    new kakao.maps.Marker({ map: mapObj, position: new kakao.maps.LatLng(destination.latitude, destination.longitude) });
+    const searchParams = new URLSearchParams(location.search);
+    const search = searchParams.get("search") || "";
+    const sort = searchParams.get("sort") || "";
+    const departure = searchParams.get("start") || "";
+    const destination = searchParams.get("end") || "";
+    const departures = searchParams.getAll("name") || "";
+
+    setSearch(search);
+    setSort(sort);
+    setDeparture(departure);
+    setDestination(destination);
+    setDepartures(departures);
+  }, [location.search]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const allPlaces = [];
+      const markers = [];
+
+      if (!search || !sort) return;
+
+      try {
+        const res = await axios.get(`${API_BASE_URL}/map?search=${search}&sort=${sort}${(departure ? `&start=${departure}` : ``)}${(destination ? `&end=${destination}` : ``)}${(departures.length ? `&${departures.map((d) => (`name=${d}`)).join('&')}` : ``)}`);
+        const start = res.data?.start || null;
+        const end = res.data?.end || null;
+        const middlePoint = res.data?.middlePoint || null;
+        const items = res.data?.list || [];
+
+        for (const place of items) {
+          if (!place.longitude || !place.latitude) continue;
+
+          const lat = parseFloat(place.latitude);
+          const lng = parseFloat(place.longitude);
+          const marker = new kakao.maps.Marker({
+            map: mapObj,
+            position: new kakao.maps.LatLng(lat, lng),
+            title: place.name
+          });
+          markers.push(marker);
+        }
+
+        allPlaces.push(...items);
+
+        setStart(start);
+        setEnd(end);
+        setMiddlePoint(middlePoint);
+      } catch (err) {
+        console.error(`❌ 전체 요청 실패:`, err);
+      }
+
+      setSelectedPlaces(allPlaces.slice(0, 50));
+      setShowSidebar(true);
+    };
+
+    fetchData();
+  }, [departure, destination, departures, sort])
+
+  useEffect(() => {
+    if (!mapObj || !start || !end) return;
+
+    const bounds = new kakao.maps.LatLngBounds();
+    const startPosition = new kakao.maps.LatLng(start.latitude, start.longitude);
+    const endPosition = new kakao.maps.LatLng(end.latitude, end.longitude);
+
+    new kakao.maps.Marker({ map: mapObj, position: startPosition });
+    new kakao.maps.Marker({ map: mapObj, position: endPosition });
+
+    bounds.extend(startPosition);
+    bounds.extend(endPosition);
+    mapObj.setBounds(bounds);
     loadRoutes();
-  }, [mapObj, departure, destination, transportMode]);
+  }, [mapObj, start, end, transportMode]);
 
   const loadRoutes = async () => {
     clearPolylines(polylines);
     setPolylines([]);
     setSelectedRouteIdx(null);
     try {
-      const pathType = transportMode === 'walk' ? 'walk' : transportMode === 'transit' ? 'transit' : 'car';
-      const res = await axios.post(`${API_BASE_URL}/path/${pathType}`, [departure, destination]);
+      const pathType = transportMode === 'walk' ? 'pedestrian' : transportMode === 'transit' ? 'transit' : 'car';
+      const res = await axios.get(`${API_BASE_URL}/path/${pathType}?name=${departure}&name=${destination}`);
       const result = transportMode === 'walk' ? [res.data[0]] : res.data.slice(0, 5);
       setRouteList(result);
       if (transportMode !== 'transit') {
-        const line = drawPolyline(mapObj, result[0].coordinates);
+        const line = drawPolyline(mapObj, result[0].coordinates, (pathType === 'pedestrian' ? '#4D524C' : '#007bff'));
         setPolylines([line]);
       }
     } catch (err) {
@@ -78,23 +152,24 @@ const Map = () => {
     }
   };
 
-  const handleRouteClick = (idx) => {
-    if (selectedRouteIdx === idx) {
-      clearPolylines(polylines);
-      setPolylines([]);
-      setSelectedRouteIdx(null);
-      return;
-    }
+  const handleRouteClick = (routeIdx, planIdx = 0) => {
+    const selectedKey = `${routeIdx}-${planIdx}`;
+    if (selectedRouteIdx === selectedKey) {
     clearPolylines(polylines);
-    const selected = routeList[idx];
-    if (transportMode === 'transit') {
-      const lines = drawTransitPlan(mapObj, selected.plan[0]);
-      setPolylines(lines);
-    } else {
-      const line = drawPolyline(mapObj, selected.coordinates);
-      setPolylines([line]);
-    }
-    setSelectedRouteIdx(idx);
+    setPolylines([]);
+    setSelectedRouteIdx(null);
+    return;
+  }
+  clearPolylines(polylines);
+  const selected = routeList[routeIdx];
+  if (transportMode === 'transit') {
+    const lines = drawTransitPlan(mapObj, selected.plan[planIdx]);
+    setPolylines(lines);
+  } else {
+    const line = drawPolyline(mapObj, selected.coordinates);
+    setPolylines([line]);
+  }
+    setSelectedRouteIdx(selectedKey);
   };
 
   const handleCategoryClick = async (code) => {
@@ -109,18 +184,18 @@ const Map = () => {
 
     for (const detailCode of detailCodes) {
       try {
-        const res = await axios.get(`${API_BASE_URL}/map/category?category=${detailCode}`);
-        const items = res.data?.response?.body?.items?.item || [];
+        const res = await axios.get(`${API_BASE_URL}/map?search=${search}&sort=${sort}${(departure ? `&start=${departure}` : ``)}${(destination ? `&end=${destination}` : ``)}${(departures.length ? `&${departures.map((d) => (`name=${d}`)).join('&')}` : ``)}&category=${detailCode}`);
+        const items = res.data?.list || [];
 
         for (const place of items) {
-          if (!place.mapx || !place.mapy) continue;
+          if (!place.longitude || !place.latitude) continue;
 
-          const lat = parseFloat(place.mapy);
-          const lng = parseFloat(place.mapx);
+          const lat = parseFloat(place.latitude);
+          const lng = parseFloat(place.longitude);
           const marker = new kakao.maps.Marker({
             map: mapObj,
             position: new kakao.maps.LatLng(lat, lng),
-            title: place.title
+            title: place.name
           });
           markers.push(marker);
         }
@@ -137,7 +212,7 @@ const Map = () => {
   };
 
   const handleAddPlace = (place) => {
-    if (addedList.find(p => p.title === place.title)) return;
+    if (addedList.find(p => p.name === place.name)) return;
     if (addedList.length >= 8) return;
     setAddedList([...addedList, place]);
   };
@@ -177,8 +252,8 @@ const Map = () => {
         </div>
 
         <div className="location-box">
-          <h4>출발지: {departure?.placeName || '없음'}</h4>
-          <h4>도착지: {destination?.placeName || '없음'}</h4>
+          <h4>출발지: {start?.name || '없음'}</h4>
+          <h4>도착지: {end?.name || '없음'}</h4>
         </div>
       </div>
 
@@ -186,18 +261,26 @@ const Map = () => {
         <button
           className="schedule-create-button"
           onClick={() => {
-            if (destination) {
+            if (end) {
               navigate('/schedule', {
                 state: {
-                  destinationCoord: {
-                    lat: destination.latitude,
-                    lng: destination.longitude
-                  },
-                  departures: [departure?.placeName || '서울역']
+                  scheduleItems: addedList, 
+                  end: {
+                    latitude: end.latitude,
+                    longitude: end.longitude
+                  }
                 }
               });
             } else {
-              alert('도착지가 설정되지 않았습니다.');
+              navigate('/schedule', {
+                state: {
+                  scheduleItems: addedList, 
+                  end: {
+                    latitude: middlePoint.latitude,
+                    longitude: middlePoint.longitude
+                  }
+                }
+              });
             }
           }}
         >
@@ -212,7 +295,7 @@ const Map = () => {
         ) : (
           <ul>
             {addedList.map((place, index) => (
-              <li key={index}>{place.title} ({place.addr1})</li>
+              <li key={index}>{place.name} ({place.address})</li>
             ))}
           </ul>
         )}

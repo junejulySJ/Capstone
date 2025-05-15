@@ -14,13 +14,23 @@ const Schedule = () => {
   const [showRecommendSection, setShowRecommendSection] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState('date');
-  const [scheduleItems, setScheduleItems] = useState([
-    { name: '서울숲', category: 'Outdoors' },
-    { name: '카페 라떼아트', category: 'Cafe' }
-  ]);
+  const [scheduleItems, setScheduleItems] = useState();
 
   const departures = location.state?.departures || [];
   const destinationCoord = location.state?.destinationCoord || null;
+
+  const { addedList = [] } = location.state || {};
+  const { end = [] } = location.state || {};
+  const [addedListStayMinutes, setAddedListStayMinutes] = useState(["", "", "", "", "", "", "", ""]);
+  const [scheduleName, setScheduleName] = useState();
+  const [scheduleAbout, setScheduleAbout] = useState();
+  const [scheduleStartTime, setScheduleStartTime] = useState();
+  const [scheduleEndTime, setScheduleEndTime] = useState();
+  const [startContentId, setStartContentId] = useState();
+  const [transport, setTransport] = useState();
+  const [additionalRecommendation, setAdditionalRecommendation] = useState(false);
+  const [totalPlaceCount, setTotalPlaceCount] = useState();
+  const [stayMinutesMean, setStayMinutesMean] = useState();
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -61,6 +71,10 @@ const Schedule = () => {
     };
     document.head.appendChild(script);
   }, [departures, destinationCoord]);
+
+  useEffect(() => {
+    setScheduleItems(addedList);
+  }, [addedList])
 
   const handleEstimate = () => {
     setEstimatedTime('차량: 35분 | 대중교통: 45분');
@@ -130,18 +144,56 @@ const Schedule = () => {
         {showCreateSection && (
           <div className="section-box">
             <h3>일정 만들기</h3>
-            {scheduleItems.length === 0 ? (
-              <p>선택한 일정이 없습니다.</p>
-            ) : (
+            {
               <ul>
-                {scheduleItems.map((item, index) => (
+                <li>스케줄 이름: 
+                  <input type="text" name="scheduleName" placeholder="이름" value={scheduleName} onChange={(e) => setScheduleName(e.target.value)} required />
+                  </li>
+                <li>스케줄 설명: 
+                  <input type="text" name="scheduleAbout" placeholder="설명" value={scheduleAbout} onChange={(e) => setScheduleAbout(e.target.value)} required />
+                </li>
+                <li>스케줄 시작 시간: 
+                  <input type="datetime-local" name="scheduleStartTime" value={scheduleStartTime} onChange={(e) => setScheduleStartTime(e.target.value)} required/>
+                </li>
+                <li>스케줄 종료 시간: 
+                  <input type="datetime-local" name="scheduleEndTime" value={scheduleEndTime} onChange={(e) => setScheduleEndTime(e.target.value)} required/>
+                </li>
+                <li>이동수단: <select name="transport" value={transport} onChange={(e) => setTransport(e.target.value)}>
+                  <option value="도보">도보</option>
+                  <option value="자동차">자동차</option>
+                  <option value="대중교통">대중교통</option>
+                  </select></li>
+                <li>추가 추천 여부: <input type="checkbox" name="additionalRecommendation" checked={additionalRecommendation} onChange={(e) => setAdditionalRecommendation(e.target.checked)} /></li>
+                {additionalRecommendation && (
+                  <>
+                    <li>총 장소 수: <input type="number" name="totalPlaceCount" value={totalPlaceCount} onChange={(e) => setTotalPlaceCount(e.target.value)} /></li>
+                    <li>테마: <select name="theme">
+                      <option value="tour">관광</option>
+                      <option value="nature">자연 힐링</option>
+                      <option value="history">역사 탐방</option>
+                      <option value="food">음식 투어</option>
+                      <option value="shopping">쇼핑</option>
+                      <option value="date">데이트</option>
+                      </select></li>
+                    <li>평균 머무는 시간: <input type="number" name="stayMinutesMean" value={stayMinutesMean} onChange={(e) => setStayMinutesMean(e.target.value)} /></li>
+                  </>
+                )}
+                <li>---</li>
+                <li>장소 목록</li>
+                {scheduleItems.length !== 0 ? (scheduleItems.map((item, index) => (
                   <li key={index} className="schedule-item">
                     {item.name} ({item.category})
+                    <input type="number" name="stayMinutes" placeholder="머무는 시간" value={addedListStayMinutes[index]} onChange={(e) => {
+                      const newArray = [...addedListStayMinutes];
+                      newArray[index] = e.target.value;
+                      setAddedListStayMinutes(newArray);
+                    }} />
+                    <input type="radio" name="startContentId" value={item.contentId} checked={startContentId === item.contentId}  onChange={(e) => setStartContentId(e.target.value)} />첫 방문 장소
                     <button className="delete-btn" onClick={() => removeFromSchedule(item.name)}>삭제</button>
                   </li>
-                ))}
+                ))) : <></>}
               </ul>
-            )}
+            }
           </div>
         )}
 

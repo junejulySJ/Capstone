@@ -133,10 +133,10 @@ export default function MainSection() {
     if (mode === 'midpoint') {
       const filtered = departures.filter((d) => d.trim() !== '');
       if (filtered.length < 2) return alert('출발지를 2개 이상 입력해야 합니다.');
-      navigate('/map', { state: { departures: filtered } });
+      navigate(`/map?search=middle-point&sort=rating_dsc&${filtered.map((f) => (`name=${f}`)).join('&')}`);
     } else {
       if (!departure.trim() || !destination.trim()) return alert('출발지와 도착지를 모두 입력해주세요.');
-      navigate('/map', { state: { departures: [departure], destination } });
+      navigate(`/map?search=destination&sort=rating_dsc&start=${departure}&end=${destination}`);
     }
   };
 

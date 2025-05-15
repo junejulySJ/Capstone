@@ -15,15 +15,15 @@ const CategorySidebar = ({ places = [], onClose, onAddPlace, addedList = [] }) =
           places.map((place, index) => (
             <div key={index} className="place-item">
               <img
-                src={place.firstImage || '/images/no_image.png'}
-                alt={place.title}
+                src={place.thumbnail || '/images/no_image.png'}
+                alt={place.name}
                 className="place-thumbnail"
               />
               <div className="place-content">
-                <h4 className="place-title">{place.title}</h4>
-                <p className="place-desc">{place.addr1 || '상세 주소 없음'}</p>
+                <h4 className="place-title">{place.name}</h4>
+                <p className="place-desc">{place.address || '상세 주소 없음'}</p>
                 <button
-                  disabled={addedList.some(p => p.title === place.title) || addedList.length >= 8}
+                  disabled={addedList.some(p => p.name === place.name) || addedList.length >= 8}
                   onClick={() => onAddPlace(place)}
                 >
                   추가

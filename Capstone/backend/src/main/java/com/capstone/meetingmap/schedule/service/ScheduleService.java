@@ -201,26 +201,21 @@ public class ScheduleService {
             // 장소 수-선택한 장소 만큼 추가 장소를 시작 장소를 기준으로 테마, 평점 기준으로 필터링해 선택(정렬은 user_ratings_total 기준 정렬)
             int remainingCount = dto.getTotalPlaceCount() - dto.getSelectedPlace().size();
 
-            // 시작 지점 찾기
-            SelectedPlace startPlace = dto.getSelectedPlace().stream()
-                    .filter(place -> place.getContentId().equals(dto.getStartContentId()))
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("시작 장소를 찾을 수 없습니다: " + dto.getStartContentId()));
-
+            // 추가로 선택된 총 장소
             List<PlaceResponseDto> mergedResponse = new ArrayList<>();
 
             // 음식점을 1개도 고르지 않은 경우 처리
             if (dto.getSelectedPlace().stream().noneMatch(place -> place.getCategory() != null && place.getCategory().startsWith("food-"))) {
-                List<PlaceResponseDto> response = mapService.getAllPlaces("user_ratings_total_dsc", startPlace.getLatitude(), startPlace.getLongitude(), "food");
+                List<PlaceResponseDto> response = mapService.getAllPlaces("user_ratings_total_dsc", dto.getPointCoordinate().getLatitude(), dto.getPointCoordinate().getLongitude(), "food");
                 // 점심식사 가능한 시간
                 if (dto.getScheduleStartTime().toLocalTime().isBefore(LocalTime.of(11, 30)) && dto.getScheduleEndTime().toLocalTime().isAfter(LocalTime.of(13, 30))) {
                     mergedResponse.add(response.get(0));
-                    remainingCount = remainingCount - 1;
+                    remainingCount -= 1;
                 }
                 // 저녁식사 가능한 시간
                 if (dto.getScheduleStartTime().toLocalTime().isBefore(LocalTime.of(17, 30)) && dto.getScheduleEndTime().toLocalTime().isAfter(LocalTime.of(19, 30))) {
                     mergedResponse.add(response.get(1));
-                    remainingCount = remainingCount - 1;
+                    remainingCount -= 1;
                 }
             }
             String category = null;
@@ -242,18 +237,21 @@ public class ScheduleService {
                     category = "tour-park";
                 }
             }
-            List<PlaceResponseDto> response = mapService.getAllPlaces("user_ratings_total_dsc", startPlace.getLatitude(), startPlace.getLongitude(), category);
+            List<PlaceResponseDto> response = mapService.getAllPlaces("user_ratings_total_dsc", dto.getPointCoordinate().getLatitude(), dto.getPointCoordinate().getLongitude(), category);
+            System.out.println("response=" + response);
             if (dto.getTheme().equals("date")) { // 데이트 테마인 경우 추가 검색
-                List<PlaceResponseDto> response2 = mapService.getAllPlaces("user_ratings_total_dsc", startPlace.getLatitude(), startPlace.getLongitude(), "cafe");
+                List<PlaceResponseDto> response2 = mapService.getAllPlaces("user_ratings_total_dsc", dto.getPointCoordinate().getLatitude(), dto.getPointCoordinate().getLongitude(), "cafe");
                 response.addAll(response2);
-                List<PlaceResponseDto> response3 = mapService.getAllPlaces("user_ratings_total_dsc", startPlace.getLatitude(), startPlace.getLongitude(), "tour-theme-park");
+                List<PlaceResponseDto> response3 = mapService.getAllPlaces("user_ratings_total_dsc", dto.getPointCoordinate().getLatitude(), dto.getPointCoordinate().getLongitude(), "tour-theme-park");
                 response.addAll(response3);
             }
-            response.sort(Comparator.comparing(PlaceResponseDto::getUserRatingsTotal));
-            for (int i = 0; i < remainingCount; i++) {
-                mergedResponse.add(response.get(i));
-            }
 
+            // 추가 검색 결과를 평점 개수 많은 기준으로 정렬
+            response.sort(Comparator.comparing(PlaceResponseDto::getUserRatingsTotal).reversed());
+
+            mergedResponse.addAll(response);
+
+            // dto에 추가로 선택된 총 장소 추가
             List<SelectedPlace> additionalPlaceList = new ArrayList<>();
             for (PlaceResponseDto placeDto : mergedResponse) {
                 additionalPlaceList.add(placeDto.toSelectedPlace(dto.getStayMinutesMean()));
@@ -261,18 +259,44 @@ public class ScheduleService {
             dto.getSelectedPlace().addAll(additionalPlaceList);
 
         }
+
+        // 스케줄 순서대로 정렬되게 할 장소들 리스트
+        List<SelectedPlace> sortedSelectedPlaceList = new ArrayList<>();
+
+        // 처음 제시된 장소(추가 추천을 사용할 경우 가장 높은 평점을 가진 종소)로 시작지점 설정
+        SelectedPlace firstPlace = null;
+        for (SelectedPlace selectedPlace : dto.getSelectedPlace()) {
+            // 점심/저녁 식사 시간부터 시작할 경우 음식점인 경우만 시작 장소로 결정
+            if ((dto.getScheduleStartTime().toLocalTime().isAfter(LocalTime.of(11, 30)) &&
+                    dto.getScheduleEndTime().toLocalTime().isBefore(LocalTime.of(13, 30))) ||
+                    (dto.getScheduleStartTime().toLocalTime().isAfter(LocalTime.of(17, 30)) &&
+                            dto.getScheduleEndTime().toLocalTime().isBefore(LocalTime.of(19, 30)))) {
+                if (selectedPlace.getCategory().contains("food")) {
+                    firstPlace = selectedPlace;
+                    break;
+                }
+            } else { // 그 외의 경우 음식점이 아닌 경우만 시작 장소로 결정
+                if (!selectedPlace.getCategory().contains("food")) {
+                    firstPlace = selectedPlace;
+                    break;
+                }
+            }
+        }
+
         // 알고리즘 변수
         Set<SelectedPlace> visited = new HashSet<>();
         LocalDateTime currentTime = dto.getScheduleStartTime();
 
+        // 첫 장소를 정렬 리스트에 넣기
+        sortedSelectedPlaceList.add(firstPlace);
+
         // 시작 지점 선택
-        SelectedPlace currentPlace = dto.getSelectedPlace().stream()
-                .filter(p -> p.getContentId().equals(dto.getStartContentId()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("시작 장소를 찾을 수 없습니다: " + dto.getStartContentId()));
+        SelectedPlace currentPlace = firstPlace;
 
         // 시작 지점 방문 처리
         visited.add(currentPlace);
+
+        System.out.println("처음 visited=" + visited);
 
         // 시작 시간 임시 저장
         LocalDateTime startTime = currentTime;
@@ -307,26 +331,28 @@ public class ScheduleService {
                     candidates.add(place);
                 }
             } else {
-                // 음식점 필터: 점심 or 저녁시간이면 음식점 우선
-                boolean isLunchTime = currentTime.toLocalTime().isAfter(LocalTime.of(11, 30)) &&
-                        currentTime.toLocalTime().isBefore(LocalTime.of(13, 30));
-                boolean isDinnerTime = currentTime.toLocalTime().isAfter(LocalTime.of(17, 30)) &&
-                        currentTime.toLocalTime().isBefore(LocalTime.of(19, 30));
+                // 음식점 필터: 점심 or 저녁시간이 되었거나 지났으면 true
+                boolean isLunchTime = currentTime.toLocalTime().isAfter(LocalTime.of(11, 30));
+                boolean isDinnerTime = currentTime.toLocalTime().isAfter(LocalTime.of(17, 30));
 
+                boolean hadLunchFlag = false;
+                boolean hadDinnerFlag = false;
                 for (SelectedPlace place : dto.getSelectedPlace()) {
+                    System.out.println("지금 visited=" + visited);
+                    System.out.println("지금 place=" + place);
+                    System.out.println("지금 visited 안에 place가 포함되어있니?" + visited.contains(place));
                     if (visited.contains(place)) { // 이미 방문한 장소면 continue
                         continue;
                     }
-
-                    if (isLunchTime && !hadLunch) { // 점심시간이면 음식점 추가
+                    if (isLunchTime && !hadLunch) { // 점심시간이거나 지났는데 음식점 방문을 안했으면 음식점 추가
                         if (place.getCategory().startsWith("food-")) {
                             candidates.add(place);
-                            hadLunch = true;
+                            hadLunchFlag = true;
                         }
-                    } else if (isDinnerTime && !hadDinner) { // 저녁시간이면 음식점 추가
+                    } else if (isDinnerTime && !hadDinner) { // 저녁시간이거나 지났는데 음식점 방문을 안했으면 음식점 추가
                         if (place.getCategory().startsWith("food-")) {
                             candidates.add(place);
-                            hadDinner = true;
+                            hadDinnerFlag = true;
                         }
                     } else { // 그 외 시간이면 음식점을 제외하고 추가
                         if (!place.getCategory().startsWith("food-")) {
@@ -334,26 +360,36 @@ public class ScheduleService {
                         }
                     }
                 }
+                if (hadLunchFlag) hadLunch = true;
+                if (hadDinnerFlag) hadDinner = true;
             }
 
-            // 방문해야 할 장소가 없으면 반복 종료
-            if (candidates.isEmpty()) break;
+            // 방문해야 할 장소가 없거나 총 장소 개수만큼 방문했으면 반복 종료
+            if (candidates.isEmpty() || visited.size() >= dto.getTotalPlaceCount()) break;
 
             // NN 알고리즘: 가장 가까운 장소 선택
-            // 도보거나 자동차이면 tmap api로 거리/시간 계산
+            // tmap api로 거리/시간 계산
             NearestInfo nearestInfo;
             if (dto.getTransport().equals("도보")) {
                 List<RouteResponse> routeResponseList = new ArrayList<>();
                 for (SelectedPlace candidate : candidates) {
+                    System.out.println("candidate: " + candidate.getName());
                     RouteResponse routeResponse = tMapApiService.getPedestrianRoutes(PedestrianRouteRequest.builder()
                             .startX(ParseUtil.parseDoubleSafe(currentPlace.getLongitude()))
                             .startY(ParseUtil.parseDoubleSafe(currentPlace.getLatitude()))
                             .endX(ParseUtil.parseDoubleSafe(candidate.getLongitude()))
                             .endY(ParseUtil.parseDoubleSafe(candidate.getLatitude()))
                             .build());
+                    System.out.println("(" + currentPlace.getLongitude() + ", " +
+                            ParseUtil.parseDoubleSafe(currentPlace.getLatitude()) + ") -> (" +
+                            ParseUtil.parseDoubleSafe(candidate.getLongitude()) + ", " +
+                            ParseUtil.parseDoubleSafe(candidate.getLatitude()) + ")에 대한 response: " +
+                            routeResponse.getFeatures().get(0).getProperties().getTotalDistance());
                     routeResponseList.add(routeResponse);
                 }
+                System.out.println("findNearest 출력 전");
                 nearestInfo = tMapApiService.findNearest(routeResponseList, candidates); // 다음 장소 결정
+                System.out.println("findNearest:" + nearestInfo.getNearest().getName());
             } else if (dto.getTransport().equals("자동차")) {
                 List<RouteResponse> routeResponseList = new ArrayList<>();
                 for (SelectedPlace candidate : candidates) {
@@ -394,6 +430,9 @@ public class ScheduleService {
             // 이동 시간 반영
             currentTime = currentTime.plusMinutes(travelMinutes);
 
+            // 정렬 리스트에 넣기
+            sortedSelectedPlaceList.add(next);
+
             // 방문 처리
             visited.add(next);
 
@@ -418,9 +457,8 @@ public class ScheduleService {
         }
 
         return ScheduleCreateResponseDto.builder()
-                .scheduleName(dto.getScheduleName())
-                .scheduleAbout(dto.getScheduleAbout())
-                .details(detailCreateDtoList)
+                .places(sortedSelectedPlaceList)
+                .schedules(detailCreateDtoList)
                 .build();
     }
 }

@@ -2,6 +2,7 @@ package com.capstone.meetingmap.schedule.dto;
 
 import com.capstone.meetingmap.schedule.entity.Schedule;
 import com.capstone.meetingmap.user.entity.User;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,10 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 public class ScheduleSaveRequestDto {
+    @NotBlank(message = "스케줄 이름은 반드시 입력해야 합니다")
     private String scheduleName;
+
+    @NotBlank(message = "스케줄 설명은 반드시 입력해야 합니다")
     private String scheduleAbout;
     private List<ScheduleDetailRequestDto> details;
 

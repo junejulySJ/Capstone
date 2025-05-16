@@ -20,12 +20,6 @@ public class ScheduleCreateRequestDto {
     // additionalRecommendation가 false면 반드시 1개 이상 작성 필요
     private List<SelectedPlace> selectedPlace;
 
-    @NotBlank(message = "스케줄 이름은 반드시 입력해야 합니다")
-    private String scheduleName;
-
-    @NotBlank(message = "스케줄 설명은 반드시 입력해야 합니다")
-    private String scheduleAbout;
-
     @NotNull(message = "스케줄 시작 시간은 반드시 필요합니다")
     @FutureOrPresent(message = "스케줄 시작 시간은 현재 시간 이후만 가능합니다")
     private LocalDateTime scheduleStartTime;
@@ -33,8 +27,6 @@ public class ScheduleCreateRequestDto {
     @NotNull(message = "스케줄 종료 시간은 반드시 필요합니다")
     @FutureOrPresent(message = "스케줄 종료 시간은 현재 시간 이후만 가능합니다")
     private LocalDateTime scheduleEndTime;
-
-    private String startContentId;
 
     @NotBlank(message = "이동 수단은 반드시 선택해야 합니다")
     @ValidTransportType
@@ -47,4 +39,15 @@ public class ScheduleCreateRequestDto {
     private String theme;
     private Double minimumRating;
     private Integer stayMinutesMean;
+
+    private PointCoordinate pointCoordinate;
+
+    @Getter
+    @NoArgsConstructor
+    @Builder
+    @AllArgsConstructor
+    public static class PointCoordinate {
+        private String latitude;
+        private String longitude;
+    }
 }

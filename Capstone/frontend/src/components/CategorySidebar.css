@@ -1,0 +1,116 @@
+/* CategorySidebar.module.css - Kakao 스타일 사이드바 UI */
+
+.sidebar {
+  position: absolute;
+  top: 0px;
+  left: 0;
+  width: 300px;
+  background-color: #fff;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+  overflow: hidden;
+  transition: transform 0.3s ease-in-out;
+}
+
+.open {
+  transform: translateX(0);
+}
+
+.closed {
+  transform: translateX(-100%);
+}
+
+.header {
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8f9fa;
+  border-bottom: 1px solid #ddd;
+}
+
+.toggle {
+  background: #eee;
+  border: none;
+  padding: 4px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.placeCard {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.placeImage {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.placeInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.placeName {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.placeMeta {
+  font-size: 13px;
+  color: #555;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.addBtn {
+  padding: 5px 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.footer {
+  padding: 10px;
+  border-top: 1px solid #ddd;
+  background: #fafafa;
+}
+
+.footer h4 {
+  margin-bottom: 6px;
+  font-size: 15px;
+}
+
+.footer ul {
+  padding-left: 20px;
+  font-size: 14px;
+}
+
+.noData {
+  text-align: center;
+  color: #777;
+  padding: 20px;
+  font-size: 14px;
+}

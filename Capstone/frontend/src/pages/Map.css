@@ -1,0 +1,118 @@
+/* Map.css - 카테고리 상단 고정, 사이드바는 '카테고리'만 표시 */
+
+.map-page {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin-top: 50px;
+  }
+  
+  .category-top-bar {
+    position: absolute;
+    top:5px;
+    left: 50px; /* 지도 좌상단부터 시작 */
+    right: 20px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 10px 16px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: flex-start;
+    gap: 14px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .category-top-bar button {
+    background-color: #eee;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 13px;
+  }
+  
+  .map-container-wrapper {
+    display: grid;
+    grid-template-areas:
+      'map-area category-panel'
+      'route-box location-box';
+    grid-template-columns: 70% 30%;
+    grid-template-rows: 60vh auto;
+    gap: 10px;
+    padding: 10px;
+    position: relative;
+  }
+  
+  .map-area {
+    grid-area: map-area;
+    width: 100%;
+    height: 100%;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    position: relative;
+  }
+  
+  .category-panel {
+    grid-area: category-panel;
+    background: transparent;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    font-size: 16px;
+    height: 100%;
+  }
+  
+  .location-box {
+    grid-area: location-box;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #fff8dc;
+    font-size: 16px;
+  }
+  
+  .route-box {
+    grid-area: route-box;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    background: #eef5ff;
+  }
+  
+  .transport-select {
+    margin-bottom: 10px;
+  }
+  
+  .transport-select button {
+    margin-right: 8px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    background: #007bff;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .route-list {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  .route-item {
+    background: white;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    padding: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .section-detail {
+    font-size: 14px;
+    color: #333;
+    margin-left: 10px;
+    margin-top: 4px;
+  }

@@ -1,0 +1,178 @@
+/* src/pages/Group.css */
+.group-page {
+  max-width: 960px;
+  margin: 40px auto;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid #cce3d0;
+  border-radius: 8px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.group-page h2 {
+  font-size: 20px;
+  margin-bottom: 20px;
+  color: #1b5e20;
+  border-bottom: 1px solid #d6e9d6;
+  padding-bottom: 8px;
+}
+
+.group-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.group-card {
+  background: #f0fdf4;
+  border: 1px solid #cce3d0;
+  border-radius: 10px;
+  padding: 16px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.group-card:hover {
+  background: #e1f7e7;
+}
+.group-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: #2e7d32;
+}
+.group-card p {
+  font-size: 14px;
+  color: #333;
+}
+.latest-post {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #4caf50;
+}
+
+.group-detail {
+  padding: 16px;
+  background-color: #f9fdfb;
+  border: 1px solid #e0f2e9;
+  border-radius: 8px;
+}
+.group-detail h3 {
+  font-size: 18px;
+  color: #256029;
+  margin-bottom: 8px;
+}
+.group-detail p {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 8px;
+}
+.group-detail .latest-post {
+  font-size: 13px;
+  color: #388e3c;
+  margin-bottom: 12px;
+}
+
+.placeholder {
+  padding: 20px;
+  border: 1px dashed #a5d6a7;
+  background-color: #f1f8f4;
+  border-radius: 6px;
+  text-align: center;
+  color: #2e7d32;
+}
+
+.back-btn {
+  display: inline-block;
+  background: #66bb6a;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 14px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: -8px;
+}
+.back-btn:hover {
+  background: #4caf50;
+}
+
+.friend-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+.friend-form input {
+  padding: 8px;
+  border: 1px solid #cce3d0;
+  border-radius: 6px;
+  flex: 1;
+}
+.friend-form button {
+  padding: 8px 12px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.friend-form button:hover {
+  background: #388e3c;
+}
+
+.friend-list ul {
+  padding-left: 16px;
+  margin-top: 8px;
+}
+.friend-list li {
+  margin-bottom: 4px;
+  cursor: pointer;
+  color: #2e7d32;
+}
+.friend-list li:hover {
+  text-decoration: underline;
+}
+
+/* 채팅창 */
+.chat-window {
+  background: #f9fdfb;
+  border: 1px solid #cce3d0;
+  padding: 20px;
+  border-radius: 8px;
+}
+.chat-box {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+  padding: 12px;
+  background-color: #f0fdf4;
+  border: 1px solid #d0e9d2;
+  border-radius: 6px;
+}
+.chat-message {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #333;
+}
+.chat-input {
+  display: flex;
+  gap: 8px;
+}
+.chat-input input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #cce3d0;
+  border-radius: 6px;
+}
+.chat-input button {
+  background: #66bb6a;
+  border: none;
+  padding: 8px 12px;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.chat-input button:hover {
+  background: #43a047;
+}

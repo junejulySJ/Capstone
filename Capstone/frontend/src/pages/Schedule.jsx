@@ -1,80 +1,136 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import axios from 'axios';
 import './Schedule.css';
 import CategorySidebar from '../components/CategorySidebar';
 import { themeSchedules } from '../data/scheduleDummy';
+import RouteSummary from '../components/RouteSummary';
+import { drawPolyline, drawTransitPlan, clearPolylines } from '../components/RouteDrawer';
 
 const categories = ['Restaurant', 'Cafe', 'Shopping', 'Culture', 'Outdoors'];
+const API_BASE_URL = 'http://localhost:8080/api';
+const { kakao } = window;
 
 const Schedule = () => {
   const location = useLocation();
+  const [mapObj, setMapObj] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [estimatedTime, setEstimatedTime] = useState('');
   const [showCreateSection, setShowCreateSection] = useState(false);
   const [showRecommendSection, setShowRecommendSection] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState('date');
-  const [scheduleItems, setScheduleItems] = useState();
-
+  
   const departures = location.state?.departures || [];
   const destinationCoord = location.state?.destinationCoord || null;
 
   const { addedList = [] } = location.state || {};
+  const [scheduleItems, setScheduleItems] = useState(() => addedList);
   const { end = [] } = location.state || {};
-  const [addedListStayMinutes, setAddedListStayMinutes] = useState(["", "", "", "", "", "", "", ""]);
+  const [scheduleItemStayMinutes, setScheduleItemStayMinutes] = useState(["", "", "", "", "", "", "", ""]);
   const [scheduleName, setScheduleName] = useState();
   const [scheduleAbout, setScheduleAbout] = useState();
+  const [scheduleDate, setScheduleDate] = useState();
+  const [startTime, setStartTime] = useState();
+  const [endTime, setEndTime] = useState();
   const [scheduleStartTime, setScheduleStartTime] = useState();
   const [scheduleEndTime, setScheduleEndTime] = useState();
-  const [startContentId, setStartContentId] = useState();
-  const [transport, setTransport] = useState();
+  const [transport, setTransport] = useState("도보");
   const [additionalRecommendation, setAdditionalRecommendation] = useState(false);
-  const [totalPlaceCount, setTotalPlaceCount] = useState();
-  const [stayMinutesMean, setStayMinutesMean] = useState();
+  const [totalPlaceCount, setTotalPlaceCount] = useState(() => scheduleItems.length);
+  const [theme, setTheme] = useState("tour");
+  const [stayMinutesMean, setStayMinutesMean] = useState(60);
+  const [placeMarkers, setPlaceMarkers] = useState([]);
+  const [showCreateScheduleSection, setShowCreateScheduleSection] = useState(false);
+  const [createdSchedule, setCreatedSchedule] = useState(null);
+  const [createScheduleLoading, setCreateScheduleLoading] = useState(false);
+  const [transportMode, setTransportMode] = useState('car');
+  const [routeList, setRouteList] = useState([]);
+  const [selectedRouteIdx, setSelectedRouteIdx] = useState(null);
+  const [polylines, setPolylines] = useState([]);
+
 
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=0bc6b6da5af871403e05922921487a1c&libraries=services&autoload=false`;
-    script.onload = () => {
-      window.kakao.maps.load(() => {
-        const container = document.getElementById('map');
-        const options = {
-          center: new window.kakao.maps.LatLng(37.5665, 126.9780),
-          level: 6
-        };
-        const map = new window.kakao.maps.Map(container, options);
+    const container = document.getElementById('map');
+    const map = new kakao.maps.Map(container, {
+      center: new kakao.maps.LatLng(37.554722, 126.970833),
+      level: 5,
+    });
+    setMapObj(map);
+  }, []);
 
-        const geocoder = new window.kakao.maps.services.Geocoder();
+  useEffect(() => {
+    // 장소들 마커 출력
+    if (!scheduleItems || !mapObj) return;
 
-        // 출발지 마커 출력
-        departures.forEach((addr) => {
-          geocoder.addressSearch(addr, (result, status) => {
-            if (status === window.kakao.maps.services.Status.OK) {
-              const coords = new window.kakao.maps.LatLng(result[0].y, result[0].x);
-              new window.kakao.maps.Marker({ map, position: coords });
-              map.setCenter(coords);
-            }
-          });
-        });
+    placeMarkers.forEach(placeMarker => {
+      placeMarker.marker.setMap(null);
+      placeMarker.infowindow.close();
+    });
 
-        // 도착지 좌표 마커 출력
-        if (destinationCoord) {
-          const destCoords = new window.kakao.maps.LatLng(destinationCoord.lat, destinationCoord.lng);
-          new window.kakao.maps.Marker({
-            map,
-            position: destCoords,
-            title: '도착지'
-          });
-          map.setCenter(destCoords);
-        }
+    const bounds = new kakao.maps.LatLngBounds();
+
+    const markers = [];
+    scheduleItems.forEach((item) => {
+      const coords = new window.kakao.maps.LatLng(item.latitude, item.longitude);
+      const marker = new window.kakao.maps.Marker({
+        map: mapObj,
+        position: coords,
+        title: item.name
       });
-    };
-    document.head.appendChild(script);
-  }, [departures, destinationCoord]);
+      marker.setMap(mapObj);
+      
+      // 인포윈도우 생성
+      const infowindow = new kakao.maps.InfoWindow({
+        content: `<div>${item.name}</div>`
+      })
+
+      // 마커에 마우스 오버/아웃 이벤트 등록(인포윈도우 표시)
+      kakao.maps.event.addListener(marker, "mouseover", () => infowindow.open(mapObj, marker));
+      kakao.maps.event.addListener(marker, "mouseout", () => infowindow.close());
+
+      markers.push({ marker, infowindow });
+      bounds.extend(coords);
+    });
+    setPlaceMarkers(markers);
+    mapObj.setBounds(bounds);
+  }, [scheduleItems, mapObj]);
 
   useEffect(() => {
-    setScheduleItems(addedList);
-  }, [addedList])
+    if (scheduleDate && startTime) {
+      const combined = `${scheduleDate}T${startTime}`;
+      setScheduleStartTime(combined);
+    }
+  }, [scheduleDate, startTime]);
+
+  useEffect(() => {
+    if (scheduleDate && endTime) {
+      const combined = `${scheduleDate}T${endTime}`;
+      setScheduleEndTime(combined);
+    }
+  }, [scheduleDate, endTime]);
+
+  useEffect(() => {
+    loadRoutes();
+  }, [createdSchedule, transportMode])
+
+  const loadRoutes = async () => {
+    clearPolylines(polylines);
+    setPolylines([]);
+    setSelectedRouteIdx(null);
+    try {
+      const pathType = transportMode === 'walk' ? 'pedestrian' : transportMode === 'transit' ? 'transit' : 'car';
+      const res = await axios.post(`${API_BASE_URL}/path/${pathType}`, createdSchedule);
+      const result = res.data.slice(0, 5);
+      setRouteList(result);
+      if (transportMode !== 'transit') {
+        const line = drawPolyline(mapObj, result[0].coordinates, (pathType === 'pedestrian' ? '#4D524C' : '#007bff'));
+        setPolylines([line]);
+      }
+    } catch (err) {
+      console.error('경로 API 오류:', err);
+    }
+  };
 
   const handleEstimate = () => {
     setEstimatedTime('차량: 35분 | 대중교통: 45분');
@@ -89,7 +145,7 @@ const Schedule = () => {
     }
   };
 
-  const addToSchedule = (place) => {
+  const addToSchedule = (place) => {    
     if (!scheduleItems.some(item => item.name === place.name)) {
       setScheduleItems([...scheduleItems, place]);
     }
@@ -98,6 +154,75 @@ const Schedule = () => {
   const removeFromSchedule = (name) => {
     setScheduleItems(scheduleItems.filter(item => item.name !== name));
   };
+
+  const handleCreateSchedule = async () => {
+    setShowCreateScheduleSection(false);
+    setCreateScheduleLoading(true);
+    try {
+      const res = await axios.post(`${API_BASE_URL}/schedules/create`,
+        {
+          "selectedPlace": scheduleItems.map((item, index) => (
+            {
+              contentId: item.contentId,
+              address: item.address,
+              name: item.name,
+              latitude: item.latitude,
+              longitude: item.longitude,
+              category: item.category,
+              stayMinutes: scheduleItemStayMinutes[index]
+            }
+          )),
+          "scheduleStartTime": scheduleStartTime,
+          "scheduleEndTime": scheduleEndTime,
+          "transport": transport,
+          "additionalRecommendation": additionalRecommendation,
+          "totalPlaceCount": totalPlaceCount,
+          "theme": theme,
+          "stayMinutesMean": stayMinutesMean,
+          "pointCoordinate": {
+            "latitude": end.latitude,
+            "longitude": end.longitude
+        }
+      });
+      const result = res.data;
+      setScheduleItems(result.places);
+
+      const updatedStayMinutes = [...scheduleItemStayMinutes];
+      result.places.forEach((place, index) => {
+        if (updatedStayMinutes[index] === "") {
+          updatedStayMinutes[index] = stayMinutesMean;
+        }
+      });
+      setScheduleItemStayMinutes(updatedStayMinutes);
+      
+      setCreatedSchedule(result.schedules);
+      setShowCreateScheduleSection(true);
+    } catch (err) {
+      console.error('스케줄 API 오류:', err);
+    } finally {
+      setCreateScheduleLoading(false);
+    }
+  };
+
+  const handleRouteClick = (routeIdx, planIdx = 0) => {
+      const selectedKey = `${routeIdx}-${planIdx}`;
+      if (selectedRouteIdx === selectedKey) {
+        clearPolylines(polylines);
+        setPolylines([]);
+        setSelectedRouteIdx(null);
+        return;
+      }
+      clearPolylines(polylines);
+      const selected = routeList[routeIdx];
+      if (transportMode === 'transit') {
+        const lines = drawTransitPlan(mapObj, selected.plan[planIdx]);
+        setPolylines(lines);
+      } else {
+        const line = drawPolyline(mapObj, selected.coordinates);
+        setPolylines([line]);
+      }
+      setSelectedRouteIdx(selectedKey);
+    };
 
   return (
     <div className="schedule-wrapper">
@@ -115,21 +240,18 @@ const Schedule = () => {
 
         <div id="map" className="map-placeholder"></div>
 
-        <div className="category-icons">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              className={`category-btn ${selectedCategory === cat ? 'active' : ''}`}
-              onClick={() => toggleSidebar(cat)}>
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        <div className="input-group">
-          <label>출력 장소</label>
-          <button onClick={handleEstimate}>예상 시간 계산</button>
-          <div className="estimated-time">{estimatedTime}</div>
+        <div className="route-box">
+          <div className="transport-select">
+            <button onClick={() => setTransportMode('car')}>🚗 차량</button>
+            <button onClick={() => setTransportMode('transit')}>🚌 대중교통</button>
+            <button onClick={() => setTransportMode('walk')}>🚶 도보</button>
+          </div>
+          <RouteSummary
+            routes={routeList}
+            transportMode={transportMode}
+            selectedIdx={selectedRouteIdx}
+            onSelect={handleRouteClick}
+          />
         </div>
 
         <div className="button-row">
@@ -139,6 +261,9 @@ const Schedule = () => {
           <button onClick={() => setShowRecommendSection((prev) => !prev)} className="action-btn">
             Recommended Schedules
           </button>
+          <button onClick={() => handleCreateSchedule()} className="action-btn">
+            일정 생성
+          </button>
         </div>
 
         {showCreateSection && (
@@ -146,17 +271,27 @@ const Schedule = () => {
             <h3>일정 만들기</h3>
             {
               <ul>
-                <li>스케줄 이름: 
-                  <input type="text" name="scheduleName" placeholder="이름" value={scheduleName} onChange={(e) => setScheduleName(e.target.value)} required />
+                <li>장소 목록</li>
+                {scheduleItems.length !== 0 ? (scheduleItems.map((item, index) => (
+                  <li key={index} className="schedule-item" onMouseOver={() => placeMarkers[index].infowindow.open(mapObj, placeMarkers[index].marker)} onMouseOut={() => placeMarkers[index].infowindow.close()}>
+                    {item.name} ({item.category})
+                    <input type="number" name="stayMinutes" placeholder="머무는 시간" value={scheduleItemStayMinutes[index]} onChange={(e) => {
+                      const newArray = [...scheduleItemStayMinutes];
+                      newArray[index] = e.target.value;
+                      setScheduleItemStayMinutes(newArray);
+                    }} />
+                    <button className="delete-btn" onClick={() => removeFromSchedule(item.name)}>삭제</button>
                   </li>
-                <li>스케줄 설명: 
-                  <input type="text" name="scheduleAbout" placeholder="설명" value={scheduleAbout} onChange={(e) => setScheduleAbout(e.target.value)} required />
+                ))) : <></>}
+                <li>---</li>
+                <li>스케줄 날짜: 
+                  <input type="date" value={scheduleDate} onChange={(e) => setScheduleDate(e.target.value)} required />
                 </li>
                 <li>스케줄 시작 시간: 
-                  <input type="datetime-local" name="scheduleStartTime" value={scheduleStartTime} onChange={(e) => setScheduleStartTime(e.target.value)} required/>
+                  <input type="time" name="startTime" value={startTime} onChange={(e) => setStartTime(e.target.value)} required/>
                 </li>
                 <li>스케줄 종료 시간: 
-                  <input type="datetime-local" name="scheduleEndTime" value={scheduleEndTime} onChange={(e) => setScheduleEndTime(e.target.value)} required/>
+                  <input type="time" name="endTime" value={endTime} onChange={(e) => setEndTime(e.target.value)} required/>
                 </li>
                 <li>이동수단: <select name="transport" value={transport} onChange={(e) => setTransport(e.target.value)}>
                   <option value="도보">도보</option>
@@ -166,8 +301,8 @@ const Schedule = () => {
                 <li>추가 추천 여부: <input type="checkbox" name="additionalRecommendation" checked={additionalRecommendation} onChange={(e) => setAdditionalRecommendation(e.target.checked)} /></li>
                 {additionalRecommendation && (
                   <>
-                    <li>총 장소 수: <input type="number" name="totalPlaceCount" value={totalPlaceCount} onChange={(e) => setTotalPlaceCount(e.target.value)} /></li>
-                    <li>테마: <select name="theme">
+                    <li>총 장소 수(선택한 장소 + 추천 받을 장소): <input type="number" name="totalPlaceCount" value={totalPlaceCount} min={scheduleItems.length} max={7} onChange={(e) => setTotalPlaceCount(e.target.value)} /></li>
+                    <li>테마: <select name="theme" value={theme} onChange={(e) => setTheme(e.target.value)}>
                       <option value="tour">관광</option>
                       <option value="nature">자연 힐링</option>
                       <option value="history">역사 탐방</option>
@@ -178,20 +313,6 @@ const Schedule = () => {
                     <li>평균 머무는 시간: <input type="number" name="stayMinutesMean" value={stayMinutesMean} onChange={(e) => setStayMinutesMean(e.target.value)} /></li>
                   </>
                 )}
-                <li>---</li>
-                <li>장소 목록</li>
-                {scheduleItems.length !== 0 ? (scheduleItems.map((item, index) => (
-                  <li key={index} className="schedule-item">
-                    {item.name} ({item.category})
-                    <input type="number" name="stayMinutes" placeholder="머무는 시간" value={addedListStayMinutes[index]} onChange={(e) => {
-                      const newArray = [...addedListStayMinutes];
-                      newArray[index] = e.target.value;
-                      setAddedListStayMinutes(newArray);
-                    }} />
-                    <input type="radio" name="startContentId" value={item.contentId} checked={startContentId === item.contentId}  onChange={(e) => setStartContentId(e.target.value)} />첫 방문 장소
-                    <button className="delete-btn" onClick={() => removeFromSchedule(item.name)}>삭제</button>
-                  </li>
-                ))) : <></>}
               </ul>
             }
           </div>
@@ -217,6 +338,36 @@ const Schedule = () => {
             </ul>
           </div>
         )}
+        {createScheduleLoading && <p>일정 생성 중...</p>}
+        {showCreateScheduleSection && createdSchedule && (
+          <div className="section-box">
+            <h3>일정 생성 결과</h3>
+            <h4>{new Date(createdSchedule[0].scheduleStartTime).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}</h4>
+            <ul>
+              {createdSchedule.map((item, index) => (
+                <li key={index}>🔹 {new Date(item.scheduleStartTime).toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit', hour12: true })} ~ {new Date(item.scheduleEndTime).toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit', hour12: true })} - {item.scheduleContent}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div className="category-icons">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              className={`category-btn ${selectedCategory === cat ? 'active' : ''}`}
+              onClick={() => toggleSidebar(cat)}>
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        <div className="input-group">
+          <label>출력 장소</label>
+          <button onClick={handleEstimate}>예상 시간 계산</button>
+          <div className="estimated-time">{estimatedTime}</div>
+        </div>
+
       </div>
     </div>
   );

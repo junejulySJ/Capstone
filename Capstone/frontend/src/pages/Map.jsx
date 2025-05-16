@@ -155,20 +155,20 @@ const Map = () => {
   const handleRouteClick = (routeIdx, planIdx = 0) => {
     const selectedKey = `${routeIdx}-${planIdx}`;
     if (selectedRouteIdx === selectedKey) {
+      clearPolylines(polylines);
+      setPolylines([]);
+      setSelectedRouteIdx(null);
+      return;
+    }
     clearPolylines(polylines);
-    setPolylines([]);
-    setSelectedRouteIdx(null);
-    return;
-  }
-  clearPolylines(polylines);
-  const selected = routeList[routeIdx];
-  if (transportMode === 'transit') {
-    const lines = drawTransitPlan(mapObj, selected.plan[planIdx]);
-    setPolylines(lines);
-  } else {
-    const line = drawPolyline(mapObj, selected.coordinates);
-    setPolylines([line]);
-  }
+    const selected = routeList[routeIdx];
+    if (transportMode === 'transit') {
+      const lines = drawTransitPlan(mapObj, selected.plan[planIdx]);
+      setPolylines(lines);
+    } else {
+      const line = drawPolyline(mapObj, selected.coordinates);
+      setPolylines([line]);
+    }
     setSelectedRouteIdx(selectedKey);
   };
 
@@ -264,7 +264,7 @@ const Map = () => {
             if (end) {
               navigate('/schedule', {
                 state: {
-                  scheduleItems: addedList, 
+                  addedList, 
                   end: {
                     latitude: end.latitude,
                     longitude: end.longitude
@@ -274,7 +274,7 @@ const Map = () => {
             } else {
               navigate('/schedule', {
                 state: {
-                  scheduleItems: addedList, 
+                  addedList, 
                   end: {
                     latitude: middlePoint.latitude,
                     longitude: middlePoint.longitude

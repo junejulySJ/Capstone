@@ -6,7 +6,7 @@ import jakarta.validation.ConstraintValidatorContext;
 import java.util.Set;
 
 public class TransportTypeValidator implements ConstraintValidator<ValidTransportType, String> {
-    private static final Set<String> VALID_TYPES = Set.of("도보", "자동차", "대중교통");
+    private static final Set<String> VALID_TYPES = Set.of("pedestrian", "car", "transit");
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {

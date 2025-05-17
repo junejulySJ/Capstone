@@ -1,6 +1,8 @@
 package com.capstone.meetingmap.map.dto;
 
 import com.capstone.meetingmap.api.kakao.dto.AddressFromKeywordResponse;
+import com.capstone.meetingmap.api.kakao.dto.PointCoord;
+import com.capstone.meetingmap.map.dto.kakaoapi.KakaoAddressSearchResponse;
 import com.capstone.meetingmap.map.dto.kakaoapi.KakaoCoordinateSearchResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,9 +43,9 @@ public class MiddlePointResponseDto<T> {
     }
 
     // 기존 place dto에 중간지점 dto를 붙여줌
-    public static MiddlePointResponseDto<List<PlaceResponseDto>> addMiddlePointResponse(List<AddressFromKeywordResponse> startResponseList, KakaoCoordinateSearchResponse response, XYDto xyDto, List<PlaceResponseDto> placeDto) {
+    public static MiddlePointResponseDto<List<PlaceResponseDto>> addMiddlePointResponse(List<PointCoord> pointCoordList, KakaoCoordinateSearchResponse response, XYDto xyDto, List<PlaceResponseDto> placeDto) {
         return MiddlePointResponseDto.<List<PlaceResponseDto>>builder()
-                .start(startResponseList.stream().map(MiddlePointResponseDto::fromAddressAutoCompleteDto).toList())
+                .start(pointCoordList.stream().map(MiddlePointResponseDto::fromPointCoord).toList())
                 .middlePoint(CustomPoint2.builder()
                         .address(response.getDocuments().get(0).getAddress().getAddress_name())
                         .latitude(String.valueOf(xyDto.getMiddleX()))
@@ -54,12 +56,22 @@ public class MiddlePointResponseDto<T> {
                 .build();
     }
 
-    public static CustomPoint fromAddressAutoCompleteDto(AddressFromKeywordResponse addressFromKeywordResponse) {
+    public static CustomPoint fromPointCoord(PointCoord pointCoord) {
+        Object doc = pointCoord.getDoc();
+        String name, address;
+        if (doc instanceof KakaoAddressSearchResponse.Document) {
+            name = ((KakaoAddressSearchResponse.Document) doc).getRoad_address().getAddress_name() != null ? ((KakaoAddressSearchResponse.Document) doc).getRoad_address().getAddress_name() : ((KakaoAddressSearchResponse.Document) doc).getAddress_name();
+            address = ((KakaoAddressSearchResponse.Document) doc).getRoad_address().getAddress_name() != null ? ((KakaoAddressSearchResponse.Document) doc).getRoad_address().getAddress_name() : ((KakaoAddressSearchResponse.Document) doc).getAddress().getAddress_name();
+        } else {
+            name = ((AddressFromKeywordResponse.Documents) doc).getPlace_name();
+            address = ((AddressFromKeywordResponse.Documents) doc).getRoad_address_name();
+        }
+
         return CustomPoint.builder()
-                .name(addressFromKeywordResponse.getDocuments().get(0).getPlace_name())
-                .address(addressFromKeywordResponse.getDocuments().get(0).getRoad_address_name())
-                .latitude(addressFromKeywordResponse.getDocuments().get(0).getY())
-                .longitude(addressFromKeywordResponse.getDocuments().get(0).getX())
+                .name(name)
+                .address(address)
+                .latitude(pointCoord.getLat())
+                .longitude(pointCoord.getLon())
                 .build();
     }
 }

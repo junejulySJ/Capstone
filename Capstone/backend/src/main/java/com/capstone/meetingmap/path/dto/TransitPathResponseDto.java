@@ -1,15 +1,16 @@
 package com.capstone.meetingmap.path.dto;
 
 import com.capstone.meetingmap.api.kakao.dto.AddressFromKeywordResponse;
+import com.capstone.meetingmap.api.kakao.dto.PointCoord;
 import com.capstone.meetingmap.api.tmap.dto.TransitRouteResponse;
 import com.capstone.meetingmap.map.dto.XYDto;
+import com.capstone.meetingmap.map.dto.kakaoapi.KakaoAddressSearchResponse;
 import com.capstone.meetingmap.schedule.dto.ScheduleDetailCreateDto;
 import com.capstone.meetingmap.util.ParseUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.locationtech.jts.geom.Coordinate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,26 +18,29 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 @Builder
+@AllArgsConstructor
 public class TransitPathResponseDto {
     private Location origin;
     private Location destination;
     private List<Plan> plan;
 
+    private String message; // 에러 받는 멤버 변수
+
     @Getter
     @NoArgsConstructor
-    @AllArgsConstructor
     @Builder
+    @AllArgsConstructor
     public static class Location {
+        private String name;
         private double x; // longitude
         private double y; // latitude
     }
 
     @Getter
     @NoArgsConstructor
-    @AllArgsConstructor
     @Builder
+    @AllArgsConstructor
     public static class Plan {
         private Integer totalDistance;
         private Integer totalTime;
@@ -49,8 +53,8 @@ public class TransitPathResponseDto {
 
     @Getter
     @NoArgsConstructor
-    @AllArgsConstructor
     @Builder
+    @AllArgsConstructor
     public static class Detail {
         private String mode;
         private String timeline;
@@ -58,16 +62,36 @@ public class TransitPathResponseDto {
         private Integer time;
         private String routeColor;
         private String routeStyle;
+        private Location start;
+        private Location end;
         private List<List<Double>> coordinates;
     }
 
-    public static TransitPathResponseDto fromScheduleDetailCreateDto(ScheduleDetailCreateDto first, ScheduleDetailCreateDto last, List<Plan> plan) {
+    public static TransitPathResponseDto fromError(String start, String end, ScheduleDetailCreateDto first, ScheduleDetailCreateDto last, String errorMessage) {
         return TransitPathResponseDto.builder()
                 .origin(Location.builder()
+                        .name(start)
                         .x(first.getLongitude().doubleValue())
                         .y(first.getLatitude().doubleValue())
                         .build())
                 .destination(Location.builder()
+                        .name(end)
+                        .x(last.getLongitude().doubleValue())
+                        .y(last.getLatitude().doubleValue())
+                        .build())
+                .message(errorMessage)
+                .build();
+    }
+
+    public static TransitPathResponseDto fromScheduleDetailCreateDto(String start, String end, ScheduleDetailCreateDto first, ScheduleDetailCreateDto last, List<Plan> plan) {
+        return TransitPathResponseDto.builder()
+                .origin(Location.builder()
+                        .name(start)
+                        .x(first.getLongitude().doubleValue())
+                        .y(first.getLatitude().doubleValue())
+                        .build())
+                .destination(Location.builder()
+                        .name(end)
                         .x(last.getLongitude().doubleValue())
                         .y(last.getLatitude().doubleValue())
                         .build())
@@ -75,27 +99,47 @@ public class TransitPathResponseDto {
                 .build();
     }
 
-    public static TransitPathResponseDto fromDocuments(AddressFromKeywordResponse.Documents first, AddressFromKeywordResponse.Documents last, List<Plan> plan) {
+    public static TransitPathResponseDto fromDocuments(String start, String end, Object first, Object last, List<Plan> plan) {
+        String firstX, firstY, lastX, lastY;
+        if (first instanceof KakaoAddressSearchResponse.Document) {
+            firstX = ((KakaoAddressSearchResponse.Document) first).getX();
+            firstY = ((KakaoAddressSearchResponse.Document) first).getY();
+        } else {
+            firstX = ((AddressFromKeywordResponse.Documents) first).getX();
+            firstY = ((AddressFromKeywordResponse.Documents) first).getY();
+        }
+        if (last instanceof KakaoAddressSearchResponse.Document) {
+            lastX = ((KakaoAddressSearchResponse.Document) last).getX();
+            lastY = ((KakaoAddressSearchResponse.Document) last).getY();
+        } else {
+            lastX = ((AddressFromKeywordResponse.Documents) last).getX();
+            lastY = ((AddressFromKeywordResponse.Documents) last).getY();
+        }
+
         return TransitPathResponseDto.builder()
                 .origin(Location.builder()
-                        .x(ParseUtil.parseDoubleSafe(first.getX()))
-                        .y(ParseUtil.parseDoubleSafe(first.getY()))
+                        .name(start)
+                        .x(ParseUtil.parseDoubleSafe(firstX))
+                        .y(ParseUtil.parseDoubleSafe(firstY))
                         .build())
                 .destination(Location.builder()
-                        .x(ParseUtil.parseDoubleSafe(last.getY()))
-                        .y(ParseUtil.parseDoubleSafe(last.getY()))
+                        .name(end)
+                        .x(ParseUtil.parseDoubleSafe(lastX))
+                        .y(ParseUtil.parseDoubleSafe(lastY))
                         .build())
                 .plan(plan)
                 .build();
     }
 
-    public static TransitPathResponseDto fromCoordinateAndXyDto(Coordinate first, XYDto last, List<Plan> plan) {
+    public static TransitPathResponseDto fromCoordinateAndXyDto(String name, PointCoord first, XYDto last, List<Plan> plan) {
         return TransitPathResponseDto.builder()
                 .origin(Location.builder()
-                        .x(first.getX())
-                        .y(first.getY())
+                        .name(name)
+                        .x(ParseUtil.parseDoubleSafe(first.getLon()))
+                        .y(ParseUtil.parseDoubleSafe(first.getLat()))
                         .build())
                 .destination(Location.builder()
+                        .name("중간 지점")
                         .x(last.getMiddleX())
                         .y(last.getMiddleY())
                         .build())
@@ -128,8 +172,8 @@ public class TransitPathResponseDto {
         for (TransitRouteResponse.Leg detail : details) {
             String mode;
             StringBuilder timeline;
-            String routeColor = null;
-            String routeStyle = null;
+            String routeColor;
+            String routeStyle;
             String coordinates;
             switch (detail.getMode()) {
                 case "WALK" -> {
@@ -185,6 +229,16 @@ public class TransitPathResponseDto {
                     .time(detail.getSectionTime() / 60)
                     .routeColor(routeColor)
                     .routeStyle(routeStyle)
+                    .start(Location.builder()
+                            .name(detail.getStart().getName())
+                            .x(detail.getStart().getLon())
+                            .y(detail.getStart().getLat())
+                            .build())
+                    .end(Location.builder()
+                            .name(detail.getEnd().getName())
+                            .x(detail.getEnd().getLon())
+                            .y(detail.getEnd().getLat())
+                            .build())
                     .coordinates(getCoordinates(coordinates))
                     .build());
         }

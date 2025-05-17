@@ -1,13 +1,17 @@
 package com.capstone.meetingmap.map.controller;
 
 import com.capstone.meetingmap.api.kakao.dto.AddressFromKeywordResponse;
+import com.capstone.meetingmap.api.kakao.dto.PointCoord;
 import com.capstone.meetingmap.api.kakao.service.KakaoApiService;
 import com.capstone.meetingmap.map.dto.*;
+import com.capstone.meetingmap.map.dto.kakaoapi.KakaoAddressSearchResponse;
 import com.capstone.meetingmap.map.dto.kakaoapi.KakaoCoordinateSearchResponse;
 import com.capstone.meetingmap.map.service.ConvexHullService;
 import com.capstone.meetingmap.map.service.MapService;
 import com.capstone.meetingmap.map.service.TourApiMapService;
+import com.capstone.meetingmap.util.AddressUtil;
 import com.capstone.meetingmap.util.ClampUtil;
+import com.capstone.meetingmap.util.MiddlePointUtil;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Point;
 import org.springframework.http.ResponseEntity;
@@ -57,31 +61,60 @@ public class MapController {
 
         switch (search) {
             case "destination" -> { // 출발지-도착지 기반 검색이면 start, end 필요
-                AddressFromKeywordResponse startResponse = kakaoApiService.getAddressFromKeyword(start);
-                AddressFromKeywordResponse endResponse = kakaoApiService.getAddressFromKeyword(end);
-                List<PlaceResponseDto> places = mapService.getAllPlaces(sort, endResponse.getDocuments().get(0).getY(), endResponse.getDocuments().get(0).getX(), category);
+                // start, end 각각 주소인지 여부 확인
+                boolean startIsAddress = AddressUtil.isAddressQuery(start);
+                boolean endIsAddress = AddressUtil.isAddressQuery(end);
+
+                // start에 맞는 API 호출
+                Object startResponse = startIsAddress
+                        ? kakaoApiService.getCoordinateFromRegion(start)
+                        : kakaoApiService.getAddressFromKeyword(start);
+
+                // end에 맞는 API 호출
+                Object endResponse = endIsAddress
+                        ? kakaoApiService.getCoordinateFromRegion(end)
+                        : kakaoApiService.getAddressFromKeyword(end);
+
+                String lat, lon;
+                if (endResponse instanceof KakaoAddressSearchResponse) { // 주소 검색 결과이면
+                    lat = ((KakaoAddressSearchResponse) endResponse).getDocuments().get(0).getY();
+                    lon = ((KakaoAddressSearchResponse) endResponse).getDocuments().get(0).getX();
+                } else {  // 장소명 검색 결과이면
+                    lat = ((AddressFromKeywordResponse) endResponse).getDocuments().get(0).getY();
+                    lon = ((AddressFromKeywordResponse) endResponse).getDocuments().get(0).getX();
+                }
+
+                // 장소 조회
+                List<PlaceResponseDto> places = mapService.getAllPlaces(sort, lat, lon, category);
+
+                // 응답 반환
                 return ResponseEntity.ok(PointResponseDto.addDestinationResponse(startResponse, endResponse, places));
             }
             case "location" -> { // 현재 위치 기반 검색이면 latitude, longitude 필요
                 return ResponseEntity.ok(mapService.getAllPlaces(sort, String.valueOf(latitude), String.valueOf(longitude), category));
             }
             case "middle-point" -> { // 중간 위치 기반 검색이면 name 리스트 필요
-                List<AddressFromKeywordResponse> startResponseList = new ArrayList<>();
+                List<PointCoord> pointCoordList = new ArrayList<>();
                 for (String placeName : name) {
-                    AddressFromKeywordResponse response = kakaoApiService.getAddressFromKeyword(placeName);
-                    startResponseList.add(response);
+                    PointCoord pointCoord = kakaoApiService.getPointCoord(placeName);
+                    pointCoordList.add(pointCoord);
                 }
-                List<Coordinate> coordList = kakaoApiService.getCoordList(name);
-                Point middlePoint = convexHullService.calculateConvexHullCentroid(coordList);
-                Point adjustedMiddlePoint = ClampUtil.clampPoint(middlePoint);
 
-                XYDto xyDto = XYDto.buildXYDtoByGeometry(adjustedMiddlePoint, coordList);
+                XYDto xyDto;
+                if (name.size() == 2) { // 두 장소의 중간지점은 일반 좌표 평균 알고리즘 사용
+                    xyDto = MiddlePointUtil.getMiddlePoint(pointCoordList);
+                } else {
+                    List<Coordinate> coordList = kakaoApiService.getCoordList(name);
+                    Point middlePoint = convexHullService.calculateConvexHullCentroid(coordList);
+                    Point adjustedMiddlePoint = ClampUtil.clampPoint(middlePoint);
 
+                    xyDto = XYDto.buildXYDtoByGeometry(adjustedMiddlePoint, coordList);
+                }
                 KakaoCoordinateSearchResponse response = kakaoApiService.getAddressFromCoordinate(xyDto.getMiddleX(), xyDto.getMiddleY());
 
                 List<PlaceResponseDto> places = mapService.getAllPlaces(sort, String.valueOf(xyDto.getMiddleY()), String.valueOf(xyDto.getMiddleX()), category);
 
-                return ResponseEntity.ok(MiddlePointResponseDto.addMiddlePointResponse(startResponseList, response, xyDto, places));
+                return ResponseEntity.ok(MiddlePointResponseDto.addMiddlePointResponse(pointCoordList, response, xyDto, places));
             }
             default -> throw new IllegalStateException("올바르지 않은 검색 방법입니다");
         }

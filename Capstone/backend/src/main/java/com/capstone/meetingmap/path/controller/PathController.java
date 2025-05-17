@@ -36,19 +36,31 @@ public class PathController {
 
     // 장소 이름으로 보행자 길찾기
     @GetMapping("/pedestrian")
-    public ResponseEntity<?> getPedestrianPath(@RequestParam(value = "name", required = false) List<String> name) {
-        return ResponseEntity.ok(pathService.getPedestrianPathByName(name));
+    public ResponseEntity<?> getPedestrianPath(
+            @RequestParam(value = "start", required = false) String start,
+            @RequestParam(value = "end", required = false) String end,
+            @RequestParam(value = "name", required = false) List<String> name
+    ) {
+        return ResponseEntity.ok(pathService.getPedestrianPathByName(start, end, name));
     }
 
     // 장소 이름으로 자동차 길찾기
     @GetMapping("/car")
-    public ResponseEntity<?> getCarPath(@RequestParam(value = "name", required = false) List<String> name) {
-        return ResponseEntity.ok(pathService.getCarPathByName(name));
+    public ResponseEntity<?> getCarPath(
+            @RequestParam(value = "start", required = false) String start,
+            @RequestParam(value = "end", required = false) String end,
+            @RequestParam(value = "name", required = false) List<String> name
+    ) {
+        return ResponseEntity.ok(pathService.getCarPathByName(start, end, name));
     }
 
     // 장소 이름으로 대중교통 길찾기
     @GetMapping("/transit")
-    public ResponseEntity<?> getTransitPath(@RequestParam(value = "name", required = false) List<String> name) {
-        return ResponseEntity.ok(pathService.getTransitPathByName(name));
+    public ResponseEntity<?> getTransitPath(
+            @RequestParam(value = "start", required = false) String start,
+            @RequestParam(value = "end", required = false) String end,
+            @RequestParam(value = "name", required = false) List<String> name
+    ) {
+        return ResponseEntity.ok(pathService.getTransitPathByName(start, end, name));
     }
 }

@@ -338,9 +338,6 @@ public class ScheduleService {
                 boolean hadLunchFlag = false;
                 boolean hadDinnerFlag = false;
                 for (SelectedPlace place : dto.getSelectedPlace()) {
-                    System.out.println("지금 visited=" + visited);
-                    System.out.println("지금 place=" + place);
-                    System.out.println("지금 visited 안에 place가 포함되어있니?" + visited.contains(place));
                     if (visited.contains(place)) { // 이미 방문한 장소면 continue
                         continue;
                     }
@@ -370,7 +367,7 @@ public class ScheduleService {
             // NN 알고리즘: 가장 가까운 장소 선택
             // tmap api로 거리/시간 계산
             NearestInfo nearestInfo;
-            if (dto.getTransport().equals("도보")) {
+            if (dto.getTransport().equals("pedestrian")) {
                 List<RouteResponse> routeResponseList = new ArrayList<>();
                 for (SelectedPlace candidate : candidates) {
                     System.out.println("candidate: " + candidate.getName());
@@ -387,10 +384,8 @@ public class ScheduleService {
                             routeResponse.getFeatures().get(0).getProperties().getTotalDistance());
                     routeResponseList.add(routeResponse);
                 }
-                System.out.println("findNearest 출력 전");
                 nearestInfo = tMapApiService.findNearest(routeResponseList, candidates); // 다음 장소 결정
-                System.out.println("findNearest:" + nearestInfo.getNearest().getName());
-            } else if (dto.getTransport().equals("자동차")) {
+            } else if (dto.getTransport().equals("car")) {
                 List<RouteResponse> routeResponseList = new ArrayList<>();
                 for (SelectedPlace candidate : candidates) {
                     RouteResponse routeResponse = tMapApiService.getCarRoutes(RouteRequest.builder()
@@ -402,7 +397,7 @@ public class ScheduleService {
                     routeResponseList.add(routeResponse);
                 }
                 nearestInfo = tMapApiService.findNearest(routeResponseList, candidates); // 다음 장소 결정
-            } else if (dto.getTransport().equals("대중교통")) {
+            } else if (dto.getTransport().equals("transit")) {
                 List<SimpleTransitRouteResponse> simpleTransitRouteResponseList = new ArrayList<>();
                 for (SelectedPlace candidate : candidates) {
                     SimpleTransitRouteResponse response = tMapApiService.getSimpleTransitRoutes(RouteRequest.builder()
@@ -411,6 +406,12 @@ public class ScheduleService {
                             .endX(ParseUtil.parseDoubleSafe(candidate.getLongitude()))
                             .endY(ParseUtil.parseDoubleSafe(candidate.getLatitude()))
                             .build());
+
+                    // 에러가 있다면
+                    if (response.getResult() != null) {
+                        throw new ResponseStatusException(HttpStatus.NOT_FOUND, response.getResult().getMessage());
+                    }
+
                     simpleTransitRouteResponseList.add(response);
                 }
                 nearestInfo = tMapApiService.findNearestTransit(simpleTransitRouteResponseList, candidates); // 다음 장소 결정

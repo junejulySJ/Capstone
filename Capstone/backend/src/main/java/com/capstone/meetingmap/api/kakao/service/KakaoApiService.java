@@ -1,14 +1,14 @@
 package com.capstone.meetingmap.api.kakao.service;
 
 import com.capstone.meetingmap.api.kakao.dto.AddressFromKeywordResponse;
+import com.capstone.meetingmap.api.kakao.dto.PointCoord;
 import com.capstone.meetingmap.map.dto.kakaoapi.KakaoAddressSearchResponse;
 import com.capstone.meetingmap.map.dto.kakaoapi.KakaoCoordinateSearchResponse;
+import com.capstone.meetingmap.util.AddressUtil;
 import org.locationtech.jts.geom.Coordinate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,11 +34,10 @@ public class KakaoApiService {
 
     // 주소를 좌표로 변환하는 카카오 api 호출
     public KakaoAddressSearchResponse getCoordinateFromRegion(String address) {
-        String encodedAddress = URLEncoder.encode(address, StandardCharsets.UTF_8);
         return kakaoRestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/v2/local/search/address.json")
-                        .queryParam("query", encodedAddress)
+                        .queryParam("query", address)
                         .build())
                 .retrieve()
                 .body(KakaoAddressSearchResponse.class);
@@ -69,9 +68,20 @@ public class KakaoApiService {
         List<Coordinate> coordList = new ArrayList<>();
         // 각 주소에 대해 좌표 검색 후 리스트에 저장
         for (String name : names) {
-            AddressFromKeywordResponse response = getAddressFromKeyword(name);
-            coordList.add(new Coordinate(Double.parseDouble(response.getDocuments().get(0).getX()), Double.parseDouble(response.getDocuments().get(0).getY())));
+            PointCoord pointCoord = getPointCoord(name);
+            coordList.add(new Coordinate(Double.parseDouble(pointCoord.getLon()), Double.parseDouble(pointCoord.getLat())));
         }
         return coordList;
+    }
+
+    // 장소명인지 주소인지 검사해 doc, lat, lon 반환
+    public PointCoord getPointCoord(String name) {
+        // 주소인지 여부 확인
+        boolean isAddress = AddressUtil.isAddressQuery(name);
+
+        // 그에 맞는 API 호출
+        Object response = isAddress ? getCoordinateFromRegion(name) : getAddressFromKeyword(name);
+
+        return PointCoord.fromResponse(response);
     }
 }

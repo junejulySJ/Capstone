@@ -22,6 +22,12 @@ public class RestClientConfig {
         return RestClient.builder()
                 .baseUrl(tMapApiProperties.getBaseUrl())
                 .defaultHeader("appKey", tMapApiProperties.getKey())
+                .requestInterceptor((request, body, execution) -> {
+                    System.out.println("Request URI: " + request.getURI());
+                    System.out.println("Request Method: " + request.getMethod());
+                    System.out.println("Request Headers: " + request.getHeaders());
+                    return execution.execute(request, body);
+                })
                 .build();
     }
 }

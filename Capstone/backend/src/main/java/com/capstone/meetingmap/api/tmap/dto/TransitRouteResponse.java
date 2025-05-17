@@ -10,6 +10,16 @@ import java.util.List;
 public class TransitRouteResponse {
     private MetaData metaData;
 
+    // 에러 받는 멤버 변수
+    private ApiError result;
+
+    @Data
+    @Builder
+    public static class ApiError {
+        private String message;
+        private Integer status;
+    }
+
     @Data
     @Builder
     public static class MetaData {

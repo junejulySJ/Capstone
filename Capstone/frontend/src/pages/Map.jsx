@@ -50,6 +50,7 @@ const Map = () => {
   const [start, setStart] = useState();
   const [end, setEnd] = useState();
   const [middlePoint, setMiddlePoint] = useState();
+  const [transferMarkers, setTransferMarkers] = useState();
 
   useEffect(() => {
     const container = document.getElementById('map');
@@ -107,6 +108,7 @@ const Map = () => {
         setStart(start);
         setEnd(end);
         setMiddlePoint(middlePoint);
+        setCategoryMarkers(markers);
       } catch (err) {
         console.error(`❌ 전체 요청 실패:`, err);
       }
@@ -116,20 +118,39 @@ const Map = () => {
     };
 
     fetchData();
-  }, [departure, destination, departures, sort])
+  }, [departure, destination, departures, sort, mapObj, search])
 
   useEffect(() => {
-    if (!mapObj || !start || !end) return;
+    if (!mapObj || (!start && !end)) return;
+
+    if (transferMarkers) {
+      transferMarkers.forEach((marker) => {
+        marker.setMap(null);
+      });
+      setTransferMarkers([]);
+    }
 
     const bounds = new kakao.maps.LatLngBounds();
-    const startPosition = new kakao.maps.LatLng(start.latitude, start.longitude);
-    const endPosition = new kakao.maps.LatLng(end.latitude, end.longitude);
 
-    new kakao.maps.Marker({ map: mapObj, position: startPosition });
-    new kakao.maps.Marker({ map: mapObj, position: endPosition });
+    if (Array.isArray(start)) { //중간지점 조회면
+      start.forEach((s) => {
+        const startPosition = new kakao.maps.LatLng(s.latitude, s.longitude);
 
-    bounds.extend(startPosition);
-    bounds.extend(endPosition);
+        new kakao.maps.Marker({ map: mapObj, position: startPosition });
+
+        bounds.extend(startPosition);
+      })
+    } else {
+      const startPosition = new kakao.maps.LatLng(start.latitude, start.longitude);
+      const endPosition = new kakao.maps.LatLng(end.latitude, end.longitude);
+
+      new kakao.maps.Marker({ map: mapObj, position: startPosition });
+      new kakao.maps.Marker({ map: mapObj, position: endPosition });
+
+      bounds.extend(startPosition);
+      bounds.extend(endPosition);
+    }
+
     mapObj.setBounds(bounds);
     loadRoutes();
   }, [mapObj, start, end, transportMode]);
@@ -138,22 +159,45 @@ const Map = () => {
     clearPolylines(polylines);
     setPolylines([]);
     setSelectedRouteIdx(null);
-    try {
-      const pathType = transportMode === 'walk' ? 'pedestrian' : transportMode === 'transit' ? 'transit' : 'car';
-      const res = await axios.get(`${API_BASE_URL}/path/${pathType}?name=${departure}&name=${destination}`);
-      const result = transportMode === 'walk' ? [res.data[0]] : res.data.slice(0, 5);
-      setRouteList(result);
-      if (transportMode !== 'transit') {
-        const line = drawPolyline(mapObj, result[0].coordinates, (pathType === 'pedestrian' ? '#4D524C' : '#007bff'));
-        setPolylines([line]);
+    if (Array.isArray(start)) { //중간지점 조회면
+      try {
+        const pathType = transportMode === 'walk' ? 'pedestrian' : transportMode === 'transit' ? 'transit' : 'car';
+        const res = await axios.get(`${API_BASE_URL}/path/${pathType}?${start.map((d) => (`name=${d.name}`)).join('&')}`);
+        // 응답 데이터를 출발지별로 묶음
+        const result = res.data.map((routes, idx) => ({
+          from: start[idx].name,
+          routes: [routes],
+        }));
+        setRouteList(result);
+        if (transportMode !== 'transit') {
+          const line = drawPolyline(mapObj, result[0].routes[0].coordinates, (pathType === 'pedestrian' ? '#4D524C' : '#007bff'));
+          setPolylines([line]);
+        }
+      } catch (err) {
+        console.error('경로 API 오류:', err);
       }
-    } catch (err) {
-      console.error('경로 API 오류:', err);
+    } else {
+      try {
+        const pathType = transportMode === 'walk' ? 'pedestrian' : transportMode === 'transit' ? 'transit' : 'car';
+        const res = await axios.get(`${API_BASE_URL}/path/${pathType}?start=${start.name}&end=${end.name}`);
+        const result = [{
+          from: start.name,
+          routes: [res.data[0]],
+        }];
+        setRouteList(result);
+        if (transportMode !== 'transit') {
+          const line = drawPolyline(mapObj, result[0].routes[0].coordinates, (pathType === 'pedestrian' ? '#4D524C' : '#007bff'), (pathType === 'pedestrian' ? 'dashed' : 'solid'));
+          setPolylines([line]);
+        }
+      } catch (err) {
+        console.error('경로 API 오류:', err);
+      }
     }
   };
 
-  const handleRouteClick = (routeIdx, planIdx = 0) => {
-    const selectedKey = `${routeIdx}-${planIdx}`;
+  const handleRouteClick = (groupIdx, routeIdx, planIdx = 0) => {
+    const pathType = transportMode === 'walk' ? 'pedestrian' : transportMode === 'transit' ? 'transit' : 'car';
+    const selectedKey = `${groupIdx}-${routeIdx}-${planIdx}`;
     if (selectedRouteIdx === selectedKey) {
       clearPolylines(polylines);
       setPolylines([]);
@@ -161,12 +205,27 @@ const Map = () => {
       return;
     }
     clearPolylines(polylines);
-    const selected = routeList[routeIdx];
+    if (transferMarkers) {
+      transferMarkers.forEach((marker) => {
+        marker.setMap(null);
+      });
+      setTransferMarkers([]);
+    }
+    const selectedGroup = routeList[groupIdx];
+    const selected = selectedGroup.routes[routeIdx];
     if (transportMode === 'transit') {
       const lines = drawTransitPlan(mapObj, selected.plan[planIdx]);
       setPolylines(lines);
+      // 환승(도보->버스, 지하철->다른 지하철 등) 지역마다 마커 찍기
+      const markers = [];
+      selected.plan[planIdx].detail.forEach(d => {
+        const marker = new window.kakao.maps.Marker({ map: mapObj, position: new window.kakao.maps.LatLng(d.start.y, d.start.x) });
+        markers.push(marker);
+      });
+      setTransferMarkers(markers);
+
     } else {
-      const line = drawPolyline(mapObj, selected.coordinates);
+      const line = drawPolyline(mapObj, selected.coordinates, (pathType === 'pedestrian' ? '#4D524C' : '#007bff'), (pathType === 'pedestrian' ? 'dashed' : 'solid'));
       setPolylines([line]);
     }
     setSelectedRouteIdx(selectedKey);
@@ -252,9 +311,25 @@ const Map = () => {
         </div>
 
         <div className="location-box">
+        {Array.isArray(start) ? (
+          <>
+            <h4>출발지:</h4>
+            <ul>
+              {start.map((s, index) => (
+                <li key={index}>{s.name}</li>
+              ))}
+            </ul>
+          </>
+        ) : (
           <h4>출발지: {start?.name || '없음'}</h4>
-          <h4>도착지: {end?.name || '없음'}</h4>
-        </div>
+        )}
+
+        {middlePoint && (
+          <h4>중간지점: {middlePoint.address}</h4>
+        )}
+
+        {end && <h4>도착지: {end.name}</h4>}
+      </div>
       </div>
 
       <div className="schedule-button-wrapper">

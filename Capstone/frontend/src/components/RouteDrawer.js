@@ -14,6 +14,7 @@ export const drawPolyline = (map, coordinates, color = '#007bff', style = 'solid
   
   export const drawTransitPlan = (map, plan) => {
     if (!map || !plan) return [];
+    
     return plan.detail.map(d => {
       const path = d.coordinates.map(([lng, lat]) => new window.kakao.maps.LatLng(lat, lng));
       const polyline = new window.kakao.maps.Polyline({

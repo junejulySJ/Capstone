@@ -35,7 +35,7 @@ const Schedule = () => {
   const [endTime, setEndTime] = useState();
   const [scheduleStartTime, setScheduleStartTime] = useState();
   const [scheduleEndTime, setScheduleEndTime] = useState();
-  const [transport, setTransport] = useState("도보");
+  const [transport, setTransport] = useState("pedestrian");
   const [additionalRecommendation, setAdditionalRecommendation] = useState(false);
   const [totalPlaceCount, setTotalPlaceCount] = useState(() => scheduleItems.length);
   const [theme, setTheme] = useState("tour");
@@ -48,6 +48,8 @@ const Schedule = () => {
   const [routeList, setRouteList] = useState([]);
   const [selectedRouteIdx, setSelectedRouteIdx] = useState(null);
   const [polylines, setPolylines] = useState([]);
+  const [transferMarkers, setTransferMarkers] = useState();
+  const [createScheduleError, setCreateScheduleError] = useState();
 
 
   useEffect(() => {
@@ -111,6 +113,7 @@ const Schedule = () => {
   }, [scheduleDate, endTime]);
 
   useEffect(() => {
+    if (!createdSchedule) return;
     loadRoutes();
   }, [createdSchedule, transportMode])
 
@@ -121,10 +124,14 @@ const Schedule = () => {
     try {
       const pathType = transportMode === 'walk' ? 'pedestrian' : transportMode === 'transit' ? 'transit' : 'car';
       const res = await axios.post(`${API_BASE_URL}/path/${pathType}`, createdSchedule);
-      const result = res.data.slice(0, 5);
+      // 응답 데이터를 출발지별로 묶음
+      const result = res.data.map((routes) => ({
+        from: routes?.origin?.name,
+        routes: [routes],
+      }));
       setRouteList(result);
       if (transportMode !== 'transit') {
-        const line = drawPolyline(mapObj, result[0].coordinates, (pathType === 'pedestrian' ? '#4D524C' : '#007bff'));
+        const line = drawPolyline(mapObj, result[0].routes[0].coordinates, (pathType === 'pedestrian' ? '#4D524C' : '#007bff'), (pathType === 'pedestrian' ? 'dashed' : 'solid'));
         setPolylines([line]);
       }
     } catch (err) {
@@ -196,16 +203,22 @@ const Schedule = () => {
       setScheduleItemStayMinutes(updatedStayMinutes);
       
       setCreatedSchedule(result.schedules);
+      setTransportMode(transport === 'pedestrian' ? 'walk' : transportMode === 'transit' ? 'transit' : 'car');
       setShowCreateScheduleSection(true);
     } catch (err) {
-      console.error('스케줄 API 오류:', err);
+      if (err.response.data.message) {
+        setCreateScheduleError(err.response.data.message);
+      } else {
+        console.error('스케줄 API 오류:', err);
+      }
     } finally {
       setCreateScheduleLoading(false);
     }
   };
 
-  const handleRouteClick = (routeIdx, planIdx = 0) => {
-      const selectedKey = `${routeIdx}-${planIdx}`;
+  const handleRouteClick = (groupIdx, routeIdx, planIdx = 0) => {
+    const pathType = transportMode === 'walk' ? 'pedestrian' : transportMode === 'transit' ? 'transit' : 'car';
+      const selectedKey = `${groupIdx}-${routeIdx}-${planIdx}`;
       if (selectedRouteIdx === selectedKey) {
         clearPolylines(polylines);
         setPolylines([]);
@@ -213,12 +226,27 @@ const Schedule = () => {
         return;
       }
       clearPolylines(polylines);
-      const selected = routeList[routeIdx];
+      if (transferMarkers) {
+      transferMarkers.forEach((marker) => {
+        marker.setMap(null);
+      });
+      setTransferMarkers([]);
+    }
+      const selectedGroup = routeList[groupIdx];
+      const selected = selectedGroup.routes[routeIdx];
       if (transportMode === 'transit') {
         const lines = drawTransitPlan(mapObj, selected.plan[planIdx]);
         setPolylines(lines);
+        // 환승(도보->버스, 지하철->다른 지하철 등) 지역마다 마커 찍기
+        const markers = [];
+        selected.plan[planIdx].detail.forEach(d => {
+          const marker = new window.kakao.maps.Marker({ map: mapObj, position: new window.kakao.maps.LatLng(d.start.y, d.start.x) });
+          markers.push(marker);
+        });
+        setTransferMarkers(markers);
+
       } else {
-        const line = drawPolyline(mapObj, selected.coordinates);
+        const line = drawPolyline(mapObj, selected.coordinates, (pathType === 'pedestrian' ? '#4D524C' : '#007bff'), (pathType === 'pedestrian' ? 'dashed' : 'solid'));
         setPolylines([line]);
       }
       setSelectedRouteIdx(selectedKey);
@@ -240,19 +268,21 @@ const Schedule = () => {
 
         <div id="map" className="map-placeholder"></div>
 
-        <div className="route-box">
-          <div className="transport-select">
-            <button onClick={() => setTransportMode('car')}>🚗 차량</button>
-            <button onClick={() => setTransportMode('transit')}>🚌 대중교통</button>
-            <button onClick={() => setTransportMode('walk')}>🚶 도보</button>
+        {showCreateScheduleSection && (
+          <div className="route-box">
+            <div className="transport-select">
+              <button onClick={() => setTransportMode('car')}>🚗 차량</button>
+              <button onClick={() => setTransportMode('transit')}>🚌 대중교통</button>
+              <button onClick={() => setTransportMode('walk')}>🚶 도보</button>
+            </div>
+            <RouteSummary
+              routes={routeList}
+              transportMode={transportMode}
+              selectedIdx={selectedRouteIdx}
+              onSelect={handleRouteClick}
+            />
           </div>
-          <RouteSummary
-            routes={routeList}
-            transportMode={transportMode}
-            selectedIdx={selectedRouteIdx}
-            onSelect={handleRouteClick}
-          />
-        </div>
+        )}
 
         <div className="button-row">
           <button onClick={() => setShowCreateSection((prev) => !prev)} className="action-btn">
@@ -294,9 +324,9 @@ const Schedule = () => {
                   <input type="time" name="endTime" value={endTime} onChange={(e) => setEndTime(e.target.value)} required/>
                 </li>
                 <li>이동수단: <select name="transport" value={transport} onChange={(e) => setTransport(e.target.value)}>
-                  <option value="도보">도보</option>
-                  <option value="자동차">자동차</option>
-                  <option value="대중교통">대중교통</option>
+                  <option value="pedestrian">도보</option>
+                  <option value="car">자동차</option>
+                  <option value="transit">대중교통</option>
                   </select></li>
                 <li>추가 추천 여부: <input type="checkbox" name="additionalRecommendation" checked={additionalRecommendation} onChange={(e) => setAdditionalRecommendation(e.target.checked)} /></li>
                 {additionalRecommendation && (
@@ -339,15 +369,19 @@ const Schedule = () => {
           </div>
         )}
         {createScheduleLoading && <p>일정 생성 중...</p>}
+        {createScheduleError && <p>{createScheduleError}</p>}
         {showCreateScheduleSection && createdSchedule && (
           <div className="section-box">
             <h3>일정 생성 결과</h3>
+            <input type="text" placeholder='스케줄 제목' value={scheduleName} onChange={(e) => setScheduleName(e.target.value)} />
+            <input type="text" placeholder='스케줄 설명' value={scheduleAbout} onChange={(e) => setScheduleAbout(e.target.value)} />
             <h4>{new Date(createdSchedule[0].scheduleStartTime).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}</h4>
             <ul>
               {createdSchedule.map((item, index) => (
                 <li key={index}>🔹 {new Date(item.scheduleStartTime).toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit', hour12: true })} ~ {new Date(item.scheduleEndTime).toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit', hour12: true })} - {item.scheduleContent}</li>
               ))}
             </ul>
+            <button>스케줄 저장</button>
           </div>
         )}
 

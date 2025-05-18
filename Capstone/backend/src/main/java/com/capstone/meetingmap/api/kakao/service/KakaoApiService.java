@@ -56,11 +56,12 @@ public class KakaoApiService {
     }
 
     // 좌표를 주소로 변환하는 카카오 api 요청
-    public List<String> getAreaFromCoordinate(double longitude, double latitude) {
+    public String getAddressFromLocation(double longitude, double latitude) {
         KakaoCoordinateSearchResponse response = getAddressFromCoordinate(longitude, latitude);
-        String area = response.getDocuments().get(0).getRoad_address().getRegion_1depth_name();
-        String sigungu = response.getDocuments().get(0).getRoad_address().getRegion_2depth_name();
-        return List.of(area, sigungu);
+
+        return (response.getDocuments().get(0).getRoad_address() != null
+                ? response.getDocuments().get(0).getRoad_address().getAddress_name()
+                : response.getDocuments().get(0).getAddress().getAddress_name());
     }
 
     // search=middle-point에 대한 알고리즘을 사용하기 위한 변환

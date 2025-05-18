@@ -88,10 +88,12 @@ public class MapController {
                 List<PlaceResponseDto> places = mapService.getAllPlaces(sort, lat, lon, category);
 
                 // 응답 반환
-                return ResponseEntity.ok(PointResponseDto.addDestinationResponse(startResponse, endResponse, places));
+                return ResponseEntity.ok(TwoPointsResponseDto.addDestinationResponse(startResponse, endResponse, places));
             }
             case "location" -> { // 현재 위치 기반 검색이면 latitude, longitude 필요
-                return ResponseEntity.ok(mapService.getAllPlaces(sort, String.valueOf(latitude), String.valueOf(longitude), category));
+                String address = kakaoApiService.getAddressFromLocation(longitude, latitude);
+                List<PlaceResponseDto> places = mapService.getAllPlaces(sort, String.valueOf(latitude), String.valueOf(longitude), category);
+                return ResponseEntity.ok(PointResponseDto.addLocationResponse(address, latitude, longitude, places));
             }
             case "middle-point" -> { // 중간 위치 기반 검색이면 name 리스트 필요
                 List<PointCoord> pointCoordList = new ArrayList<>();

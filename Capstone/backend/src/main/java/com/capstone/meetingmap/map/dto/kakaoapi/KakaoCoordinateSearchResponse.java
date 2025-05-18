@@ -11,7 +11,7 @@ public class KakaoCoordinateSearchResponse {
 
     @Data
     public static class Meta {
-        private int total_count;
+        private Integer total_count;
     }
 
     @Data

@@ -3,7 +3,7 @@
 - [User API](UserAPI.md)
 - [Auth API](AuthAPI.md)
 - [Friendship API](FriendshipAPI.md)
-- [Map API](AuthAPI.md) **(Example)**
+- [Map API](MapAPI.md) **(Example)**
 - [Schedule API](ScheduleAPI.md) [(Example)](ScheduleAPIDetail.md)
 - [Path API](PathAPI.md) [(Example)](PathAPIDetail.md)
 
@@ -22,12 +22,12 @@
 
 ### 카테고리 조회
 
-#### Request 예시 1
+#### Request 예시 1 (카테고리)
 ```javascript
 axios.get(`${API_BASE_URL}/map/category`)
 ```
 
-#### Response 예시 1
+#### Response 예시 1 (카테고리)
 ```json
 [
     {
@@ -61,12 +61,12 @@ axios.get(`${API_BASE_URL}/map/category`)
 ]
 ```
 
-#### Request 예시 2
+#### Request 예시 2 (세부 카테고리)
 ```javascript
 axios.get(`${API_BASE_URL}/map/category?category=tour`)
 ```
 
-#### Response 예시 2
+#### Response 예시 2 (세부 카테고리)
 ```json
 [
     {
@@ -92,12 +92,12 @@ axios.get(`${API_BASE_URL}/map/category?category=tour`)
 
 ### 지도 출력
 
-#### Request 예시 1
+#### Request 예시 1 (출발지-도착지)
 ```javascript
 axios.get(`${API_BASE_URL}/map?search=destination&sort=user_ratings_total_dsc&start=한성대학교&end=종로구 관훈동 18&category=cafe`)
 ```
 
-#### Response 예시 1
+#### Response 예시 1 (출발지-도착지)
 ```json
 {
   "start": {
@@ -141,13 +141,13 @@ axios.get(`${API_BASE_URL}/map?search=destination&sort=user_ratings_total_dsc&st
 }
 ```
 
-#### Request 예시 2
+#### Request 예시 2 (중간 지점)
 ```javascript
 axios.get(`${API_BASE_URL}/map?search=middle-point&sort=rating_dsc&name=동작구민회관&name=녹번동근린공원&name=올림픽공원&category=food-korean`)
 ```
 ※name 파라미터는 여러 개 가능합니다.
 
-#### Response 예시 2
+#### Response 예시 2 (중간 지점)
 ```json
 {
   "start": [
@@ -199,6 +199,46 @@ axios.get(`${API_BASE_URL}/map?search=middle-point&sort=rating_dsc&name=동작�
       "name": "현대칼국수",
       "rating": "4.4",
       "userRatingsTotal": "337"
+    }
+  ]
+}
+```
+
+#### Request 예시 3 (위치)
+```javascript
+axios.get(`${API_BASE_URL}/map?search=location&sort=title_asc&latitude=37.5745839959&longitude=126.9857145803&category=food`)
+```
+
+#### Response 예시 3 (위치)
+```json
+{
+  "current": {
+    "address": "서울특별시 종로구 인사동10길 11-4",
+    "latitude": "37.5745839959",
+    "longitude": "126.9857145803"
+  },
+  "list": [
+    {
+      "address": "서울특별시 중구 남대문로 52-5 (명동2가) ",
+      "contentId": "134746",
+      "category": "food-chinese",
+      "thumbnail": "http://tong.visitkorea.or.kr/cms/resource/96/3474896_image2_1.jpg",
+      "latitude": "37.5621214856",
+      "longitude": "126.9818402861",
+      "name": "개화",
+      "rating": "3.9",
+      "userRatingsTotal": "867"
+    },
+    {
+      "address": "서울특별시 중구 무교로 24 (무교동) 2층",
+      "contentId": "133276",
+      "category": "food-korean",
+      "thumbnail": "http://tong.visitkorea.or.kr/cms/resource/18/3474918_image2_1.jpg",
+      "latitude": "37.5681540761",
+      "longitude": "126.9794958849",
+      "name": "곰국시집",
+      "rating": "4.1",
+      "userRatingsTotal": "849"
     }
   ]
 }

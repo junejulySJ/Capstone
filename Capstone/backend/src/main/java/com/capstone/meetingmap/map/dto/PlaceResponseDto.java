@@ -12,7 +12,6 @@ import lombok.*;
 @ToString
 public class PlaceResponseDto {
     private String address;
-    private String sigunguCode;
     private String contentId;
     private String category;
     private String thumbnail;
@@ -23,10 +22,9 @@ public class PlaceResponseDto {
     private String userRatingsTotal;
 
     // Google Places API nearbySearch로 가져온 장소 정보를 TourAPI 장소 형태로 변환
-    public static PlaceResponseDto fromGooglePlaceResultNearBySearch(GooglePlaceResult result, String sigunguCode, PlaceCategoryDetail placeCategoryDetail, String imageUrl) {
+    public static PlaceResponseDto fromGooglePlaceResultNearBySearch(GooglePlaceResult result, PlaceCategoryDetail placeCategoryDetail, String imageUrl) {
         return PlaceResponseDto.builder()
                 .address(result.getVicinity())
-                .sigunguCode(sigunguCode)
                 .contentId("google_" + result.getPlace_id())
                 .category(placeCategoryDetail.getPlaceCategoryDetailCode())
                 .thumbnail(imageUrl)

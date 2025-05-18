@@ -12,9 +12,9 @@
 - [User API](docs/UserAPI.md)
 - [Auth API](docs/AuthAPI.md)
 - [Friendship API](docs/FriendshipAPI.md)
-- [Map API](docs/MapAPI.md) ✏️
-- [Schedule API](docs/ScheduleAPI.md) ✏️
-- [Path API](docs/PathAPI.md) ✏️
+- [Map API](docs/MapAPI.md) [(Example)](docs/MapAPIDetail.md) ✏️
+- [Schedule API](docs/ScheduleAPI.md) [(Example)](docs/ScheduleAPIDetail.md) ✏️
+- [Path API](docs/PathAPI.md) [(Example)](docs/PathAPIDetail.md) ✏️
 
 ## 주의사항 1
 - 비밀번호 암호화 방식이 변경되어 기존 사용자로 로그인을 하려면 다음과 같은 sql문을 적용해주세요.
@@ -31,10 +31,8 @@ WHERE user_id IN (
 
 ## 주의사항 2 ✏️
 - 카테고리에 따른 contentTypeId와 cat 매핑 테이블이 필요합니다.
-- 다음의 sql문을 적용해 기존 content_type 테이블을 삭제하고 새로운 테이블을 만들어주세요.
+- 다음의 sql문을 적용해 기존 content_type 테이블이 있다면 삭제하고 새로운 테이블을 만들어주세요.
 ```mysql
-DROP TABLE content_type;
-
 CREATE TABLE place_category (
     place_category_no INT AUTO_INCREMENT,
     place_category_code VARCHAR(20),

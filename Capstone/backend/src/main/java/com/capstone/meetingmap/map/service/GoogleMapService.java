@@ -7,7 +7,6 @@ import com.capstone.meetingmap.map.dto.TourApiPlaceResponse;
 import com.capstone.meetingmap.map.dto.googleapi.GoogleApiResponse;
 import com.capstone.meetingmap.map.dto.googleapi.GooglePlaceResult;
 import com.capstone.meetingmap.map.repository.PlaceCategoryDetailRepository;
-import com.capstone.meetingmap.util.AddressUtil;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -26,10 +25,9 @@ public class GoogleMapService {
 
     private final WebClient webClient;
     private final GoogleApiProperties googleApiProperties;
-    private final TourApiMapService tourApiMapService;
     private final PlaceCategoryDetailRepository placeCategoryDetailRepository;
 
-    public GoogleMapService(GoogleApiProperties googleApiProperties, TourApiMapService tourApiMapService, PlaceCategoryDetailRepository placeCategoryDetailRepository) {
+    public GoogleMapService(GoogleApiProperties googleApiProperties, PlaceCategoryDetailRepository placeCategoryDetailRepository) {
         this.googleApiProperties = googleApiProperties;
         DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory(googleApiProperties.getBaseUrl());
         factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY);
@@ -38,7 +36,6 @@ public class GoogleMapService {
                 .baseUrl(googleApiProperties.getBaseUrl())
                 .uriBuilderFactory(factory) // URI 빌더 팩토리 설정
                 .build();
-        this.tourApiMapService = tourApiMapService;
         this.placeCategoryDetailRepository = placeCategoryDetailRepository;
     }
 
@@ -98,7 +95,6 @@ public class GoogleMapService {
                         result.getVicinity() != null && result.getVicinity().contains("구")) // 이미지와 평점, "구"가 들어간 주소가 존재하는 경우만 가져오기
                 .map(result -> PlaceResponseDto.fromGooglePlaceResultNearBySearch(
                         result,
-                        tourApiMapService.findSigunguCodeByName(AddressUtil.extractGu(result.getVicinity())),
                         placeCategoryDetailRepository.findBySearchType(searchType)
                                         .orElseThrow(),
                         getPlaceImageUrl(result.getPhotos().get(0).getPhoto_reference(), 800)
@@ -114,7 +110,6 @@ public class GoogleMapService {
                     RatingResponse ratingResponse = searchPlace(place.getName());
                     return PlaceResponseDto.builder()
                             .address(place.getAddress())
-                            .sigunguCode(place.getSigunguCode())
                             .contentId(place.getContentId())
                             .category(place.getCategory())
                             .thumbnail(place.getThumbnail())

@@ -23,21 +23,25 @@ public class PlaceCategoryDetailService {
                         );
             }
             case "A02" -> {
-                if (cat2 == null) {
-                    return placeCategoryDetailRepository.findByContentTypeIdAndCat1(contentTypeId, cat1)
-                            .orElse(placeCategoryDetailRepository.findByPlaceCategoryDetailCode("other")
-                                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다"))
-                            );
-                } else if (cat3 == null) {
-                    return placeCategoryDetailRepository.findByContentTypeIdAndCat1AndCat2(contentTypeId, cat1, cat2)
-                            .orElse(placeCategoryDetailRepository.findByPlaceCategoryDetailCode("other")
-                                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다"))
-                            );
-                } else {
-                    return placeCategoryDetailRepository.findByContentTypeIdAndCat1AndCat2AndCat3(contentTypeId, cat1, cat2, cat3)
-                            .orElse(placeCategoryDetailRepository.findByPlaceCategoryDetailCode("other")
-                                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다"))
-                            );
+                switch (cat2) {
+                    case "A0201", "A0206" -> {
+                        return placeCategoryDetailRepository.findByContentTypeIdAndCat1AndCat2(contentTypeId, cat1, cat2)
+                                .orElse(placeCategoryDetailRepository.findByPlaceCategoryDetailCode("other")
+                                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다"))
+                                );
+                    }
+                    case "A0202" -> {
+                        return placeCategoryDetailRepository.findByContentTypeIdAndCat1AndCat2AndCat3(contentTypeId, cat1, cat2, cat3)
+                                .orElse(placeCategoryDetailRepository.findByPlaceCategoryDetailCode("other")
+                                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다"))
+                                );
+                    }
+                    default -> {
+                        return placeCategoryDetailRepository.findByContentTypeIdAndCat1AndCat2(contentTypeId, cat1, null)
+                                .orElse(placeCategoryDetailRepository.findByPlaceCategoryDetailCode("other")
+                                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다"))
+                                );
+                    }
                 }
             }
             case "A04", "A05" -> {

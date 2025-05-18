@@ -5,11 +5,11 @@ import './Map.css';
 import CategorySidebar from '../components/CategorySidebar';
 import RouteSummary from '../components/RouteSummary';
 import { drawPolyline, drawTransitPlan, clearPolylines } from '../components/RouteDrawer';
+import { API_BASE_URL} from '../constants.js'
 
-const API_BASE_URL = 'http://localhost:8080/api';
 const { kakao } = window;
 
-const categoryList = [
+export const categoryList = [
   { code: 'tour', name: '관광지' },
   { code: 'food', name: '음식점' },
   { code: 'cafe', name: '카페' },
@@ -20,7 +20,7 @@ const categoryList = [
 ];
 
 // 정확한 분류코드 구조
-const categoryDetailCodes = {
+export const categoryDetailCodes = {
   tour: ['tour-nature', 'tour-tradition', 'tour-park', 'tour-theme-park'],
   food: ['food-korean', 'food-western', 'food-japanese', 'food-chinese', 'food-other'],
   cafe: ['cafe'],

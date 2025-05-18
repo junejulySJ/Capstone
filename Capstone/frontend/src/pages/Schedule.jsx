@@ -6,9 +6,9 @@ import CategorySidebar from '../components/CategorySidebar';
 import { themeSchedules } from '../data/scheduleDummy';
 import RouteSummary from '../components/RouteSummary';
 import { drawPolyline, drawTransitPlan, clearPolylines } from '../components/RouteDrawer';
+import { categoryList, categoryDetailCodes } from './Map';
+import { API_BASE_URL} from '../constants.js'
 
-const categories = ['Restaurant', 'Cafe', 'Shopping', 'Culture', 'Outdoors'];
-const API_BASE_URL = 'http://localhost:8080/api';
 const { kakao } = window;
 
 const Schedule = () => {
@@ -50,6 +50,7 @@ const Schedule = () => {
   const [polylines, setPolylines] = useState([]);
   const [transferMarkers, setTransferMarkers] = useState();
   const [createScheduleError, setCreateScheduleError] = useState();
+  const [selectedCategoryPlaces, setSelectedCategoryPlaces] = useState();
 
 
   useEffect(() => {
@@ -97,6 +98,9 @@ const Schedule = () => {
     setPlaceMarkers(markers);
     mapObj.setBounds(bounds);
   }, [scheduleItems, mapObj]);
+  useEffect(() => {
+    setPlaceByCategory();
+  }, [selectedCategory])
 
   useEffect(() => {
     if (scheduleDate && startTime) {
@@ -144,13 +148,32 @@ const Schedule = () => {
   };
 
   const toggleSidebar = (cat) => {
-    if (selectedCategory === cat && sidebarVisible) {
+    if (selectedCategory === cat.code && sidebarVisible) {
       setSidebarVisible(false);
     } else {
-      setSelectedCategory(cat);
+      setSelectedCategory(cat.code);
       setSidebarVisible(true);
     }
   };
+
+  const setPlaceByCategory = async () => {
+    const detailCodes = categoryDetailCodes[selectedCategory];
+    if (!detailCodes) return;
+
+    const allPlaces = [];
+    for (const detailCode of detailCodes) {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/map?search=location&sort=rating_dsc&latitude=${end.latitude}&longitude=${end.longitude}&category=${detailCode}`);
+        const items = res.data?.list || [];
+
+        allPlaces.push(...items);
+
+        setSelectedCategoryPlaces(allPlaces);
+      } catch (err) {
+        console.error(`❌ ${detailCode} 요청 실패:`, err);
+      }
+    }
+  }
 
   const addToSchedule = (place) => {    
     if (!scheduleItems.some(item => item.name === place.name)) {
@@ -257,8 +280,9 @@ const Schedule = () => {
       {sidebarVisible && (
         <CategorySidebar
           category={selectedCategory}
+          places={selectedCategoryPlaces}
           onClose={() => setSidebarVisible(false)}
-          onAdd={addToSchedule}
+          onAddPlace={addToSchedule}
         />
       )}
 
@@ -386,12 +410,12 @@ const Schedule = () => {
         )}
 
         <div className="category-icons">
-          {categories.map((cat) => (
+          {categoryList.map((cat) => (
             <button
-              key={cat}
-              className={`category-btn ${selectedCategory === cat ? 'active' : ''}`}
+              key={cat.code}
+              className={`category-btn ${selectedCategory === cat.code ? 'active' : ''}`}
               onClick={() => toggleSidebar(cat)}>
-              {cat}
+              {cat.name}
             </button>
           ))}
         </div>

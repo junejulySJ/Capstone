@@ -16,6 +16,8 @@
 - [Schedule API](docs/ScheduleAPI.md) [(Example)](docs/ScheduleAPIDetail.md) ✏️
 - [Path API](docs/PathAPI.md) [(Example)](docs/PathAPIDetail.md) ✏️
 
+# ※주의사항 3까지 있습니다
+
 ## 주의사항 1
 - 비밀번호 암호화 방식이 변경되어 기존 사용자로 로그인을 하려면 다음과 같은 sql문을 적용해주세요.
 - 적용하면 기존대로 123456으로 로그인이 가능해집니다.
@@ -83,3 +85,35 @@ INSERT INTO place_category_detail (place_category_detail_code, place_category_de
  ('event', '공연/행사', 7, '15', 'A02', null, null, false, null),
  ('other', '기타', 8, null, null, null, null, false, null);
 ```
+
+## 주의사항 3 ✏️
+- 클라이언트 기준 게시판 출력을 위한 필드 추가 sql문과 view 수정문입니다.
+```mysql
+ALTER TABLE BOARD ADD COLUMN BOARD_DESCRIPTION VARCHAR(255);
+
+DROP VIEW `BOARD_VIEW`;
+
+CREATE VIEW `BOARD_VIEW` AS
+SELECT
+    B.`BOARD_NO`,
+    B.`USER_ID`,
+    U.`USER_NICK`,
+    U.`USER_TYPE`,
+    UR.`USER_TYPE_NAME`,
+    B.`BOARD_TITLE`,
+    B.`BOARD_DESCRIPTION`,
+    B.`BOARD_VIEW_COUNT`,
+    B.`BOARD_WRITE_DATE`,
+    B.`BOARD_UPDATE_DATE`,
+    IFNULL((SELECT COUNT(*) FROM `BOARD_LIKE` BL WHERE BL.`BOARD_NO` = B.`BOARD_NO`), 0) AS `BOARD_LIKE`,
+    IFNULL((SELECT COUNT(*) FROM `BOARD_HATE` BH WHERE BH.`BOARD_NO` = B.`BOARD_NO`), 0) AS `BOARD_HATE`,
+    B.`CATEGORY_NO`,
+    C.`CATEGORY_NAME`,
+    IFNULL((SELECT COUNT(*) FROM `COMMENT` CM WHERE CM.`BOARD_NO` = B.`BOARD_NO`), 0) AS `COMMENT_COUNT`,
+    U.`USER_IMG`
+FROM `BOARD` B
+         JOIN `USER` U ON B.`USER_ID` = U.`USER_ID`
+         JOIN `USER_ROLE` UR ON U.`USER_TYPE` = UR.`USER_TYPE`
+         JOIN `CATEGORY` C ON B.`CATEGORY_NO` = C.`CATEGORY_NO`;
+```
+

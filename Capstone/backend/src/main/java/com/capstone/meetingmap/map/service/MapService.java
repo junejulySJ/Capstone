@@ -1,11 +1,9 @@
 package com.capstone.meetingmap.map.service;
 
+import com.capstone.meetingmap.api.google.service.GoogleApiService;
 import com.capstone.meetingmap.api.kakao.dto.AddressFromKeywordResponse;
 import com.capstone.meetingmap.api.kakao.service.KakaoApiService;
-import com.capstone.meetingmap.map.dto.AddressAutocompleteDto;
-import com.capstone.meetingmap.map.dto.CodeResponseDto;
-import com.capstone.meetingmap.map.dto.PlaceResponseDto;
-import com.capstone.meetingmap.map.dto.TourApiPlaceResponse;
+import com.capstone.meetingmap.map.dto.*;
 import com.capstone.meetingmap.map.entity.PlaceCategory;
 import com.capstone.meetingmap.map.entity.PlaceCategoryDetail;
 import com.capstone.meetingmap.map.repository.PlaceCategoryDetailRepository;
@@ -26,13 +24,15 @@ public class MapService {
     private final KakaoApiService kakaoApiService;
     private final PlaceCategoryDetailRepository placeCategoryDetailRepository;
     private final PlaceCategoryRepository placeCategoryRepository;
+    private final GoogleApiService googleApiService;
 
-    public MapService(TourApiMapService tourApiMapService, GoogleMapService googleMapService, KakaoApiService kakaoApiService, PlaceCategoryDetailRepository placeCategoryDetailRepository, PlaceCategoryRepository placeCategoryRepository) {
+    public MapService(TourApiMapService tourApiMapService, GoogleMapService googleMapService, KakaoApiService kakaoApiService, PlaceCategoryDetailRepository placeCategoryDetailRepository, PlaceCategoryRepository placeCategoryRepository, GoogleApiService googleApiService) {
         this.tourApiMapService = tourApiMapService;
         this.googleMapService = googleMapService;
         this.kakaoApiService = kakaoApiService;
         this.placeCategoryDetailRepository = placeCategoryDetailRepository;
         this.placeCategoryRepository = placeCategoryRepository;
+        this.googleApiService = googleApiService;
     }
 
     // 카테고리를 반환
@@ -79,7 +79,7 @@ public class MapService {
                     List<TourApiPlaceResponse> tourApiPlaceList = tourApiMapService.getPlaceList(longitude, latitude, categoryDetail.getContentTypeId(), count, categoryDetail.getPlaceCategoryDetailCode());
                     // Google Places API로 장소에 대해 평점 붙이기
                     if (!tourApiPlaceList.isEmpty()) {
-                        List<PlaceResponseDto> placeListWithRating = googleMapService.getPlaceListWithRating(tourApiPlaceList);
+                        List<PlaceResponseDto> placeListWithRating = getPlaceListWithRating(tourApiPlaceList);
                         mergedList.addAll(placeListWithRating);
                     }
                 }
@@ -98,7 +98,7 @@ public class MapService {
             List<TourApiPlaceResponse> tourApiPlaceList = tourApiMapService.getPlaceList(longitude, latitude, null, 10, null);
             // Google Places API로 10개 장소에 대해 평점 붙이기
             if (!tourApiPlaceList.isEmpty()) {
-                List<PlaceResponseDto> placeListWithRating = googleMapService.getPlaceListWithRating(tourApiPlaceList);
+                List<PlaceResponseDto> placeListWithRating = getPlaceListWithRating(tourApiPlaceList);
                 mergedList.addAll(placeListWithRating);
             }
 
@@ -137,5 +137,15 @@ public class MapService {
     public List<AddressAutocompleteDto> getAddressAutocomplete(String keyword) {
         AddressFromKeywordResponse response = kakaoApiService.getAddressFromKeyword(keyword);
         return AddressAutocompleteDto.fromKakaoApiResponse(response);
+    }
+
+    // tourAPI 결과에 rating, user_ratings_total 붙여서 반환
+    private List<PlaceResponseDto> getPlaceListWithRating(List<TourApiPlaceResponse> tourApiPlaceList) {
+        return tourApiPlaceList.stream()
+                .map(place -> {
+                    RatingResponse ratingResponse = googleApiService.searchPlace(place.getName());
+                    return PlaceResponseDto.fromTourApiPlaceResponse(place, ratingResponse);
+                })
+                .collect(Collectors.toList());
     }
 }

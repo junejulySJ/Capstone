@@ -27,7 +27,7 @@ public class AuthService {
     private final JWTUtil jwtUtil;
     private final HttpSession session;
 
-    @Value("${kakao.service.app.admin.key}")
+    @Value("${kakao.api.admin-key}")
     private String serviceAppAdminKey;
 
     public AuthService(KakaoOAuthProperties kakaoOAuthProperties, UserService userService, UserRepository userRepository, JWTUtil jwtUtil, HttpSession session) {

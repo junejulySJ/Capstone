@@ -1,4 +1,4 @@
-package com.capstone.meetingmap;
+package com.capstone.meetingmap.api.google.properties;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -6,6 +6,7 @@ import com.capstone.meetingmap.map.dto.kakaoapi.KakaoAddressSearchResponse;
 import com.capstone.meetingmap.map.dto.kakaoapi.KakaoCoordinateSearchResponse;
 import com.capstone.meetingmap.util.AddressUtil;
 import org.locationtech.jts.geom.Coordinate;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -16,7 +17,7 @@ import java.util.List;
 public class KakaoApiService {
     private final RestClient kakaoRestClient;
 
-    public KakaoApiService(RestClient kakaoRestClient) {
+    public KakaoApiService(@Qualifier("kakaoRestClient") RestClient kakaoRestClient) {
         this.kakaoRestClient = kakaoRestClient;
     }
 

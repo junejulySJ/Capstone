@@ -48,4 +48,19 @@ public class PlaceResponseDto {
                 .stayMinutes(stayMinutesMean)
                 .build();
     }
+
+    // tourAPI 결과에 rating, user_ratings_total 붙여서 반환
+    public static PlaceResponseDto fromTourApiPlaceResponse(TourApiPlaceResponse tourApiPlaceResponse, RatingResponse ratingResponse) {
+        return PlaceResponseDto.builder()
+                .address(tourApiPlaceResponse.getAddress())
+                .contentId(tourApiPlaceResponse.getContentId())
+                .category(tourApiPlaceResponse.getCategory())
+                .thumbnail(tourApiPlaceResponse.getThumbnail())
+                .latitude(tourApiPlaceResponse.getLatitude())
+                .longitude(tourApiPlaceResponse.getLongitude())
+                .name(tourApiPlaceResponse.getName())
+                .rating(String.valueOf(ratingResponse.getRating()))
+                .userRatingsTotal(String.valueOf(ratingResponse.getUserRatingsTotal()))
+                .build();
+    }
 }

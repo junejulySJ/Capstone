@@ -1,5 +1,6 @@
 package com.capstone.meetingmap;
 
+import com.capstone.meetingmap.api.google.properties.GoogleApiProperties;
 import com.capstone.meetingmap.api.kakao.properties.KakaoApiProperties;
 import com.capstone.meetingmap.api.tmap.properties.TMapApiProperties;
 import org.springframework.boot.SpringApplication;

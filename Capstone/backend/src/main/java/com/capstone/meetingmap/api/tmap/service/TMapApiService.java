@@ -3,6 +3,7 @@ package com.capstone.meetingmap.api.tmap.service;
 import com.capstone.meetingmap.api.tmap.dto.*;
 import com.capstone.meetingmap.schedule.dto.NearestInfo;
 import com.capstone.meetingmap.schedule.dto.SelectedPlace;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ import java.util.stream.IntStream;
 public class TMapApiService {
     private final RestClient tMapRestClient;
 
-    public TMapApiService(RestClient tMapRestClient) {
+    public TMapApiService(@Qualifier("tMapRestClient") RestClient tMapRestClient) {
         this.tMapRestClient = tMapRestClient;
     }
 

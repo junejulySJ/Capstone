@@ -1,18 +1,20 @@
 package com.capstone.meetingmap.board.controller;
 
-import com.capstone.meetingmap.board.dto.BoardWriteResponseDto;
-import com.capstone.meetingmap.board.dto.BoardDetailResponseDto;
-import com.capstone.meetingmap.board.dto.BoardResponseDto;
-import com.capstone.meetingmap.board.dto.BoardWriteRequestDto;
+import com.capstone.meetingmap.board.dto.*;
 import com.capstone.meetingmap.board.service.BoardService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -26,32 +28,69 @@ public class BoardController {
         this.boardService = boardService;
     }
 
-    //게시글 상세보기
+    // 전체/카테고리별 게시글 보기
+    @GetMapping
+    public ResponseEntity<?> search(
+            @RequestParam(value = "category", required = false) Integer categoryNo,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(defaultValue = "boardWriteDate") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction
+    ) {
+        Sort sort = direction.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return ResponseEntity.ok(boardService.searchArticlesDesc(categoryNo, pageable));
+    }
+
+    // 게시글 상세보기
     @GetMapping("/{boardNo}")
     public ResponseEntity<BoardDetailResponseDto> viewDetail(@PathVariable("boardNo") Integer boardNo) {
         return ResponseEntity.ok(boardService.searchByBoardNo(boardNo));
     }
 
-    //전체/카테고리별 게시글 보기
-    @GetMapping
-    public ResponseEntity<List<BoardResponseDto>> search(@RequestParam(value = "category", required = false) Integer categoryNo) {
-        // category 파라미터가 없으면 전체 목록을 가져오는 메서드 호출
-        if (categoryNo == null) {
-            return ResponseEntity.ok(boardService.searchAllDesc());
-        }
-        // categoryNo 파라미터가 있으면 해당 카테고리 목록을 가져오는 메서드 호출
-        return ResponseEntity.ok(boardService.searchByCategoryNoDesc(categoryNo));
-    }
-
-    //게시글 추가
-    @PostMapping
-    public ResponseEntity<BoardWriteResponseDto> write(@Valid @RequestBody BoardWriteRequestDto boardWriteRequestDto) {
+    // 게시글 등록
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> write(
+            @Valid @RequestBody BoardRequestDto boardRequestDto,
+            @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        BoardWriteResponseDto boardWriteResponseDto = boardService.write(boardWriteRequestDto, userId);
+        Integer boardNo = boardService.write(boardRequestDto, files, userId);
 
-        log.info("Post added: '{}'", boardWriteRequestDto.getBoardTitle());
+        log.info("Article added: '{}' [{}] by {}", boardNo, boardRequestDto.getBoardTitle(), userId);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(boardWriteResponseDto);
+        URI location = URI.create("/api/boards/" + boardNo);
+
+        return ResponseEntity.created(location).build();
+    }
+
+    // 게시글 수정
+    @PutMapping(value = "/{boardNo}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> modify(
+            @PathVariable Integer boardNo,
+            @Valid @RequestBody BoardRequestDto boardRequestDto,
+            @RequestPart(value = "files", required = false) List<MultipartFile> files,
+            @RequestParam(value = "deleteFileNos", required = false) List<Integer> deleteFileNos
+    ) {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        boardService.modify(boardNo, boardRequestDto, files, deleteFileNos, userId);
+
+        log.info("Article modified: '{}' [{}] by {}", boardNo, boardRequestDto.getBoardTitle(), userId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    // 게시글 삭제
+    @DeleteMapping("/{boardNo}")
+    public ResponseEntity<?> delete(@PathVariable Integer boardNo) {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        boardService.delete(boardNo, userId);
+
+        log.info("Article deleted: '{}' by {}", boardNo, userId);
+
+        return ResponseEntity.noContent().build();
     }
 }

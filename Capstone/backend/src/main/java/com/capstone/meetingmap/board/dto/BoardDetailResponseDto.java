@@ -1,12 +1,14 @@
 package com.capstone.meetingmap.board.dto;
 
 import com.capstone.meetingmap.board.entity.Board;
+import com.capstone.meetingmap.board.entity.BoardFile;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -14,27 +16,41 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class BoardDetailResponseDto {
     private Integer boardNo;
+    private String userId;
+    private String userNick;
+    private Integer userType;
+    private String userTypeName;
     private String boardTitle;
+    private String boardDescription;
     private String boardContent;
     private Integer boardViewCount;
     private LocalDateTime boardWriteDate;
     private LocalDateTime boardUpdateDate;
-    private String userNick;
+    private Long boardLike;
+    private Long boardHate;
     private Integer categoryNo;
     private String categoryName;
+    private List<BoardFile> boardFiles;
 
     //엔티티를 dto로 변환
     public static BoardDetailResponseDto fromEntity(Board board) {
         return BoardDetailResponseDto.builder()
                 .boardNo(board.getBoardNo())
+                .userId(board.getUser().getUserId())
+                .userNick(board.getUser().getUserNick())
+                .userType(board.getUser().getUserRole().getUserType())
+                .userTypeName(board.getUser().getUserRole().getUserTypeName())
                 .boardTitle(board.getBoardTitle())
+                .boardDescription(board.getBoardDescription())
                 .boardContent(board.getBoardContent())
                 .boardViewCount(board.getBoardViewCount())
                 .boardWriteDate(board.getBoardWriteDate())
                 .boardUpdateDate(board.getBoardUpdateDate())
-                .userNick(board.getUser().getUserNick())
+                .boardLike((long) board.getLikes().size())
+                .boardHate((long) board.getHates().size())
                 .categoryNo(board.getCategory().getCategoryNo())
                 .categoryName(board.getCategory().getCategoryName())
+                .boardFiles(board.getBoardFiles())
                 .build();
     }
 }

@@ -14,9 +14,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class BoardWriteRequestDto {
+public class BoardRequestDto {
     @NotBlank(message = "게시글 제목은 반드시 입력해야 합니다")
     private String boardTitle;
+
+    @NotBlank(message = "게시글 설명은 반드시 입력해야 합니다")
+    private String boardDescription;
 
     @NotBlank(message = "게시글 본문은 반드시 입력해야 합니다")
     private String boardContent;
@@ -28,6 +31,7 @@ public class BoardWriteRequestDto {
     public Board toEntity(Category category, User user) {
         return Board.builder()
                 .boardTitle(boardTitle)
+                .boardDescription(boardDescription)
                 .boardContent(boardContent)
                 .category(category)
                 .user(user)

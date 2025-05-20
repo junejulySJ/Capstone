@@ -10,13 +10,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class BoardWriteResponseDto {
+public class BoardModifyResponseDto {
     private String boardTitle;
+    private String userId;
 
     //엔티티를 dto로 변환
-    public static BoardWriteResponseDto fromEntity(Board board) {
-        return BoardWriteResponseDto.builder()
+    public static BoardModifyResponseDto fromEntity(Board board) {
+        return BoardModifyResponseDto.builder()
                 .boardTitle(board.getBoardTitle())
+                .userId(board.getUser().getUserId())
                 .build();
     }
 }

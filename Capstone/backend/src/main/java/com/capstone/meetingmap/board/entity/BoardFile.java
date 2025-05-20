@@ -22,8 +22,7 @@ public class BoardFile {
     private Board board;
 
     @Builder
-    public BoardFile(Integer fileNo, String fileName, String fileUrl, Board board) {
-        this.fileNo = fileNo;
+    public BoardFile(String fileName, String fileUrl, Board board) {
         this.fileName = fileName;
         this.fileUrl = fileUrl;
         this.board = board;

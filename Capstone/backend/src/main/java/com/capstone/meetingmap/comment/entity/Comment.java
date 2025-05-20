@@ -1,6 +1,7 @@
 package com.capstone.meetingmap.comment.entity;
 
 import com.capstone.meetingmap.board.entity.Board;
+import com.capstone.meetingmap.comment.dto.CommentRequestDto;
 import com.capstone.meetingmap.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -32,5 +33,9 @@ public class Comment extends CommentTime {
         this.commentContent = commentContent;
         this.user = user;
         this.board = board;
+    }
+
+    public void setCommentContent(CommentRequestDto commentRequestDto) {
+        this.commentContent = commentRequestDto.getCommentContent();
     }
 }

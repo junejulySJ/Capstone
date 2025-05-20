@@ -16,7 +16,9 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
     @Id
+    @Column(length = 50)
     private String userId;
+
     private String userEmail;
     private String userPasswd;
     private String userNick;

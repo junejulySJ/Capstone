@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './Mypage.css';
 import { myPosts } from "../data/myPosts";
 import { getPostsFromLocal, removePostFromLocal } from '../utils/storage';
+import { members } from '../data/members';
 
 const mockUser = {
   id: '홍길동',
@@ -15,6 +16,11 @@ const Mypage = () => {
   const navigate = useNavigate();
   const [likedPosts, setLikedPosts] = useState(getPostsFromLocal("like"));
   const [savedPosts, setSavedPosts] = useState(getPostsFromLocal("save"));
+  const [searchTerm, setSearchTerm] = useState('');
+  const [friends, setFriends] = useState(members);
+  const [newSchedule, setNewSchedule] = useState({ title: '', date: '' });
+  const [schedules, setSchedules] = useState([]);
+  const [settingsTab, setSettingsTab] = useState('profile');
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
@@ -38,6 +44,22 @@ const handleDeleteLiked = (postId) => {
 const handleDeleteSaved = (postId) => {
   removePostFromLocal("save", postId);
   setSavedPosts(getPostsFromLocal("save"));
+};
+
+const handleRemoveFriend = (id) => {
+  setFriends(friends.filter(friend => friend.id !== id));
+};
+
+const handleAddSchedule = (e) => {
+  e.preventDefault();
+  setSchedules([...schedules, newSchedule]);
+  setNewSchedule({ title: '', date: '' });
+};
+
+const handleDeleteSchedule = (index) => {
+  const updated = [...schedules];
+  updated.splice(index, 1);
+  setSchedules(updated);
 };
 
   return (
@@ -135,9 +157,143 @@ const handleDeleteSaved = (postId) => {
 )}
 
 
-        {view === 'friends' && <div>친구목록 화면 구성</div>}
-        {view === 'schedules' && <div>일정 화면 구성</div>}
-        {view === 'settings' && <div>설정 화면 구성</div>}
+       {view === 'friends' && (
+  <div className="p-4">
+    <h2 className="text-xl font-semibold mb-4">친구 목록</h2>
+
+    {/* 검색창 */}
+    <input
+      type="text"
+      placeholder="친구 이름 검색"
+      className="friend-search-input"
+      onChange={(e) => setSearchTerm(e.target.value)}
+    />
+
+    {/* 친구 목록 카드 */}
+    <div className="friend-list">
+      {friends
+        .filter(friend => friend.name.includes(searchTerm))
+        .map(friend => (
+          <div key={friend.id} className="friend-card">
+  <div className="friend-info">
+    <img src={friend.avatar} alt="프로필" className="friend-avatar" />
+    <div className="friend-details">
+      <p className="friend-name">{friend.name}</p>
+      <p className="friend-status">{friend.statusMessage}</p>
+    </div>
+  </div>
+  <button className="friend-delete-btn" onClick={() => handleRemoveFriend(friend.id)}>
+    삭제
+  </button>
+</div>
+
+        ))}
+    </div>
+  </div>
+)}
+
+        {view === 'schedules' && (
+  <div className="p-4">
+    <h2 className="text-xl font-semibold mb-4">일정 관리</h2>
+
+    {/* 일정 추가 폼 */}
+    <form onSubmit={handleAddSchedule} className="schedule-form">
+      <input
+        type="text"
+        placeholder="일정 제목"
+        value={newSchedule.title}
+        onChange={(e) => setNewSchedule({ ...newSchedule, title: e.target.value })}
+        required
+      />
+      <input
+        type="date"
+        value={newSchedule.date}
+        onChange={(e) => setNewSchedule({ ...newSchedule, date: e.target.value })}
+        required
+      />
+      <button type="submit">추가</button>
+    </form>
+
+    {/* 일정 목록 */}
+    <ul className="schedule-list">
+      {schedules.map((item, index) => (
+        <li key={index} className="schedule-item">
+          <div>
+            <strong>{item.date}</strong> - {item.title}
+          </div>
+          <button onClick={() => handleDeleteSchedule(index)}>삭제</button>
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
+
+                {view === 'settings' && (
+          <div className="settings-page">
+            <div className="settings-menu">
+              <ul>
+                {['profile', 'account', 'privacy', 'notifications', 'withdraw'].map(tab => (
+                  <li
+                    key={tab}
+                    className={settingsTab === tab ? 'active' : ''}
+                    onClick={() => setSettingsTab(tab)}
+                  >
+                    {tab === 'profile' && '프로필 수정'}
+                    {tab === 'account' && '계정 정보'}
+                    {tab === 'privacy' && '개인정보 설정'}
+                    {tab === 'notifications' && '알림 설정'}
+                    {tab === 'withdraw' && '회원 탈퇴'}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="settings-content">
+              {settingsTab === 'profile' && (
+                <div>
+                  <h3>프로필 수정</h3>
+                  <p>프로필 사진 및 닉네임을 변경할 수 있습니다.</p>
+                  <input type="text" placeholder="새 닉네임 입력" />
+                  <button>저장</button>
+                </div>
+              )}
+              {settingsTab === 'account' && (
+                <div>
+                  <h3>계정 정보</h3>
+                  <p>이메일: user@example.com</p>
+                  <input type="password" placeholder="새 비밀번호 입력" />
+                  <button>변경</button>
+                </div>
+              )}
+              {settingsTab === 'privacy' && (
+                <div>
+                  <h3>개인정보 설정</h3>
+                  <label>
+                    <input type="checkbox" /> 내 활동을 친구에게만 공개
+                  </label>
+                </div>
+              )}
+              {settingsTab === 'notifications' && (
+                <div>
+                  <h3>알림 설정</h3>
+                  <label>
+                    <input type="checkbox" /> 이메일 알림 수신 동의
+                  </label>
+                  <label>
+                    <input type="checkbox" /> 앱 푸시 알림 허용
+                  </label>
+                </div>
+              )}
+              {settingsTab === 'withdraw' && (
+                <div>
+                  <h3>회원 탈퇴</h3>
+                  <p>계정을 삭제하려면 비밀번호를 입력해주세요.</p>
+                  <input type="password" placeholder="비밀번호" />
+                  <button className="danger">탈퇴하기</button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

@@ -29,6 +29,7 @@
 
 > 게시글 전체를 조회합니다.  
 > category 쿼리 파라미터로 특정 카테고리만 조회하거나 page, size 등으로 일부만 조회할 수 있습니다.  
+> keyword 쿼리 파라미터로 boardTitle과 boardDescription에서 해당 키워드와 일치하는 게시글만 볼 수 있습니다.
 > 파라미터를 사용하지 않을 경우 page는 0, size는 10, sortBy는 boardWriteDate, direction은 desc이 기본값입니다.
 
 ## [Example](BoardAPIDetail.md#게시글-조회)
@@ -37,6 +38,7 @@
 | 파라미터      | 필수 여부 | 설명          | 값 예시             |
 |-----------|-------|-------------|------------------|
 | category  | X     | 카테고리 번호     | 1                |
+| keyword   | X     | 검색할 키워드     | "질문"             |
 | page      | X     | 페이지 번호      | 0                |
 | size      | X     | 한 번에 출력할 개수 | 10               |
 | sortBy    | X     | 정렬 기준       | boardWriteDate 등 |

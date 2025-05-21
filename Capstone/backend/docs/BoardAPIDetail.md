@@ -171,12 +171,12 @@ axios.get(`${API_BASE_URL}/boards`)
 }
 ```
 
-#### Request 예시 2 (Q&A 글 10개만 작성일 기준 내림차순 조회)
+#### Request 예시 2 (Q&A 글 중 "질문"이 포함된 10개만 작성일 기준 내림차순 조회)
 ```javascript
-axios.get(`${API_BASE_URL}/boards?category=1&page=0&size=10&sortBy=boardWriteDate&direction=desc`)
+axios.get(`${API_BASE_URL}/boards?category=1&keyword=질문&page=0&size=10&sortBy=boardWriteDate&direction=desc`)
 ```
 
-#### Response 예시 2 (Q&A 글 10개만 작성일 기준 내림차순 조회)
+#### Response 예시 2 (Q&A 글 중 "질문"이 포함된 10개만 작성일 기준 내림차순 조회)
 ```json
 {
     "content": [

@@ -32,6 +32,7 @@ public class BoardController {
     @GetMapping
     public ResponseEntity<?> search(
             @RequestParam(value = "category", required = false) Integer categoryNo,
+            @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(defaultValue = "boardWriteDate") String sortBy,
@@ -40,7 +41,7 @@ public class BoardController {
         Sort sort = direction.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        return ResponseEntity.ok(boardService.searchArticlesDesc(categoryNo, pageable));
+        return ResponseEntity.ok(boardService.searchArticlesDesc(categoryNo, keyword, pageable));
     }
 
     // 게시글 상세보기

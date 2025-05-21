@@ -1,7 +1,6 @@
 package com.capstone.meetingmap.board.dto;
 
 import com.capstone.meetingmap.board.entity.Board;
-import com.capstone.meetingmap.board.entity.BoardFile;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

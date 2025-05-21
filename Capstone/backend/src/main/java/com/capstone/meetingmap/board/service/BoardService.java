@@ -1,11 +1,11 @@
 package com.capstone.meetingmap.board.service;
 
-import com.capstone.meetingmap.board.dto.*;
+import com.capstone.meetingmap.board.dto.BoardDetailResponseDto;
+import com.capstone.meetingmap.board.dto.BoardRequestDto;
 import com.capstone.meetingmap.board.entity.Board;
 import com.capstone.meetingmap.board.entity.BoardFile;
 import com.capstone.meetingmap.board.entity.BoardView;
 import com.capstone.meetingmap.board.repository.BoardFileRepository;
-import com.capstone.meetingmap.board.repository.BoardLikeRepository;
 import com.capstone.meetingmap.board.repository.BoardRepository;
 import com.capstone.meetingmap.board.repository.BoardViewRepository;
 import com.capstone.meetingmap.category.entity.Category;
@@ -33,9 +33,8 @@ public class BoardService {
     private final CommentRepository commentRepository;
     private final BoardFileService boardFileService;
     private final BoardFileRepository boardFileRepository;
-    private final BoardLikeRepository boardLikeRepository;
 
-    public BoardService(CategoryRepository categoryRepository, BoardRepository boardRepository, UserRepository userRepository, BoardViewRepository boardViewRepository, CommentRepository commentRepository, BoardFileService boardFileService, BoardFileRepository boardFileRepository, BoardLikeRepository boardLikeRepository) {
+    public BoardService(CategoryRepository categoryRepository, BoardRepository boardRepository, UserRepository userRepository, BoardViewRepository boardViewRepository, CommentRepository commentRepository, BoardFileService boardFileService, BoardFileRepository boardFileRepository) {
         this.categoryRepository = categoryRepository;
         this.boardRepository = boardRepository;
         this.userRepository = userRepository;
@@ -43,20 +42,31 @@ public class BoardService {
         this.commentRepository = commentRepository;
         this.boardFileService = boardFileService;
         this.boardFileRepository = boardFileRepository;
-        this.boardLikeRepository = boardLikeRepository;
     }
 
     // 게시글 보기
-    public Page<BoardView> searchArticlesDesc(Integer categoryNo, Pageable pageable) {
-        // category 파라미터가 없으면 전체 목록을 가져오는 메서드 호출
-        if (categoryNo == null) {
-            return boardViewRepository.findAllByOrderByBoardNoDesc(pageable);
-        }
-        // categoryNo 파라미터가 있으면 해당 카테고리 목록을 가져오는 메서드 호출
-        categoryRepository.findById(categoryNo) // 실제 존재하는 카테고리인지 검증
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 카테고리가 존재하지 않습니다"));
+    public Page<BoardView> searchArticlesDesc(Integer categoryNo, String keyword, Pageable pageable) {
 
-        return boardViewRepository.findAllByCategoryNoOrderByBoardNoDesc(categoryNo, pageable);
+        // categoryNo, keyword 파라미터가 모두 있으면 해당 키워드로 검색
+        if (categoryNo != null && keyword != null && !keyword.trim().isEmpty()) {
+            return boardViewRepository.searchByCategoryAndKeyword(categoryNo, keyword, pageable);
+        }
+
+        // categoryNo 파라미터만 있으면 해당 카테고리 목록을 가져오는 메서드 호출
+        if (categoryNo != null) {
+            categoryRepository.findById(categoryNo) // 실제 존재하는 카테고리인지 검증
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 카테고리가 존재하지 않습니다"));
+
+            return boardViewRepository.findAllByCategoryNoOrderByBoardNoDesc(categoryNo, pageable);
+        }
+
+        // keyword 파라미터만 있으면 해당 키워드로 검색
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            return boardViewRepository.findAllByBoardTitleContainingIgnoreCaseOrBoardDescriptionContainingIgnoreCase(keyword, keyword, pageable);
+        }
+
+        // 아무 파라미터도 없으면 전체 목록을 가져오는 메서드 호출
+        return boardViewRepository.findAllByOrderByBoardNoDesc(pageable);
     }
 
     // 게시글 상세보기

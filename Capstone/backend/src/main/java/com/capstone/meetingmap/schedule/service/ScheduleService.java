@@ -1,5 +1,6 @@
 package com.capstone.meetingmap.schedule.service;
 
+import com.capstone.meetingmap.api.openai.service.OpenAIService;
 import com.capstone.meetingmap.api.tmap.dto.PedestrianRouteRequest;
 import com.capstone.meetingmap.api.tmap.dto.RouteRequest;
 import com.capstone.meetingmap.api.tmap.dto.RouteResponse;
@@ -41,8 +42,9 @@ public class ScheduleService {
     private final GroupUserRepository groupUserRepository;
     private final FriendshipRepository friendshipRepository;
     private final MapService mapService;
+    private final OpenAIService openAIService;
 
-    public ScheduleService(TMapApiService tMapApiService, ScheduleRepository scheduleRepository, ScheduleDetailRepository scheduleDetailRepository, UserRepository userRepository, GroupUserRepository groupUserRepository, FriendshipRepository friendshipRepository, MapService mapService) {
+    public ScheduleService(TMapApiService tMapApiService, ScheduleRepository scheduleRepository, ScheduleDetailRepository scheduleDetailRepository, UserRepository userRepository, GroupUserRepository groupUserRepository, FriendshipRepository friendshipRepository, MapService mapService, OpenAIService openAIService) {
         this.tMapApiService = tMapApiService;
         this.scheduleRepository = scheduleRepository;
         this.scheduleDetailRepository = scheduleDetailRepository;
@@ -50,6 +52,7 @@ public class ScheduleService {
         this.groupUserRepository = groupUserRepository;
         this.friendshipRepository = friendshipRepository;
         this.mapService = mapService;
+        this.openAIService = openAIService;
     }
 
     // 회원이 속한 모든 스케줄 가져오기
@@ -197,10 +200,62 @@ public class ScheduleService {
 
         List<ScheduleDetailCreateDto> detailCreateDtoList = new ArrayList<>();
 
-        if (dto.getAdditionalRecommendation()) { // 추가 추천 받기를 체크한 경우
-            // 장소 수-선택한 장소 만큼 추가 장소를 시작 장소를 기준으로 테마, 평점 기준으로 필터링해 선택(정렬은 user_ratings_total 기준 정렬)
+        /*if (dto.getAiRecommendation()) { // AI 추천 받기를 체크한 경우
+            // 추가 장소를 PointCoordinate와 테마 기준으로 AI에 정보를 제공해 선택(정렬은 user_ratings_total 기준 정렬)
             int remainingCount = dto.getTotalPlaceCount() - dto.getSelectedPlace().size();
 
+            // AI에게 추천을 맡길 총 장소
+            List<PlaceResponseDto> mergedResponse = new ArrayList<>();
+
+            List<String> categoryList = new ArrayList<>();
+            switch (dto.getTheme()) {
+                case "tour" -> categoryList.add("tour");
+                case "nature" -> categoryList.add("tour-nature");
+                case "history" -> categoryList.add("tour-tradition");
+                case "food" -> categoryList.add("food");
+                case "shopping" -> categoryList.add("shopping");
+                case "date" -> {
+                    categoryList.add("tour-park");
+                    categoryList.add("cafe");
+                    categoryList.add("tour-theme-park");
+                }
+            }
+
+            for (String category : categoryList) {
+                List<PlaceResponseDto> placeResponse = mapService.getAllPlaces("user_ratings_total_dsc", dto.getPointCoordinate().getLatitude(), dto.getPointCoordinate().getLongitude(), category);
+                mergedResponse.addAll(placeResponse);
+            }
+
+            if (!dto.getTheme().equals("food")) {
+                List<PlaceResponseDto> foodPlaceResponse = mapService.getAllPlaces("user_ratings_total_dsc", dto.getPointCoordinate().getLatitude(), dto.getPointCoordinate().getLongitude(), "food");
+                mergedResponse.addAll(foodPlaceResponse);
+            }
+
+            String themeDescription = switch (dto.getTheme()) {
+                case "history" -> "역사적 가치가 높고 전통적인 분위기가 있는 장소";
+                case "nature" -> "자연 경관이 아름답고 휴식하기 좋은 장소";
+                case "food" -> "맛이 좋고 리뷰 수가 많은 현지 인기 맛집";
+                case "date" -> "분위기 좋고 둘이 걷기 좋은 장소";
+                default -> "추천할만한 장소";
+            };
+
+            // AI 호출: AI 서비스에 필요한 정보(현재 위치, 테마, 이미 선택한 장소, 시간 등)를 보내 추천 장소 요청
+            List<PlaceResponseDto> aiRecommendedPlaces = openAIService.getRecommendedPlaces(dto, mergedResponse, themeDescription);
+
+            // AI 추천 장소 중 필요한 수량만큼만 선택
+            List<PlaceResponseDto> selectedAiPlaces = aiRecommendedPlaces.stream()
+                    .limit(remainingCount)
+                    .toList();
+
+            // 기존에 선택된 장소 + AI 추천 장소 합치기
+            List<SelectedPlace> additionalPlaceList = selectedAiPlaces.stream()
+                    .map(placeDto -> placeDto.toSelectedPlace(dto.getStayMinutesMean()))
+                    .toList();
+
+            dto.getSelectedPlace().addAll(additionalPlaceList);
+        } else*/ if (dto.getAdditionalRecommendation()) { // 추가 추천 받기를 체크한 경우
+            // 추가 장소를 PointCoordinate를 기준으로 테마, 평점 기준으로 필터링해 선택(정렬은 user_ratings_total 기준 정렬)
+            int remainingCount = dto.getTotalPlaceCount() - dto.getSelectedPlace().size();
             // 추가로 선택된 총 장소
             List<PlaceResponseDto> mergedResponse = new ArrayList<>();
 
@@ -210,46 +265,57 @@ public class ScheduleService {
                 // 점심식사 가능한 시간
                 if (dto.getScheduleStartTime().toLocalTime().isBefore(LocalTime.of(11, 30)) && dto.getScheduleEndTime().toLocalTime().isAfter(LocalTime.of(13, 30))) {
                     mergedResponse.add(response.get(0));
-                    remainingCount -= 1;
+                    remainingCount--;
                 }
                 // 저녁식사 가능한 시간
-                if (dto.getScheduleStartTime().toLocalTime().isBefore(LocalTime.of(17, 30)) && dto.getScheduleEndTime().toLocalTime().isAfter(LocalTime.of(19, 30))) {
+                if (dto.getScheduleStartTime().toLocalTime().isBefore(LocalTime.of(17, 0)) && dto.getScheduleEndTime().toLocalTime().isAfter(LocalTime.of(19, 0))) {
                     mergedResponse.add(response.get(1));
-                    remainingCount -= 1;
+                    remainingCount--;
                 }
             }
-            String category = null;
+            List<String> categoryList = new ArrayList<>();
             switch (dto.getTheme()) {
-                case "tour" -> category = "tour";
-                case "nature" -> {
-                    category = "tour-nature";
-                }
-                case "history" -> {
-                    category = "tour-tradition";
-                }
-                case "food" -> {
-                    category = "food";
-                }
-                case "shopping" -> {
-                    category = "shopping";
-                }
+                case "tour" -> categoryList.add("tour");
+                case "nature" -> categoryList.add("tour-nature");
+                case "history" -> categoryList.add("tour-tradition");
+                case "food" -> categoryList.add("food");
+                case "shopping" -> categoryList.add("shopping");
                 case "date" -> {
-                    category = "tour-park";
+                    categoryList.add("tour-park");
+                    categoryList.add("cafe");
+                    categoryList.add("tour-theme-park");
                 }
             }
-            List<PlaceResponseDto> response = mapService.getAllPlaces("user_ratings_total_dsc", dto.getPointCoordinate().getLatitude(), dto.getPointCoordinate().getLongitude(), category);
-            System.out.println("response=" + response);
-            if (dto.getTheme().equals("date")) { // 데이트 테마인 경우 추가 검색
-                List<PlaceResponseDto> response2 = mapService.getAllPlaces("user_ratings_total_dsc", dto.getPointCoordinate().getLatitude(), dto.getPointCoordinate().getLongitude(), "cafe");
-                response.addAll(response2);
-                List<PlaceResponseDto> response3 = mapService.getAllPlaces("user_ratings_total_dsc", dto.getPointCoordinate().getLatitude(), dto.getPointCoordinate().getLongitude(), "tour-theme-park");
-                response.addAll(response3);
+
+            for (String category : categoryList) {
+                List<PlaceResponseDto> placeResponse = mapService.getAllPlaces("user_ratings_total_dsc", dto.getPointCoordinate().getLatitude(), dto.getPointCoordinate().getLongitude(), category);
+                mergedResponse.addAll(placeResponse);
+            }
+
+            Set<String> alreadySelectedNames = dto.getSelectedPlace().stream()
+                    .map(SelectedPlace::getName)
+                    .collect(Collectors.toSet());
+
+            // 중복 제거
+            mergedResponse = mergedResponse.stream()
+                    .filter(placeDto -> !alreadySelectedNames.contains(placeDto.getName()))
+                    .collect(Collectors.toList());
+
+            // 최소 평점 이상만 추출
+            mergedResponse = mergedResponse.stream()
+                    .filter(placeDto -> ParseUtil.parseDoubleSafe(placeDto.getRating()) >= dto.getMinimumRating())
+                    .toList();
+
+            List<PlaceResponseDto> subMergedResponse;
+            if (mergedResponse.size() > dto.getTotalPlaceCount()) {
+                // subList로 앞부분만 추출해서 새로운 리스트로 만듬
+                subMergedResponse = new ArrayList<>(mergedResponse.subList(0, dto.getTotalPlaceCount()));
+            } else {
+                subMergedResponse = new ArrayList<>(mergedResponse);
             }
 
             // 추가 검색 결과를 평점 개수 많은 기준으로 정렬
-            response.sort(Comparator.comparing(PlaceResponseDto::getUserRatingsTotal).reversed());
-
-            mergedResponse.addAll(response);
+            subMergedResponse.sort(Comparator.comparing(PlaceResponseDto::getUserRatingsTotal).reversed());
 
             // dto에 추가로 선택된 총 장소 추가
             List<SelectedPlace> additionalPlaceList = new ArrayList<>();
@@ -263,14 +329,14 @@ public class ScheduleService {
         // 스케줄 순서대로 정렬되게 할 장소들 리스트
         List<SelectedPlace> sortedSelectedPlaceList = new ArrayList<>();
 
-        // 처음 제시된 장소(추가 추천을 사용할 경우 가장 높은 평점을 가진 종소)로 시작지점 설정
+        // 처음 제시된 장소(추가 추천을 사용할 경우 가장 높은 평점을 가진 장소)로 시작지점 설정
         SelectedPlace firstPlace = null;
         for (SelectedPlace selectedPlace : dto.getSelectedPlace()) {
             // 점심/저녁 식사 시간부터 시작할 경우 음식점인 경우만 시작 장소로 결정
             if ((dto.getScheduleStartTime().toLocalTime().isAfter(LocalTime.of(11, 30)) &&
                     dto.getScheduleEndTime().toLocalTime().isBefore(LocalTime.of(13, 30))) ||
-                    (dto.getScheduleStartTime().toLocalTime().isAfter(LocalTime.of(17, 30)) &&
-                            dto.getScheduleEndTime().toLocalTime().isBefore(LocalTime.of(19, 30)))) {
+                    (dto.getScheduleStartTime().toLocalTime().isAfter(LocalTime.of(17, 0)) &&
+                            dto.getScheduleEndTime().toLocalTime().isBefore(LocalTime.of(19, 0)))) {
                 if (selectedPlace.getCategory().contains("food")) {
                     firstPlace = selectedPlace;
                     break;
@@ -333,7 +399,7 @@ public class ScheduleService {
             } else {
                 // 음식점 필터: 점심 or 저녁시간이 되었거나 지났으면 true
                 boolean isLunchTime = currentTime.toLocalTime().isAfter(LocalTime.of(11, 30));
-                boolean isDinnerTime = currentTime.toLocalTime().isAfter(LocalTime.of(17, 30));
+                boolean isDinnerTime = currentTime.toLocalTime().isAfter(LocalTime.of(17, 0));
 
                 boolean hadLunchFlag = false;
                 boolean hadDinnerFlag = false;

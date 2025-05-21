@@ -125,7 +125,7 @@ axios.get(`${API_BASE_URL}/api/schedules/1/members`)
 
 ### 스케줄 생성
 
-#### Request 예시 1
+#### Request 예시 1 (추가 추천 O, AI 추천 X)
 ```javascript
 axios.post(`${API_BASE_URL}/api/schedules/create`,
     {
@@ -144,6 +144,7 @@ axios.post(`${API_BASE_URL}/api/schedules/create`,
         "scheduleEndTime": "2025-06-01T18:00:00",
         "transport": "pedestrian",
         "additionalRecommendation": true,
+        "aiRecommendation": false,
         "totalPlaceCount": 4,
         "theme": "tour",
         "stayMinutesMean": 60,
@@ -155,7 +156,7 @@ axios.post(`${API_BASE_URL}/api/schedules/create`,
 )
 ```
 
-#### Response 예시 1
+#### Response 예시 1 (추가 추천 O, AI 추천 X)
 ```json
 {
   "places": [
@@ -228,6 +229,115 @@ axios.post(`${API_BASE_URL}/api/schedules/create`,
       "longitude": 127.0050907302,
       "scheduleStartTime": "2025-06-01T14:30:00",
       "scheduleEndTime": "2025-06-01T15:30:00"
+    }
+  ]
+}
+```
+
+#### Request 예시 2 (AI 추천 O) ✏️
+```javascript
+axios.post(`${API_BASE_URL}/api/schedules/create`,
+    {
+        "selectedPlace": [
+            {
+                "contentId": "126508",
+                "address": "서울특별시 종로구 사직로 161 (세종로) ",
+                "latitude": "37.5760836609",
+                "longitude": "126.9767375783",
+                "name": "경복궁",
+                "category": "tour-tradition",
+                "stayMinutes": 60
+            }
+        ],
+        "scheduleStartTime": "2025-06-01T10:00:00",
+        "scheduleEndTime": "2025-06-01T18:00:00",
+        "transport": "pedestrian",
+        "additionalRecommendation": true,
+        "aiRecommendation": true,
+        "totalPlaceCount": 4,
+        "theme": "tour",
+        "stayMinutesMean": 60,
+        "pointCoordinate": {
+            "latitude": "37.57596445980707",
+            "longitude": "126.97685309595215"
+        }
+    }
+)
+```
+
+#### Response 예시 2 (AI 추천 O) ✏️
+```json
+{
+  "places": [
+    {
+      "contentId": "126508",
+      "address": "서울특별시 종로구 사직로 161 (세종로) ",
+      "name": "경복궁",
+      "latitude": "37.5760836609",
+      "longitude": "126.9767375783",
+      "category": "tour-tradition",
+      "stayMinutes": 60
+    },
+    {
+      "contentId": "129507",
+      "address": "서울특별시 종로구 창신동 ",
+      "name": "청계천",
+      "latitude": "37.5697015781",
+      "longitude": "127.0050907302",
+      "category": "tour-park",
+      "stayMinutes": 60
+    },
+    {
+      "contentId": "1325115",
+      "address": "서울특별시 종로구 종로40가길 18 (종로5가) ",
+      "name": "진옥화할매원조닭한마리",
+      "latitude": "37.5704292825",
+      "longitude": "127.0057128756",
+      "category": "food-korean",
+      "stayMinutes": 60
+    },
+    {
+      "contentId": "126943",
+      "address": "서울특별시 종로구 북악산로 267 (평창동) ",
+      "name": "북악스카이 팔각정",
+      "latitude": "37.6020279351",
+      "longitude": "126.9805642714",
+      "category": "tour-park",
+      "stayMinutes": 60
+    }
+  ],
+  "schedules": [
+    {
+      "scheduleContent": "경복궁 방문",
+      "scheduleAddress": "서울특별시 종로구 사직로 161 (세종로) ",
+      "latitude": 37.5760836609,
+      "longitude": 126.9767375783,
+      "scheduleStartTime": "2025-06-01T10:00:00",
+      "scheduleEndTime": "2025-06-01T11:00:00"
+    },
+    {
+      "scheduleContent": "청계천 방문",
+      "scheduleAddress": "서울특별시 종로구 창신동 ",
+      "latitude": 37.5697015781,
+      "longitude": 127.0050907302,
+      "scheduleStartTime": "2025-06-01T12:00:00",
+      "scheduleEndTime": "2025-06-01T13:00:00"
+    },
+    {
+      "scheduleContent": "진옥화할매원조닭한마리 방문",
+      "scheduleAddress": "서울특별시 종로구 종로40가길 18 (종로5가) ",
+      "latitude": 37.5704292825,
+      "longitude": 127.0057128756,
+      "scheduleStartTime": "2025-06-01T13:30:00",
+      "scheduleEndTime": "2025-06-01T14:30:00"
+    },
+    {
+      "scheduleContent": "북악스카이 팔각정 방문",
+      "scheduleAddress": "서울특별시 종로구 북악산로 267 (평창동) ",
+      "latitude": 37.6020279351,
+      "longitude": 126.9805642714,
+      "scheduleStartTime": "2025-06-01T16:30:00",
+      "scheduleEndTime": "2025-06-01T17:30:00"
     }
   ]
 }

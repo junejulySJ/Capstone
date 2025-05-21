@@ -124,25 +124,26 @@
 
 ## [Example](ScheduleAPIDetail.md#스케줄-생성)
 
-#### 요청 파라미터
-| 파라미터                     | 필수 여부              | 설명                                                            | 값 예시                           |
-|--------------------------|--------------------|---------------------------------------------------------------|--------------------------------|
-| selectedPlace            | 추가 추천 여부가 false면 O | 선택한 장소들                                                       | [{contentId, ...}, ...]        |
-| contentId                |                    | 장소 ID                                                         | 126508                         |
-| address                  |                    | 장소 주소                                                         | "서울특별시 종로구 사직로 161 (세종로)"      |
-| latitude                 |                    | 장소 위도                                                         | "37.5760836609"                |
-| longitude                |                    | 장소 경도                                                         | "126.9767375783"               |
-| name                     |                    | 장소 이름                                                         | "경복궁"                          |
-| category                 |                    | 카테고리                                                          | "tour-tradition"               |
-| stayMinutes              |                    | 장소별 머무는 시간(분 단위)                                              | 60                             |
-| scheduleStartTime        | O                  | 스케줄 시작 시간(input type="datetime-local")                        | "2025-06-01T10:00:00"          |
-| scheduleEndTime          | O                  | 스케줄 종료 시간(input type="datetime-local")                        | "2025-06-01T18:00:00"          |
-| transport                | O                  | 이동 수단                                                         | "pedestrian", "car", "transit" |
-| additionalRecommendation | O                  | 추가 추천 여부                                                      | true/false                     |
-| totalPlaceCount          | 추가 추천 여부가 true면 O  | 선택한 장소를 포함한 스케줄에 포함될 총 장소 개수                                  | 4                              |
-| theme                    | 추가 추천 여부가 true면 O  | 추천에 사용될 테마                                                    | "tour" 등                       |
-| stayMinutesMean          | 추가 추천 여부가 true면 O  | 추천될 장소들의 평균 머무는 시간(분 단위)                                      | 60                             |
-| pointCoordinate          | 추가 추천 여부가 true면 O  | 추천을 시작할 장소 위치(출발지-목적지 기반 검색이면 목적지 좌표, 중간 지점 기반 검색이면 중간 지점 좌표) | {latitude, longitude}          |
+#### 요청 파라미터 ✏️
+| 파라미터                     | 필수 여부                  | 설명                                                            | 값 예시                           |
+|--------------------------|------------------------|---------------------------------------------------------------|--------------------------------|
+| selectedPlace            | 추가(AI) 추천 여부가 false면 O | 선택한 장소들                                                       | [{contentId, ...}, ...]        |
+| contentId                |                        | 장소 ID                                                         | 126508                         |
+| address                  |                        | 장소 주소                                                         | "서울특별시 종로구 사직로 161 (세종로)"      |
+| latitude                 |                        | 장소 위도                                                         | "37.5760836609"                |
+| longitude                |                        | 장소 경도                                                         | "126.9767375783"               |
+| name                     |                        | 장소 이름                                                         | "경복궁"                          |
+| category                 |                        | 카테고리                                                          | "tour-tradition"               |
+| stayMinutes              |                        | 장소별 머무는 시간(분 단위)                                              | 60                             |
+| scheduleStartTime        | O                      | 스케줄 시작 시간(input type="datetime-local")                        | "2025-06-01T10:00:00"          |
+| scheduleEndTime          | O                      | 스케줄 종료 시간(input type="datetime-local")                        | "2025-06-01T18:00:00"          |
+| transport                | O                      | 이동 수단                                                         | "pedestrian", "car", "transit" |
+| additionalRecommendation | O                      | 추가 추천 여부                                                      | true/false                     |
+| aiRecommendation         | O                      | AI 추천 여부, 추가 추천 여부보다 우선순위가 높음                                 | true/false                     |
+| totalPlaceCount          | 추가(AI) 추천 여부가 true면 O  | 선택한 장소를 포함한 스케줄에 포함될 총 장소 개수                                  | 4                              |
+| theme                    | 추가(AI) 추천 여부가 true면 O  | 추천에 사용될 테마                                                    | "tour" 등                       |
+| stayMinutesMean          | 추가(AI) 추천 여부가 true면 O  | 추천될 장소들의 평균 머무는 시간(분 단위)                                      | 60                             |
+| pointCoordinate          | 추가(AI) 추천 여부가 true면 O  | 추천을 시작할 장소 위치(출발지-목적지 기반 검색이면 목적지 좌표, 중간 지점 기반 검색이면 중간 지점 좌표) | {latitude, longitude}          |
 
 #### theme 종류
 | theme    | 설명   | 카테고리                             |

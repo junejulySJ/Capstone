@@ -2,6 +2,7 @@ package com.capstone.meetingmap.config;
 
 import com.capstone.meetingmap.api.google.properties.GoogleApiProperties;
 import com.capstone.meetingmap.api.kakao.properties.KakaoApiProperties;
+import com.capstone.meetingmap.api.openai.properties.OpenAiApiProperties;
 import com.capstone.meetingmap.api.tmap.properties.TMapApiProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,15 @@ import java.net.URI;
 public class ExternalApiRestClientConfig {
 
     private static final Logger log = LoggerFactory.getLogger(ExternalApiRestClientConfig.class);
+
+    @Bean
+    public RestClient openAiRestClient(final OpenAiApiProperties openAiApiProperties) {
+        return RestClient.builder()
+                .baseUrl(openAiApiProperties.getBaseUrl())
+                .defaultHeader("Authorization", "Bearer " + openAiApiProperties.getKey())
+                .requestInterceptor(loggingInterceptor())
+                .build();
+    }
 
     @Bean
     public RestClient googleRestClient(final GoogleApiProperties googleApiProperties) {

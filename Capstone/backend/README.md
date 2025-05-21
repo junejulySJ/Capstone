@@ -13,12 +13,12 @@
 - [Auth API](docs/AuthAPI.md)
 - [Friendship API](docs/FriendshipAPI.md)
 - [Map API](docs/MapAPI.md) [(Example)](docs/MapAPIDetail.md)
-- [Schedule API](docs/ScheduleAPI.md) [(Example)](docs/ScheduleAPIDetail.md)
+- [Schedule API](docs/ScheduleAPI.md) [(Example)](docs/ScheduleAPIDetail.md) ✏️
 - [Path API](docs/PathAPI.md) [(Example)](docs/PathAPIDetail.md)
 - [Board API](docs/BoardAPI.md) [(Example)](docs/BoardAPIDetail.md) ✏️
 - [Comment API](docs/CommentAPI.md) [(Example)](docs/CommentAPIDetail.md) ✏️
 
-# ※주의사항 4까지 있습니다
+# ※주의사항 5까지 있습니다
 
 ## 주의사항 1
 - 비밀번호 암호화 방식이 변경되어 기존 사용자로 로그인을 하려면 다음과 같은 sql문을 적용해주세요.
@@ -121,8 +121,13 @@ FROM `BOARD` B
 
 ## 주의사항 4 ✏️
 - 아마존 s3 키가 application.properties에 포함되어있으면 github에 업로드가 아예 안되서 지우고 해당 기능을 주석 처리하고 올렸습니다.
-- 프로젝트를 s3 테스트(프로필 사진 변경 등) 해볼려면 S3Config, S3Service, UserService의 프로필 사진 처리 부분의 주석을 해제하고 s3 서비스에 가입해서 application.properties에 다음 정보를 채우시면 됩니다.  
+- s3 테스트(프로필 사진 변경 등) 해보려면 S3Config, S3Service의 전체 주석, UserService의 프로필 사진 처리 부분의 주석을 해제하고 s3 서비스에 가입해서 application.properties에 다음 정보를 채우시면 됩니다.  
 cloud.aws.credentials.access-key
 cloud.aws.credentials.secret-key
 cloud.aws.region.static 
 cloud.aws.s3.bucket
+
+## 주의사항 5 ✏️
+- 마찬가지로 OpenAI 키가 application.properties에 포함되어있으면 github에 업로드가 아예 안되서 지우고 해당 기능을 주석 처리하고 올렸습니다.
+- AI 추천 스케줄 기능을 사용 해보려면 OpenAIService의 전체 주석, ScheduleService의 'AI 추천 받기를 체크한 경우' 부분의 주석을 해제하고 openAI에 가입해서 application.properties에 다음 정보를 채우시면 됩니다.  
+  openai.api.key

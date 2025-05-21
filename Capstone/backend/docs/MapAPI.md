@@ -6,6 +6,8 @@
 - **Map API** [(Example)](MapAPIDetail.md)
 - [Schedule API](ScheduleAPI.md) [(Example)](ScheduleAPIDetail.md)
 - [Path API](PathAPI.md) [(Example)](PathAPIDetail.md)
+- [Board API](BoardAPI.md) [(Example)](BoardAPIDetail.md)
+- [Comment API](CommentAPI.md) [(Example)](CommentAPIDetail.md)
 
 # MAP API
 ## API 바로가기

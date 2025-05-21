@@ -6,6 +6,8 @@
 - [Map API](AuthAPI.md) [(Example)](MapAPIDetail.md)
 - [Schedule API](ScheduleAPI.md) **(Example)**
 - [Path API](PathAPI.md) [(Example)](PathAPIDetail.md)
+- [Board API](BoardAPI.md) [(Example)](BoardAPIDetail.md)
+- [Comment API](CommentAPI.md) [(Example)](CommentAPIDetail.md)
 
 # Schedule API 예시
 ## API 바로가기

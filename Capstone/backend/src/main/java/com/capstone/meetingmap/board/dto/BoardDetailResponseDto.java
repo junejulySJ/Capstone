@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
@@ -30,7 +31,7 @@ public class BoardDetailResponseDto {
     private Long boardHate;
     private Integer categoryNo;
     private String categoryName;
-    private List<BoardFile> boardFiles;
+    private List<BoardFileResponseDto> boardFiles;
 
     //엔티티를 dto로 변환
     public static BoardDetailResponseDto fromEntity(Board board) {
@@ -50,7 +51,7 @@ public class BoardDetailResponseDto {
                 .boardHate((long) board.getHates().size())
                 .categoryNo(board.getCategory().getCategoryNo())
                 .categoryName(board.getCategory().getCategoryName())
-                .boardFiles(board.getBoardFiles())
+                .boardFiles(board.getBoardFiles().stream().map(BoardFileResponseDto::fromEntity).collect(Collectors.toList()))
                 .build();
     }
 }

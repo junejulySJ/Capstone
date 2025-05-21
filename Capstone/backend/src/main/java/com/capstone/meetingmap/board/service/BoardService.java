@@ -5,6 +5,7 @@ import com.capstone.meetingmap.board.entity.Board;
 import com.capstone.meetingmap.board.entity.BoardFile;
 import com.capstone.meetingmap.board.entity.BoardView;
 import com.capstone.meetingmap.board.repository.BoardFileRepository;
+import com.capstone.meetingmap.board.repository.BoardLikeRepository;
 import com.capstone.meetingmap.board.repository.BoardRepository;
 import com.capstone.meetingmap.board.repository.BoardViewRepository;
 import com.capstone.meetingmap.category.entity.Category;
@@ -32,8 +33,9 @@ public class BoardService {
     private final CommentRepository commentRepository;
     private final BoardFileService boardFileService;
     private final BoardFileRepository boardFileRepository;
+    private final BoardLikeRepository boardLikeRepository;
 
-    public BoardService(CategoryRepository categoryRepository, BoardRepository boardRepository, UserRepository userRepository, BoardViewRepository boardViewRepository, CommentRepository commentRepository, BoardFileService boardFileService, BoardFileRepository boardFileRepository) {
+    public BoardService(CategoryRepository categoryRepository, BoardRepository boardRepository, UserRepository userRepository, BoardViewRepository boardViewRepository, CommentRepository commentRepository, BoardFileService boardFileService, BoardFileRepository boardFileRepository, BoardLikeRepository boardLikeRepository) {
         this.categoryRepository = categoryRepository;
         this.boardRepository = boardRepository;
         this.userRepository = userRepository;
@@ -41,6 +43,7 @@ public class BoardService {
         this.commentRepository = commentRepository;
         this.boardFileService = boardFileService;
         this.boardFileRepository = boardFileRepository;
+        this.boardLikeRepository = boardLikeRepository;
     }
 
     // 게시글 보기

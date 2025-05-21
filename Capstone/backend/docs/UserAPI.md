@@ -3,9 +3,11 @@
 - **User API**
 - [Auth API](AuthAPI.md)
 - [Friendship API](FriendshipAPI.md)
-- [Map API](MapAPI.md)
-- [Schedule API](ScheduleAPI.md)
-- [Path API](PathAPI.md)
+- [Map API](MapAPI.md) [(Example)](MapAPIDetail.md)
+- [Schedule API](ScheduleAPI.md) [(Example)](ScheduleAPIDetail.md)
+- [Path API](PathAPI.md) [(Example)](PathAPIDetail.md)
+- [Board API](BoardAPI.md) [(Example)](BoardAPIDetail.md)
+- [Comment API](CommentAPI.md) [(Example)](CommentAPIDetail.md)
 
 # User API
 주요 기능:

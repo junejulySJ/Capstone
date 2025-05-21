@@ -52,7 +52,7 @@ public class BoardController {
     // 게시글 등록
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> write(
-            @Valid @RequestBody BoardRequestDto boardRequestDto,
+            @RequestPart("json") @Valid BoardRequestDto boardRequestDto,
             @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -69,7 +69,7 @@ public class BoardController {
     @PutMapping(value = "/{boardNo}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> modify(
             @PathVariable Integer boardNo,
-            @Valid @RequestBody BoardRequestDto boardRequestDto,
+            @RequestPart("json") @Valid BoardRequestDto boardRequestDto,
             @RequestPart(value = "files", required = false) List<MultipartFile> files,
             @RequestParam(value = "deleteFileNos", required = false) List<Integer> deleteFileNos
     ) {

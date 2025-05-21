@@ -1,6 +1,6 @@
 ## 📚 목차
 - [Home](../README.md)
-- [User API](UserAPI.md)
+- [User API](UserAPI.md) [(Example)](UserAPIDetail.md)
 - [Auth API](AuthAPI.md)
 - [Friendship API](FriendshipAPI.md)
 - **Map API** [(Example)](MapAPIDetail.md)

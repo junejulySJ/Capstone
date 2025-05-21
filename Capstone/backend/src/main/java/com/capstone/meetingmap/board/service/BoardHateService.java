@@ -24,7 +24,7 @@ public class BoardHateService {
     }
 
     @Transactional
-    public void toggleHate(Integer boardNo, String userId) {
+    public void addHate(Integer boardNo, String userId) {
         if (boardHateRepository.existsByBoard_BoardNoAndUser_UserId(boardNo, userId)) {
             throw new IllegalStateException("이미 싫어요를 눌렀습니다");
         }

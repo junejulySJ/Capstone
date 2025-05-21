@@ -1,6 +1,6 @@
 ## 📚 목차
 - [Home](../README.md)
-- [User API](UserAPI.md)
+- [User API](UserAPI.md) [(Example)](UserAPIDetail.md)
 - [Auth API](AuthAPI.md)
 - [Friendship API](FriendshipAPI.md)
 - [Map API](MapAPI.md) [(Example)](MapAPIDetail.md)
@@ -328,6 +328,7 @@ axios.post(`${API_BASE_URL}/boards`, formData, {
     headers: {
         "Content-Type": "multipart/form-data",
     },
+    withCredentials: true
 })
 ```
 
@@ -371,6 +372,7 @@ axios.put(`${API_BASE_URL}/boards`, formData, {
     headers: {
         "Content-Type": "multipart/form-data",
     },
+    withCredentials: true
 })
 ```
 
@@ -380,5 +382,23 @@ axios.put(`${API_BASE_URL}/boards`, formData, {
 
 #### Request 예시
 ```javascript
-axios.delete(`${API_BASE_URL}/boards/1`)
+axios.delete(`${API_BASE_URL}/boards/1`, { withCredentials: true })
+```
+
+---
+
+### 좋아요 처리
+
+#### Request 예시
+```javascript
+axios.post(`${API_BASE_URL}/boards/1/like`, { withCredentials: true })
+```
+
+---
+
+### 싫어요 처리
+
+#### Request 예시
+```javascript
+axios.post(`${API_BASE_URL}/boards/1/hate`, { withCredentials: true })
 ```

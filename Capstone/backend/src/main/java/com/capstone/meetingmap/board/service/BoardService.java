@@ -6,6 +6,7 @@ import com.capstone.meetingmap.board.entity.Board;
 import com.capstone.meetingmap.board.entity.BoardFile;
 import com.capstone.meetingmap.board.entity.BoardView;
 import com.capstone.meetingmap.board.repository.BoardFileRepository;
+import com.capstone.meetingmap.board.repository.BoardLikeRepository;
 import com.capstone.meetingmap.board.repository.BoardRepository;
 import com.capstone.meetingmap.board.repository.BoardViewRepository;
 import com.capstone.meetingmap.category.entity.Category;
@@ -33,8 +34,9 @@ public class BoardService {
     private final CommentRepository commentRepository;
     private final BoardFileService boardFileService;
     private final BoardFileRepository boardFileRepository;
+    private final BoardLikeRepository boardLikeRepository;
 
-    public BoardService(CategoryRepository categoryRepository, BoardRepository boardRepository, UserRepository userRepository, BoardViewRepository boardViewRepository, CommentRepository commentRepository, BoardFileService boardFileService, BoardFileRepository boardFileRepository) {
+    public BoardService(CategoryRepository categoryRepository, BoardRepository boardRepository, UserRepository userRepository, BoardViewRepository boardViewRepository, CommentRepository commentRepository, BoardFileService boardFileService, BoardFileRepository boardFileRepository, BoardLikeRepository boardLikeRepository) {
         this.categoryRepository = categoryRepository;
         this.boardRepository = boardRepository;
         this.userRepository = userRepository;
@@ -42,6 +44,7 @@ public class BoardService {
         this.commentRepository = commentRepository;
         this.boardFileService = boardFileService;
         this.boardFileRepository = boardFileRepository;
+        this.boardLikeRepository = boardLikeRepository;
     }
 
     // 게시글 보기
@@ -68,6 +71,21 @@ public class BoardService {
         // 아무 파라미터도 없으면 전체 목록을 가져오는 메서드 호출
         return boardViewRepository.findAllByOrderByBoardNoDesc(pageable);
     }
+
+    // 특정 회원의 게시글 보기
+    public Page<BoardView> searchArticlesByUserDesc(String userId, Pageable pageable) {
+        return boardViewRepository.findAllByUserIdOrderByBoardNoDesc(userId, pageable);
+    }
+
+    // 특정 회원이 좋아요한 게시글 보기
+    public Page<BoardView> searchArticlesByLikedDesc(String userId, Pageable pageable) {
+        List<Integer> likedBoardNos = boardLikeRepository.findBoardNosByUserId(userId);
+        if (likedBoardNos.isEmpty()) {
+            return Page.empty(pageable);
+        }
+        return boardViewRepository.findByBoardNoIn(likedBoardNos, pageable);
+    }
+
 
     // 게시글 상세보기
     @Transactional

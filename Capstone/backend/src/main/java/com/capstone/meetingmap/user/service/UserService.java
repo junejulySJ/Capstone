@@ -1,5 +1,6 @@
 package com.capstone.meetingmap.user.service;
 
+import com.capstone.meetingmap.api.amazon.service.S3Service;
 import com.capstone.meetingmap.auth.dto.KakaoUserInfo;
 import com.capstone.meetingmap.user.dto.*;
 import com.capstone.meetingmap.user.entity.User;
@@ -10,8 +11,10 @@ import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,11 +23,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final S3Service s3Service;
 
-    public UserService(UserRepository userRepository, UserRoleRepository userRoleRepository) {
+    public UserService(UserRepository userRepository, UserRoleRepository userRoleRepository, S3Service s3Service) {
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
         this.bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        this.s3Service = s3Service;
     }
 
     //중복 아이디 검증
@@ -91,11 +96,24 @@ public class UserService {
     }
 
     //회원 정보 변경
-    public UserResponseDto updateUser(String userId, UserUpdateRequestDto userUpdateRequestDto) {
+    @Transactional
+    public void updateUser(UserUpdateRequestDto userUpdateRequestDto, MultipartFile profileImage, String userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
-        User updatedUser = user.updateInfo(userUpdateRequestDto.getUserEmail(), userUpdateRequestDto.getUserNick(), userUpdateRequestDto.getUserAddress());
-        userRepository.save(updatedUser);
-        return UserResponseDto.fromEntity(updatedUser);
+
+        User updatedUser;
+
+        // 프로필 사진 처리
+        if (profileImage != null && !profileImage.isEmpty()) {
+            try {
+                String imageUrl = s3Service.upload(profileImage);
+                System.out.println("imageUrl=" + imageUrl);
+                user.setProfileImageUrl(imageUrl);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        user.updateInfo(userUpdateRequestDto.getUserEmail(), userUpdateRequestDto.getUserNick(), userUpdateRequestDto.getUserAddress());
     }
 }

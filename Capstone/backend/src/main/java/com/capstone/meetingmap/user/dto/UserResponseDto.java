@@ -31,6 +31,7 @@ public class UserResponseDto {
                 .userId(user.getUserId())
                 .userEmail(user.getUserEmail())
                 .userNick(user.getUserNick())
+                .userImg(user.getUserImg())
                 .userAddress(user.getUserAddress())
                 .userType(user.getUserRole().getUserType())
                 .build();

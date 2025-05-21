@@ -25,7 +25,7 @@ public class BoardLikeService {
     }
 
     @Transactional
-    public void toggleLike(Integer boardNo, String userId) {
+    public void addLike(Integer boardNo, String userId) {
         if (boardLikeRepository.existsByBoard_BoardNoAndUser_UserId(boardNo, userId)) {
             throw new IllegalStateException("이미 좋아요를 눌렀습니다");
         }

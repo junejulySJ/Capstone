@@ -1,6 +1,6 @@
 ## 📚 목차
 - [Home](../README.md)
-- [User API](UserAPI.md)
+- [User API](UserAPI.md) [(Example)](UserAPIDetail.md)
 - [Auth API](AuthAPI.md)
 - [Friendship API](FriendshipAPI.md)
 - [Map API](MapAPI.md) [(Example)](MapAPIDetail.md)
@@ -130,7 +130,7 @@ axios.get(`${API_BASE_URL}/boards/37/comments?page=0&size=10&sortBy=commentWrite
 ```javascript
 axios.post(`${API_BASE_URL}/boards/37/comments`, {
     "commentContent": "댓글 내용"
-})
+}, { withCredentials: true })
 ```
 
 #### Response 예시
@@ -156,7 +156,7 @@ axios.post(`${API_BASE_URL}/boards/37/comments`, {
 ```javascript
 axios.put(`${API_BASE_URL}/comments/3`, {
     "commentContent": "댓글 내용"
-})
+}, { withCredentials: true })
 ```
 
 ---
@@ -165,5 +165,5 @@ axios.put(`${API_BASE_URL}/comments/3`, {
 
 #### Request 예시
 ```javascript
-axios.delete(`${API_BASE_URL}/comments/3`)
+axios.delete(`${API_BASE_URL}/comments/3`, { withCredentials: true })
 ```

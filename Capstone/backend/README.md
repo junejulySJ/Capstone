@@ -9,7 +9,7 @@
 
 ## 📚 목차
 - **Home**
-- [User API](docs/UserAPI.md)
+- [User API](docs/UserAPI.md) [(Example)](docs/UserAPIDetail.md) ✏️
 - [Auth API](docs/AuthAPI.md)
 - [Friendship API](docs/FriendshipAPI.md)
 - [Map API](docs/MapAPI.md) [(Example)](docs/MapAPIDetail.md)
@@ -18,7 +18,7 @@
 - [Board API](docs/BoardAPI.md) [(Example)](docs/BoardAPIDetail.md) ✏️
 - [Comment API](docs/CommentAPI.md) [(Example)](docs/CommentAPIDetail.md) ✏️
 
-# ※주의사항 3까지 있습니다
+# ※주의사항 4까지 있습니다
 
 ## 주의사항 1
 - 비밀번호 암호화 방식이 변경되어 기존 사용자로 로그인을 하려면 다음과 같은 sql문을 적용해주세요.
@@ -119,3 +119,10 @@ FROM `BOARD` B
          JOIN `CATEGORY` C ON B.`CATEGORY_NO` = C.`CATEGORY_NO`;
 ```
 
+## 주의사항 4 ✏️
+- 아마존 s3 키가 application.properties에 포함되어있으면 github에 업로드가 아예 안되서 지우고 올렸습니다.
+- s3 테스트(프로필 사진 변경 등) 해볼려면 application.properties에 다음 정보를 채우시면 됩니다.
+  - cloud.aws.credentials.access-key
+  - cloud.aws.credentials.secret-key
+  - cloud.aws.region.static
+  - cloud.aws.s3.bucket

@@ -1,0 +1,272 @@
+## 📚 목차
+- [Home](../README.md)
+- [User API](UserAPI.md) **(Example)**
+- [Auth API](AuthAPI.md)
+- [Friendship API](FriendshipAPI.md)
+- [Map API](MapAPI.md) [(Example)](MapAPIDetail.md)
+- [Schedule API](ScheduleAPI.md) [(Example)](ScheduleAPIDetail.md)
+- [Path API](PathAPI.md) [(Example)](PathAPIDetail.md)
+- [Board API](BoardAPI.md) [(Example)](BoardAPIDetail.md)
+- [Comment API](CommentAPI.md) [(Example)](CommentAPIDetail.md)
+
+# User API 예시
+## API 바로가기
+| API 호출                               | 설명        |
+|--------------------------------------|-----------|
+| [POST /user/check-id](#아이디-중복-검사)    | 아이디 중복 검사 |
+| [POST /user/register](#회원가입)         | 회원가입      |
+| [GET /user](#회원-정보-조회)               | 회원 정보 조회  |
+| [GET /user/list](#전체-회원-조회)          | 전체 회원 조회  |
+| [PUT /user](#회원-정보-변경)               | 회원 정보 변경  |
+| [GET /user/boards](#작성한-글-조회)        | 작성한 글 조회  |
+| [GET /user/boards/liked](#좋아요한-글-조회) | 좋아요한 글 조회 |
+
+---
+
+## API 목록
+
+### 아이디 중복 검사
+
+#### Request 예시
+```javascript
+axios.post(`${API_BASE_URL}/user/check-id`, {
+    "userId": "exampleUser"
+})
+```
+
+#### Response 예시
+```json
+{
+  "available": true
+}
+```
+
+---
+
+### 회원가입
+
+#### Request 예시
+```javascript
+axios.post(`${API_BASE_URL}/user/register`, {
+  "userId": "exampleUser",
+  "userEmail": "hong@example.com",
+  "userPasswd": "password123",
+  "userNick": "홍길동",
+  "userAddress": "서울특별시 중구 세종대로 110"
+})
+```
+
+#### Response 예시
+```json
+{
+  "userId": "exampleUser",
+  "userEmail": "hong@example.com",
+  "userNick": "홍길동",
+  "userImg": null,
+  "userAddress": "서울특별시 중구 세종대로 110",
+  "userType": 1
+}
+```
+
+---
+
+### 회원 정보 조회
+
+#### Request 예시
+```javascript
+axios.get(`${API_BASE_URL}/user`, { withCredentials: true })
+```
+
+#### Response 예시
+```json
+{
+  "userId": "exampleUser",
+  "userEmail": "hong@example.com",
+  "userNick": "홍길동",
+  "userImg": "hong.png",
+  "userAddress": "서울특별시 중구 세종대로 110",
+  "userType": 1
+}
+```
+
+---
+
+### 전체 회원 조회
+
+#### Request 예시
+```javascript
+axios.get(`${API_BASE_URL}/user`, { withCredentials: true })
+```
+
+#### Response 예시
+```json
+[
+  {
+    "userId": "exampleUser1",
+    "userEmail": "hong@example.com",
+    "userNick": "홍길동",
+    "userImg": "hong.png",
+    "userAddress": "서울특별시 중구 세종대로 110",
+    "userType": 1
+  },
+  {
+    "userId": "exampleUser2",
+    "userEmail": "lee@example.com",
+    "userNick": "이순신",
+    "userImg": "lee.png",
+    "userAddress": "서울특별시 종로구 세종대로 172",
+    "userType": 0
+  }
+]
+```
+
+---
+
+### 회원 정보 변경
+
+#### Request 예시
+```javascript
+axios.put(`${API_BASE_URL}/user`, {
+        "userEmail": "hong1@example.com",
+        "userNick": "홍길동",
+        "userAddress": "서울특별시 용산구 남산공원길 105",
+    }, { withCredentials: true })
+```
+
+---
+
+### 작성한 글 조회
+
+#### Request 예시
+```javascript
+axios.get(`${API_BASE_URL}/user/boards`, { withCredentials: true })
+```
+
+#### Response 예시
+```json
+{
+  "content": [
+    {
+        "boardNo": 16,
+        "userId": "user1",
+        "userNick": "사용자1",
+        "userType": 1,
+        "userTypeName": "User",
+        "boardTitle": "자유게시판 글 1",
+        "boardDescription": null,
+        "boardViewCount": 50,
+        "boardWriteDate": "2025-03-04T00:00:00",
+        "boardUpdateDate": "2025-03-04T00:00:00",
+        "boardLike": 0,
+        "boardHate": 0,
+        "categoryNo": 2,
+        "categoryName": "자유",
+        "commentCount": 0,
+        "userImg": "https://capstone-meetingmap.s3.eu-north-1.amazonaws.com/8c0405c9-6369-4dec-ae70-4e197217fbb4_ai-generated-9510467_640.jpg"
+    },
+    {
+        "boardNo": 6,
+        "userId": "user1",
+        "userNick": "사용자1",
+        "userType": 1,
+        "userTypeName": "User",
+        "boardTitle": "Q&A 질문 1",
+        "boardDescription": null,
+        "boardViewCount": 50,
+        "boardWriteDate": "2025-03-04T00:00:00",
+        "boardUpdateDate": "2025-03-04T00:00:00",
+        "boardLike": 0,
+        "boardHate": 0,
+        "categoryNo": 1,
+        "categoryName": "Q&A",
+        "commentCount": 0,
+        "userImg": "https://capstone-meetingmap.s3.eu-north-1.amazonaws.com/8c0405c9-6369-4dec-ae70-4e197217fbb4_ai-generated-9510467_640.jpg"
+    }
+  ],
+    "pageable": {
+        "pageNumber": 0,
+        "pageSize": 10,
+        "sort": {
+            "empty": false,
+            "unsorted": false,
+            "sorted": true
+        },
+        "offset": 0,
+        "unpaged": false,
+        "paged": true
+    },
+    "totalPages": 1,
+    "totalElements": 9,
+    "last": true,
+    "size": 10,
+    "number": 0,
+    "sort": {
+        "empty": false,
+        "unsorted": false,
+        "sorted": true
+    },
+    "first": true,
+    "numberOfElements": 9,
+    "empty": false
+}
+```
+
+---
+
+### 좋아요한 글 조회
+
+#### Request 예시
+```javascript
+axios.get(`${API_BASE_URL}/user/boards/liked`, { withCredentials: true })
+```
+
+#### Response 예시
+```json
+{
+    "content": [
+        {
+            "boardNo": 37,
+            "userId": "user1",
+            "userNick": "사용자1",
+            "userType": 1,
+            "userTypeName": "User",
+            "boardTitle": "test글",
+            "boardDescription": "test글입니다",
+            "boardViewCount": 3,
+            "boardWriteDate": "2025-05-20T23:21:49",
+            "boardUpdateDate": "2025-05-21T17:43:30",
+            "boardLike": 1,
+            "boardHate": 0,
+            "categoryNo": 1,
+            "categoryName": "Q&A",
+            "commentCount": 2,
+            "userImg": null
+        }
+    ],
+    "pageable": {
+        "pageNumber": 0,
+        "pageSize": 10,
+        "sort": {
+            "empty": false,
+            "sorted": true,
+            "unsorted": false
+        },
+        "offset": 0,
+        "paged": true,
+        "unpaged": false
+    },
+    "last": true,
+    "totalElements": 1,
+    "totalPages": 1,
+    "size": 10,
+    "number": 0,
+    "sort": {
+        "empty": false,
+        "sorted": true,
+        "unsorted": false
+    },
+    "numberOfElements": 1,
+    "first": true,
+    "empty": false
+}
+```

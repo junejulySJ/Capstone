@@ -55,4 +55,9 @@ public class User {
             this.userAddress = userAddress;
         return this;
     }
+
+    public User setProfileImageUrl(String profileImageUrl) {
+        this.userImg = profileImageUrl;
+        return this;
+    }
 }

@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface BoardViewRepository extends JpaRepository<BoardView, Integer> {
     @Query("SELECT b FROM BoardView b " +
             "WHERE (:categoryNo IS NULL OR b.categoryNo = :categoryNo) " +
@@ -16,6 +18,8 @@ public interface BoardViewRepository extends JpaRepository<BoardView, Integer> {
                                                @Param("keyword") String keyword,
                                                Pageable pageable);
 
+    Page<BoardView> findAllByUserIdOrderByBoardNoDesc(String userId, Pageable pageable);
+    Page<BoardView> findByBoardNoIn(List<Integer> boardNos, Pageable pageable);
     Page<BoardView> findAllByBoardTitleContainingIgnoreCaseOrBoardDescriptionContainingIgnoreCase(String titleKeyword, String descriptionKeyword, Pageable pageable);
     Page<BoardView> findAllByCategoryNoOrderByBoardNoDesc(Integer categoryNo, Pageable pageable);
     Page<BoardView> findAllByOrderByBoardNoDesc(Pageable pageable);

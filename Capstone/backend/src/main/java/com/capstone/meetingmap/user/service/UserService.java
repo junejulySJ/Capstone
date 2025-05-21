@@ -104,7 +104,7 @@ public class UserService {
         User updatedUser;
 
         // 프로필 사진 처리
-        if (profileImage != null && !profileImage.isEmpty()) {
+        /*if (profileImage != null && !profileImage.isEmpty()) {
             try {
                 String imageUrl = s3Service.upload(profileImage);
                 System.out.println("imageUrl=" + imageUrl);
@@ -112,7 +112,7 @@ public class UserService {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }
+        }*/
 
         user.updateInfo(userUpdateRequestDto.getUserEmail(), userUpdateRequestDto.getUserNick(), userUpdateRequestDto.getUserAddress());
     }

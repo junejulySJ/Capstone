@@ -120,9 +120,9 @@ FROM `BOARD` B
 ```
 
 ## 주의사항 4 ✏️
-- 아마존 s3 키가 application.properties에 포함되어있으면 github에 업로드가 아예 안되서 지우고 올렸습니다.
-- s3 테스트(프로필 사진 변경 등) 해볼려면 application.properties에 다음 정보를 채우시면 됩니다.
-  - cloud.aws.credentials.access-key
-  - cloud.aws.credentials.secret-key
-  - cloud.aws.region.static
-  - cloud.aws.s3.bucket
+- 아마존 s3 키가 application.properties에 포함되어있으면 github에 업로드가 아예 안되서 지우고 해당 기능을 주석 처리하고 올렸습니다.
+- 프로젝트를 s3 테스트(프로필 사진 변경 등) 해볼려면 S3Config, S3Service, UserService의 프로필 사진 처리 부분의 주석을 해제하고 s3 서비스에 가입해서 application.properties에 다음 정보를 채우시면 됩니다.  
+cloud.aws.credentials.access-key
+cloud.aws.credentials.secret-key
+cloud.aws.region.static 
+cloud.aws.s3.bucket

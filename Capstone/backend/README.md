@@ -121,13 +121,15 @@ FROM `BOARD` B
 
 ## 주의사항 4 ✏️
 - 아마존 s3 키가 application.properties에 포함되어있으면 github에 업로드가 아예 안되서 지우고 해당 기능을 주석 처리하고 올렸습니다.
-- s3 테스트(프로필 사진 변경 등) 해보려면 S3Config, S3Service의 전체 주석, UserService의 프로필 사진 처리 부분의 주석을 해제하고 s3 서비스에 가입해서 application.properties에 다음 정보를 채우시면 됩니다.  
+- s3 테스트(프로필 사진 변경 등) 해보려면 S3Config, S3Service의 전체 주석, UserService의 프로필 사진 처리 부분의 주석을 해제하고 s3 서비스에 가입하거나 application.properties에 다음 정보를 채우시면 됩니다.  
 cloud.aws.credentials.access-key
 cloud.aws.credentials.secret-key
 cloud.aws.region.static 
 cloud.aws.s3.bucket
+- 또는 Apidog의 외부 API->S3 API에 Header에 키가 들어있으니 해당 값을 복사해서 사용하셔도 됩니다.
 
 ## 주의사항 5 ✏️
 - 마찬가지로 OpenAI 키가 application.properties에 포함되어있으면 github에 업로드가 아예 안되서 지우고 해당 기능을 주석 처리하고 올렸습니다.
 - AI 추천 스케줄 기능을 사용 해보려면 OpenAIService의 전체 주석, ScheduleService의 'AI 추천 받기를 체크한 경우' 부분의 주석을 해제하고 openAI에 가입해서 application.properties에 다음 정보를 채우시면 됩니다.  
   openai.api.key
+- 또는 Apidog의 외부 API->OpenAI API에 Header에 키가 들어있으니 'Bearer '를 제외한 해당 값을 복사해서 사용하셔도 됩니다.

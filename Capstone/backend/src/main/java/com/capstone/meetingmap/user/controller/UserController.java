@@ -2,6 +2,8 @@ package com.capstone.meetingmap.user.controller;
 
 import com.capstone.meetingmap.board.entity.BoardView;
 import com.capstone.meetingmap.board.service.BoardService;
+import com.capstone.meetingmap.group.dto.GroupResponseDto;
+import com.capstone.meetingmap.group.service.GroupService;
 import com.capstone.meetingmap.user.dto.*;
 import com.capstone.meetingmap.user.service.UserService;
 import org.slf4j.Logger;
@@ -26,10 +28,12 @@ public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
     private final BoardService boardService;
+    private final GroupService groupService;
 
-    public UserController(UserService userService, BoardService boardService) {
+    public UserController(UserService userService, BoardService boardService, GroupService groupService) {
         this.userService = userService;
         this.boardService = boardService;
+        this.groupService = groupService;
     }
 
     //아이디 중복 검사
@@ -111,5 +115,35 @@ public class UserController {
 
         Page<BoardView> boardView = boardService.searchArticlesByLikedDesc(userId, pageable);
         return ResponseEntity.ok(boardView);
+    }
+
+    // 속한 그룹 조회
+    @GetMapping("/groups")
+    public ResponseEntity<?> getMyBoards() {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        List<GroupResponseDto> groupResponseDtoList = groupService.getGroupsByUserId(userId);
+
+        return ResponseEntity.ok(groupResponseDtoList);
+    }
+
+    // 비밀번호 변경
+    @PostMapping("/password")
+    public ResponseEntity<?> updatePassword(@RequestBody UserUpdatePasswdRequestDto userUpdatePasswdRequestDto) {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        userService.updatePassword(userUpdatePasswdRequestDto, userId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    // 회원 탈퇴
+    @DeleteMapping
+    public ResponseEntity<?> delete(@RequestBody UserDeleteRequestDto userDeleteRequestDto) {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        userService.delete(userDeleteRequestDto, userId);
+
+        return ResponseEntity.noContent().build();
     }
 }

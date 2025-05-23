@@ -11,15 +11,18 @@
 
 # User API 예시
 ## API 바로가기
-| API 호출                               | 설명        |
-|--------------------------------------|-----------|
-| [POST /user/check-id](#아이디-중복-검사)    | 아이디 중복 검사 |
-| [POST /user/register](#회원가입)         | 회원가입      |
-| [GET /user](#회원-정보-조회)               | 회원 정보 조회  |
-| [GET /user/list](#전체-회원-조회)          | 전체 회원 조회  |
-| [PUT /user](#회원-정보-변경)               | 회원 정보 변경  |
-| [GET /user/boards](#작성한-글-조회)        | 작성한 글 조회  |
-| [GET /user/boards/liked](#좋아요한-글-조회) | 좋아요한 글 조회 |
+| API 호출                               | 설명          |
+|--------------------------------------|-------------|
+| [POST /user/check-id](#아이디-중복-검사)    | 아이디 중복 검사   |
+| [POST /user/register](#회원가입)         | 회원가입        |
+| [GET /user](#회원-정보-조회)               | 회원 정보 조회    |
+| [GET /user/list](#전체-회원-조회)          | 전체 회원 조회    |
+| [PUT /user](#회원-정보-변경)               | 회원 정보 변경    |
+| [GET /user/boards](#작성한-글-조회)        | 작성한 글 조회    |
+| [GET /user/boards/liked](#좋아요한-글-조회) | 좋아요한 글 조회   |
+| [GET /user/groups](#속한-그룹-조회)        | 속한 그룹 조회 ✏️ |
+| [POST /user/password](#비밀번호-변경)      | 비밀번호 변경 ✏️  |
+| [DELETE /user](#회원-탈퇴)               | 회원 탈퇴 ✏️    |
 
 ---
 
@@ -269,4 +272,48 @@ axios.get(`${API_BASE_URL}/user/boards/liked`, { withCredentials: true })
     "first": true,
     "empty": false
 }
+```
+
+---
+
+### 속한 그룹 조회
+
+#### Request 예시
+```javascript
+axios.get(`${API_BASE_URL}/user/groups`, { withCredentials: true })
+```
+
+#### Response 예시
+```json
+[
+    {
+        "groupNo": 2,
+        "groupTitle": "헬스 커뮤니티",
+        "groupDescription": "헬스를 사랑하는 자들의 모임",
+        "groupCreateDate": "2025-05-24T01:02:54",
+        "groupCreatedUserId": "user1"
+    }
+]
+```
+
+---
+
+### 비밀번호 변경
+
+#### Request 예시
+```javascript
+axios.post(`${API_BASE_URL}/user/password`, {
+    "userPasswd": "12345678"
+}, { withCredentials: true })
+```
+
+---
+
+### 회원 탈퇴
+
+#### Request 예시
+```javascript
+axios.delete(`${API_BASE_URL}/user`, {
+    "userPasswd": "12345678"
+}, { withCredentials: true })
 ```

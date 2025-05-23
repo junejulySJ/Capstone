@@ -7,14 +7,13 @@ import com.capstone.meetingmap.user.entity.User;
 import com.capstone.meetingmap.user.repository.UserRepository;
 import com.capstone.meetingmap.userrole.entity.UserRole;
 import com.capstone.meetingmap.userrole.repository.UserRoleRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,21 +24,21 @@ public class UserService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final S3Service s3Service;
 
-    public UserService(UserRepository userRepository, UserRoleRepository userRoleRepository, S3Service s3Service) {
+    public UserService(UserRepository userRepository, UserRoleRepository userRoleRepository, BCryptPasswordEncoder bCryptPasswordEncoder, S3Service s3Service) {
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
-        this.bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.s3Service = s3Service;
     }
 
-    //중복 아이디 검증
+    // 중복 아이디 검증
     public UserCheckIdResponseDto existsByUserId(UserCheckIdRequestDto userCheckIdRequestDto) {
         String userId = userCheckIdRequestDto.getUserId();
         boolean isExists = userRepository.existsById(userId);
         return new UserCheckIdResponseDto(!isExists);
     }
 
-    //일반 회원가입
+    // 일반 회원가입
     @Transactional
     public UserResponseDto join(UserRegisterRequestDto userRegisterRequestDto) {
         String userId = userRegisterRequestDto.getUserId();
@@ -60,7 +59,7 @@ public class UserService {
         return UserResponseDto.fromEntity(user); //User 엔티티를 UserResponseDto로 변환해 반환
     }
 
-    //카카오 회원가입
+    // 카카오 회원가입
     @Transactional
     public User kakaoJoin(KakaoUserInfo kakaoUser) {
         String userId = "kakao_" + kakaoUser.getId();
@@ -80,14 +79,14 @@ public class UserService {
         return user;
     }
 
-    //특정 회원 조회
+    // 특정 회원 조회
     public UserResponseDto findOne(String userId) {
         return userRepository.findById(userId)
                 .map(UserResponseDto::fromEntity)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
     }
 
-    //모든 회원 조회
+    // 모든 회원 조회
     public List<UserResponseDto> findAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream()
@@ -95,7 +94,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    //회원 정보 변경
+    // 회원 정보 변경
     @Transactional
     public void updateUser(UserUpdateRequestDto userUpdateRequestDto, MultipartFile profileImage, String userId) {
         User user = userRepository.findById(userId)
@@ -115,5 +114,31 @@ public class UserService {
         }*/
 
         user.updateInfo(userUpdateRequestDto.getUserEmail(), userUpdateRequestDto.getUserNick(), userUpdateRequestDto.getUserAddress());
+    }
+
+    // 회원 비밀번호 변경
+    @Transactional
+    public void updatePassword(UserUpdatePasswdRequestDto userUpdatePasswdRequestDto, String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
+
+        String hashedUserPasswd = bCryptPasswordEncoder.encode(userUpdatePasswdRequestDto.getUserPasswd()); //비밀번호를 해시함수로 암호화
+
+        User newUser = userUpdatePasswdRequestDto.toEntity(hashedUserPasswd, user);
+
+        userRepository.save(newUser);
+    }
+
+    // 회원 탈퇴
+    @Transactional
+    public void delete(UserDeleteRequestDto userDeleteRequestDto, String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
+
+        if (bCryptPasswordEncoder.matches(userDeleteRequestDto.getUserPasswd(), user.getUserPasswd())) {
+            userRepository.delete(user);
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 잘못되었습니다.");
+        }
     }
 }

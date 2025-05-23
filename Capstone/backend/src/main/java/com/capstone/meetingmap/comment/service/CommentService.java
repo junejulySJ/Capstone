@@ -29,7 +29,7 @@ public class CommentService {
     }
 
     // 댓글 보기
-    public Page<CommentResponseDto> searchCommentsDesc(Integer boardNo, Pageable pageable) {
+    public Page<CommentResponseDto> searchComments(Integer boardNo, Pageable pageable) {
         return commentRepository.findAllByBoard_BoardNo(boardNo, pageable).map(CommentResponseDto::fromEntity);
     }
 

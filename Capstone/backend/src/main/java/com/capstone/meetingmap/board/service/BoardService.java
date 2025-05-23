@@ -48,7 +48,7 @@ public class BoardService {
     }
 
     // 게시글 보기
-    public Page<BoardView> searchArticlesDesc(Integer categoryNo, String keyword, Pageable pageable) {
+    public Page<BoardView> searchArticles(Integer categoryNo, String keyword, Pageable pageable) {
 
         // categoryNo, keyword 파라미터가 모두 있으면 해당 키워드로 검색
         if (categoryNo != null && keyword != null && !keyword.trim().isEmpty()) {
@@ -60,7 +60,7 @@ public class BoardService {
             categoryRepository.findById(categoryNo) // 실제 존재하는 카테고리인지 검증
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 카테고리가 존재하지 않습니다"));
 
-            return boardViewRepository.findAllByCategoryNoOrderByBoardNoDesc(categoryNo, pageable);
+            return boardViewRepository.findAllByCategoryNo(categoryNo, pageable);
         }
 
         // keyword 파라미터만 있으면 해당 키워드로 검색
@@ -69,12 +69,12 @@ public class BoardService {
         }
 
         // 아무 파라미터도 없으면 전체 목록을 가져오는 메서드 호출
-        return boardViewRepository.findAllByOrderByBoardNoDesc(pageable);
+        return boardViewRepository.findAll(pageable);
     }
 
     // 특정 회원의 게시글 보기
     public Page<BoardView> searchArticlesByUserDesc(String userId, Pageable pageable) {
-        return boardViewRepository.findAllByUserIdOrderByBoardNoDesc(userId, pageable);
+        return boardViewRepository.findAllByUserId(userId, pageable);
     }
 
     // 특정 회원이 좋아요한 게시글 보기
@@ -155,8 +155,8 @@ public class BoardService {
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "이미지를 저장하는데 실패했습니다");
             }
         }
-
-        boardRepository.save(board);
+        // 자동으로 변경 사항 반영
+        //boardRepository.save(board);
     }
 
     // 게시글 삭제

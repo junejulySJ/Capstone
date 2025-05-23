@@ -41,12 +41,12 @@ public class BoardController {
         Sort sort = direction.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        return ResponseEntity.ok(boardService.searchArticlesDesc(categoryNo, keyword, pageable));
+        return ResponseEntity.ok(boardService.searchArticles(categoryNo, keyword, pageable));
     }
 
     // 게시글 상세보기
     @GetMapping("/{boardNo}")
-    public ResponseEntity<BoardDetailResponseDto> viewDetail(@PathVariable("boardNo") Integer boardNo) {
+    public ResponseEntity<?> viewDetail(@PathVariable("boardNo") Integer boardNo) {
         return ResponseEntity.ok(boardService.searchByBoardNo(boardNo));
     }
 

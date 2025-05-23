@@ -39,12 +39,12 @@ public class CommentController {
         Sort sort = direction.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        return ResponseEntity.ok(commentService.searchCommentsDesc(boardNo, pageable));
+        return ResponseEntity.ok(commentService.searchComments(boardNo, pageable));
     }
 
     // 댓글 작성
     @PostMapping("/api/boards/{boardNo}/comments")
-    public ResponseEntity<?> write(@PathVariable("boardNo") Integer boardNo, @Valid @RequestBody CommentRequestDto commentRequestDto) {
+    public ResponseEntity<?> write(@PathVariable Integer boardNo, @Valid @RequestBody CommentRequestDto commentRequestDto) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
 
         CommentResponseDto commentResponseDto = commentService.write(boardNo, commentRequestDto, userId);

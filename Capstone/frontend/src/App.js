@@ -1,4 +1,3 @@
-// 📁 src/App.js
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
@@ -12,6 +11,7 @@ import Register from './pages/Register';
 import Map from './pages/Map';
 import './App.css';
 
+
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -21,7 +21,7 @@ function App() {
     <Router>
       <div className="App">
         {/* ✅ 햄버거 버튼은 App에서만 렌더링 */}
-        <button className="hamburger" onClick={toggleSidebar}>☰</button>
+        <button className="sidebar-toggle-button" onClick={toggleSidebar}>☰</button>
 
         {/* ✅ 사이드바는 열릴 때만 보여짐 */}
         <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />

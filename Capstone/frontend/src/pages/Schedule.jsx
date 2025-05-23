@@ -3,7 +3,6 @@ import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import './Schedule.css';
 import CategorySidebar from '../components/CategorySidebar';
-import { themeSchedules } from '../data/scheduleDummy';
 import RouteSummary from '../components/RouteSummary';
 import { drawPolyline, drawTransitPlan, clearPolylines } from '../components/RouteDrawer';
 import { categoryList, categoryDetailCodes } from './Map';
@@ -17,13 +16,8 @@ const Schedule = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [estimatedTime, setEstimatedTime] = useState('');
   const [showCreateSection, setShowCreateSection] = useState(false);
-  const [showRecommendSection, setShowRecommendSection] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(false);
-  const [selectedTheme, setSelectedTheme] = useState('date');
   
-  const departures = location.state?.departures || [];
-  const destinationCoord = location.state?.destinationCoord || null;
-
   const { addedList = [] } = location.state || {};
   const [scheduleItems, setScheduleItems] = useState(() => addedList);
   const { end = [] } = location.state || {};
@@ -278,22 +272,46 @@ const Schedule = () => {
   return (
     <div className="schedule-wrapper">
       {sidebarVisible && (
+        <div className="schedule-category-panel">
         <CategorySidebar
           category={selectedCategory}
           places={selectedCategoryPlaces}
           onClose={() => setSidebarVisible(false)}
           onAddPlace={addToSchedule}
         />
+          </div>
       )}
 
       <div className="schedule-container">
         <h2 className="schedule-title">Schedule</h2>
-        <p className="schedule-sub">카카오맵 기반 지도 화면 완성 및 딥정 추가 기능이 구현될 예정입니다.</p>
+        <div className="category-icons">
+          {categoryList.map((cat) => (
+            <button
+              key={cat.code}
+              className={`category-btn ${selectedCategory === cat.code ? 'active' : ''}`}
+              onClick={() => toggleSidebar(cat)}>
+              {cat.name}
+            </button>
+          ))}
+        </div>
+        <p className="schedule-sub"></p>
 
+        <div className="schedule-map-wrapper">
         <div id="map" className="map-placeholder"></div>
 
+        <div className="schedule-location-box">
+    {scheduleItems.length === 0 ? (
+      <p>출발지: 없음</p>
+    ) : (
+      <>
+        <p><strong>출발지:</strong> {scheduleItems[0]?.name}</p>
+        <p><strong>도착지:</strong> {scheduleItems[scheduleItems.length - 1]?.name}</p>
+      </>
+    )}
+  </div>
+</div>
         {showCreateScheduleSection && (
-          <div className="route-box">
+          <div className="route-box schedule-route-box">
             <div className="transport-select">
               <button onClick={() => setTransportMode('car')}>🚗 차량</button>
               <button onClick={() => setTransportMode('transit')}>🚌 대중교통</button>
@@ -310,16 +328,15 @@ const Schedule = () => {
 
         <div className="button-row">
           <button onClick={() => setShowCreateSection((prev) => !prev)} className="action-btn">
-            Create Schedule
-          </button>
-          <button onClick={() => setShowRecommendSection((prev) => !prev)} className="action-btn">
-            Recommended Schedules
+            스케줄 생성하기
           </button>
           <button onClick={() => handleCreateSchedule()} className="action-btn">
             일정 생성
           </button>
         </div>
 
+        {(showCreateSection || (showCreateScheduleSection && createdSchedule)) && (
+  <div className="schedule-bottom-row">
         {showCreateSection && (
           <div className="section-box">
             <h3>일정 만들기</h3>
@@ -372,26 +389,6 @@ const Schedule = () => {
           </div>
         )}
 
-        {showRecommendSection && (
-          <div className="section-box">
-            <h3>추천 스케줄</h3>
-            <div className="theme-buttons">
-              {Object.keys(themeSchedules).map((theme) => (
-                <button
-                  key={theme}
-                  className={`theme-btn ${selectedTheme === theme ? 'active' : ''}`}
-                  onClick={() => setSelectedTheme(theme)}>
-                  {theme}
-                </button>
-              ))}
-            </div>
-            <ul>
-              {themeSchedules[selectedTheme].map((item, index) => (
-                <li key={index}>🔹 {item.time} - {item.activity}</li>
-              ))}
-            </ul>
-          </div>
-        )}
         {createScheduleLoading && <p>일정 생성 중...</p>}
         {createScheduleError && <p>{createScheduleError}</p>}
         {showCreateScheduleSection && createdSchedule && (
@@ -408,23 +405,8 @@ const Schedule = () => {
             <button>스케줄 저장</button>
           </div>
         )}
-
-        <div className="category-icons">
-          {categoryList.map((cat) => (
-            <button
-              key={cat.code}
-              className={`category-btn ${selectedCategory === cat.code ? 'active' : ''}`}
-              onClick={() => toggleSidebar(cat)}>
-              {cat.name}
-            </button>
-          ))}
-        </div>
-
-        <div className="input-group">
-          <label>출력 장소</label>
-          <button onClick={handleEstimate}>예상 시간 계산</button>
-          <div className="estimated-time">{estimatedTime}</div>
-        </div>
+          </div>
+          )}
 
       </div>
     </div>

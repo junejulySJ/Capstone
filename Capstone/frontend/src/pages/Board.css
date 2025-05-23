@@ -162,3 +162,29 @@
   margin-bottom: 1.5rem;
   width: 100%;
 }
+
+.post-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.like-btn,
+.save-btn {
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #f8f8f8;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.like-btn:hover {
+  background-color: #ffe5e5;
+  color: #d00;
+}
+
+.save-btn:hover {
+  background-color: #e8f4ff;
+  color: #0077cc;
+}

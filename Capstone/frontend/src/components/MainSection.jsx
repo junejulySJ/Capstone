@@ -6,6 +6,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './MainSection.css';
+import dummyPosts from '../data/dummyPosts';
 
 const API_BASE_URL = 'http://localhost:8080';
 
@@ -14,14 +15,6 @@ const images = [
   '/images/bg2.jpg',
   '/images/bg3.jpg',
   '/images/bg4.jpg'
-];
-
-const samplePosts = [
-  { id: 1, title: '서울 핫플 탐방기', views: 150, likes: 30 },
-  { id: 2, title: '부산 해운대 맛집 추천', views: 120, likes: 40 },
-  { id: 3, title: '제주도 힐링 여행 후기', views: 300, likes: 80 },
-  { id: 4, title: '대구 시내 야경 명소', views: 90, likes: 20 },
-  { id: 5, title: '강릉 카페 투어', views: 200, likes: 50 },
 ];
 
 const randomPlaces = [
@@ -51,8 +44,10 @@ export default function MainSection() {
   const [randomPlace, setRandomPlace] = useState('');
   const [suggestions, setSuggestions] = useState({});
   const [focusedInput, setFocusedInput] = useState(null);
+  const [topPosts, setTopPosts] = useState([]);
   const navigate = useNavigate();
   const timeoutRef = useRef(null);
+  
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -64,6 +59,15 @@ export default function MainSection() {
   useEffect(() => {
     const random = randomPlaces[Math.floor(Math.random() * randomPlaces.length)];
     setRandomPlace(random);
+  }, []);
+  useEffect(() => {
+    const updatePosts = () => {
+      const shuffled = [...dummyPosts].sort(() => 0.5 - Math.random());
+      setTopPosts(shuffled.slice(0, 3));
+    };
+    updatePosts(); // 최초 1회
+    const interval = setInterval(updatePosts, 5000); // 이후 5초마다
+    return () => clearInterval(interval);
   }, []);
 
   const fetchSuggestions = async (query, index = null) => {
@@ -151,10 +155,10 @@ export default function MainSection() {
     }
   };
 
-  const topPosts = [...samplePosts].sort((a, b) => (b.views + b.likes * 2) - (a.views + a.likes * 2)).slice(0, 3);
+  //const topPosts = [...dummyPosts].sort((a, b) => (b.views + b.likes * 2) - (a.views + a.likes * 2)).slice(0, 3);
 
-  return (
-    <div className="page-container">
+  return (  
+  <div className="page-container">
       <header className="header">
         <h1 className="logo-text">MeetingMap</h1>
       </header>
@@ -259,14 +263,19 @@ export default function MainSection() {
           <h2>#오늘의 추천</h2>
           <div className="card-row">
             {topPosts.map((post) => (
-              <div key={post.id} className="recommend-card">
-                <img src={`/images/sample${post.id}.jpg`} alt={post.title} className="card-image" />
-                <div className="card-content">
-                  <h3>{post.title}</h3>
-                  <p>조회수 {post.views} | 좋아요 {post.likes}</p>
-                </div>
-              </div>
-            ))}
+  <div
+    key={post.id}
+    className="recommend-card"
+    onClick={() => navigate(`/board?postId=${post.id}`)}
+    style={{ cursor: 'pointer' }}
+  >
+    <img src={`/images/${post.image}`} alt={post.title} className="card-image" />
+    <div className="card-content">
+      <h3>{post.title}</h3>
+      <p>{post.description}</p>
+    </div>
+  </div>
+))}
           </div>
         </div>
 

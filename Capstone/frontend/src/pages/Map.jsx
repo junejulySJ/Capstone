@@ -296,7 +296,7 @@ const Map = () => {
           />
         )}
 
-        <div className="route-box">
+<div className="route-box" style={{ gridArea: 'route-box' }}>
           <div className="transport-select">
             <button onClick={() => setTransportMode('car')}>🚗 차량</button>
             <button onClick={() => setTransportMode('transit')}>🚌 대중교통</button>
@@ -309,30 +309,8 @@ const Map = () => {
             onSelect={handleRouteClick}
           />
         </div>
-
-        <div className="location-box">
-        {Array.isArray(start) ? (
-          <>
-            <h4>출발지:</h4>
-            <ul>
-              {start.map((s, index) => (
-                <li key={index}>{s.name}</li>
-              ))}
-            </ul>
-          </>
-        ) : (
-          <h4>출발지: {start?.name || '없음'}</h4>
-        )}
-
-        {middlePoint && (
-          <h4>중간지점: {middlePoint.address}</h4>
-        )}
-
-        {end && <h4>도착지: {end.name}</h4>}
-      </div>
-      </div>
-
-      <div className="schedule-button-wrapper">
+        <div className="right-box" style={{ gridArea: 'right-box' }}>
+        <div className="schedule-button-wrapper">
         <button
           className="schedule-create-button"
           onClick={() => {
@@ -375,6 +353,30 @@ const Map = () => {
           </ul>
         )}
       </div>
+</div>
+        <div className="location-box">
+        {Array.isArray(start) ? (
+          <>
+            <h4>출발지:</h4>
+            <ul>
+              {start.map((s, index) => (
+                <li key={index}>{s.name}</li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <h4>출발지: {start?.name || '없음'}</h4>
+        )}
+
+        {middlePoint && (
+          <h4>중간지점: {middlePoint.address}</h4>
+        )}
+
+        {end && <h4>도착지: {end.name}</h4>}
+      </div>
+      </div>
+
+
     </div>
   );
 };

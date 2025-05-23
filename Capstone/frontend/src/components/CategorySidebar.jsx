@@ -14,11 +14,17 @@ const CategorySidebar = ({ places = [], onClose, onAddPlace, addedList = [] }) =
         ) : (
           places.map((place, index) => (
             <div key={index} className="place-item">
-              <img
-                src={place.thumbnail || '/images/no_image.png'}
-                alt={place.name}
-                className="place-thumbnail"
-              />
+              <div className="place-thumbnail-container">
+                {place.thumbnail ? (
+                  <img
+                    src={place.thumbnail}
+                    alt={place.name}
+                    className="place-thumbnail"
+                  />
+                ) : (
+                  <span className="no-image-text">이미지 없음</span>
+                )}
+              </div>
               <div className="place-content">
                 <h4 className="place-title">{place.name}</h4>
                 <p className="place-desc">{place.address || '상세 주소 없음'}</p>

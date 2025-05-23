@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -103,7 +104,7 @@ public class UserService {
         User updatedUser;
 
         // 프로필 사진 처리
-        /*if (profileImage != null && !profileImage.isEmpty()) {
+        if (profileImage != null && !profileImage.isEmpty()) {
             try {
                 String imageUrl = s3Service.upload(profileImage);
                 System.out.println("imageUrl=" + imageUrl);
@@ -111,7 +112,7 @@ public class UserService {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }*/
+        }
 
         user.updateInfo(userUpdateRequestDto.getUserEmail(), userUpdateRequestDto.getUserNick(), userUpdateRequestDto.getUserAddress());
     }

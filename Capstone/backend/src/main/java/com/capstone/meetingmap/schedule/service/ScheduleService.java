@@ -117,7 +117,7 @@ public class ScheduleService {
 
         List<ScheduleDetailCreateDto> detailCreateDtoList = new ArrayList<>();
 
-        /*if (dto.getAiRecommendation()) { // AI 추천 받기를 체크한 경우
+        if (dto.getAiRecommendation()) { // AI 추천 받기를 체크한 경우
             // 추가 장소를 PointCoordinate와 테마 기준으로 AI에 정보를 제공해 선택(정렬은 user_ratings_total 기준 정렬)
             int remainingCount = dto.getTotalPlaceCount() - dto.getSelectedPlace().size();
 
@@ -170,7 +170,7 @@ public class ScheduleService {
                     .toList();
 
             dto.getSelectedPlace().addAll(additionalPlaceList);
-        } else*/ if (dto.getAdditionalRecommendation()) { // 추가 추천 받기를 체크한 경우
+        } else if (dto.getAdditionalRecommendation()) { // 추가 추천 받기를 체크한 경우
             // 추가 장소를 PointCoordinate를 기준으로 테마, 평점 기준으로 필터링해 선택(정렬은 user_ratings_total 기준 정렬)
             int remainingCount = dto.getTotalPlaceCount() - dto.getSelectedPlace().size();
             // 추가로 선택된 총 장소

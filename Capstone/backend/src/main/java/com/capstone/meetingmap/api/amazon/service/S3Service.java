@@ -16,7 +16,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class S3Service {
 
-    /*private final S3Client s3Client;
+    private final S3Client s3Client;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -42,6 +42,6 @@ public class S3Service {
 
     public String getFileUrl(String fileName) {
         return "https://" + bucket + ".s3." + region + ".amazonaws.com/" + fileName;
-    }*/
+    }
 }
 

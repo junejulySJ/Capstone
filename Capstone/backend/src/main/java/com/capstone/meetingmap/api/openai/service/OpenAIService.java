@@ -15,7 +15,6 @@ import java.util.Map;
 
 @Service
 public class OpenAIService {
-    /*
     private final RestClient openAiRestClient;
 
     public OpenAIService(RestClient openAiRestClient) {
@@ -122,5 +121,5 @@ public class OpenAIService {
 
     private boolean isTimeBetween(LocalTime start, LocalTime end, LocalTime rangeStart, LocalTime rangeEnd) {
         return !(end.isBefore(rangeStart) || start.isAfter(rangeEnd));
-    }*/
+    }
 }

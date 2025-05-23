@@ -218,10 +218,12 @@ public class ScheduleService {
                     .filter(placeDto -> !alreadySelectedNames.contains(placeDto.getName()))
                     .collect(Collectors.toList());
 
-            // 최소 평점 이상만 추출
-            mergedResponse = mergedResponse.stream()
-                    .filter(placeDto -> ParseUtil.parseDoubleSafe(placeDto.getRating()) >= dto.getMinimumRating())
-                    .toList();
+            if (dto.getMinimumRating() != null) {
+                // 최소 평점 이상만 추출
+                mergedResponse = mergedResponse.stream()
+                        .filter(placeDto -> ParseUtil.parseDoubleSafe(placeDto.getRating()) >= dto.getMinimumRating())
+                        .toList();
+            }
 
             List<PlaceResponseDto> subMergedResponse;
             if (mergedResponse.size() > dto.getTotalPlaceCount()) {

@@ -6,11 +6,7 @@ import com.capstone.meetingmap.api.tmap.dto.RouteRequest;
 import com.capstone.meetingmap.api.tmap.dto.RouteResponse;
 import com.capstone.meetingmap.api.tmap.dto.SimpleTransitRouteResponse;
 import com.capstone.meetingmap.api.tmap.service.TMapApiService;
-import com.capstone.meetingmap.friendship.entity.FriendshipStatus;
-import com.capstone.meetingmap.friendship.repository.FriendshipRepository;
-import com.capstone.meetingmap.groupuser.entity.GroupUser;
-import com.capstone.meetingmap.groupuser.entity.GroupUserId;
-import com.capstone.meetingmap.groupuser.repository.GroupUserRepository;
+import com.capstone.meetingmap.group.repository.GroupScheduleRepository;
 import com.capstone.meetingmap.map.dto.PlaceResponseDto;
 import com.capstone.meetingmap.map.service.MapService;
 import com.capstone.meetingmap.schedule.dto.*;
@@ -18,7 +14,6 @@ import com.capstone.meetingmap.schedule.entity.Schedule;
 import com.capstone.meetingmap.schedule.entity.ScheduleDetail;
 import com.capstone.meetingmap.schedule.repository.ScheduleDetailRepository;
 import com.capstone.meetingmap.schedule.repository.ScheduleRepository;
-import com.capstone.meetingmap.user.dto.UserResponseDto;
 import com.capstone.meetingmap.user.entity.User;
 import com.capstone.meetingmap.user.repository.UserRepository;
 import com.capstone.meetingmap.util.ParseUtil;
@@ -39,36 +34,31 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final ScheduleDetailRepository scheduleDetailRepository;
     private final UserRepository userRepository;
-    private final GroupUserRepository groupUserRepository;
-    private final FriendshipRepository friendshipRepository;
     private final MapService mapService;
     private final OpenAIService openAIService;
+    private final GroupScheduleRepository groupScheduleRepository;
 
-    public ScheduleService(TMapApiService tMapApiService, ScheduleRepository scheduleRepository, ScheduleDetailRepository scheduleDetailRepository, UserRepository userRepository, GroupUserRepository groupUserRepository, FriendshipRepository friendshipRepository, MapService mapService, OpenAIService openAIService) {
+    public ScheduleService(TMapApiService tMapApiService,
+                           ScheduleRepository scheduleRepository,
+                           ScheduleDetailRepository scheduleDetailRepository,
+                           UserRepository userRepository,
+                           MapService mapService,
+                           OpenAIService openAIService,
+                           GroupScheduleRepository groupScheduleRepository) {
         this.tMapApiService = tMapApiService;
         this.scheduleRepository = scheduleRepository;
         this.scheduleDetailRepository = scheduleDetailRepository;
         this.userRepository = userRepository;
-        this.groupUserRepository = groupUserRepository;
-        this.friendshipRepository = friendshipRepository;
         this.mapService = mapService;
         this.openAIService = openAIService;
+        this.groupScheduleRepository = groupScheduleRepository;
     }
 
-    // 회원이 속한 모든 스케줄 가져오기
+    // 회원이 만든 스케줄 가져오기
     public List<ScheduleResponseDto> getSchedulesByUserId(String userId) {
-        // userId로 해당되는 그룹 데이터 가져오기
-        List<GroupUser> groupUsers = groupUserRepository.findByUser_UserId(userId);
+        List<Schedule> scheduleList = scheduleRepository.findAllByUser_UserId(userId);
 
-        // Set으로 중복 자동 제거
-        Set<Schedule> schedules = groupUsers.stream()
-                .map(GroupUser::getSchedule)
-                .collect(Collectors.toSet());
-
-        // 스케줄 목록 반환
-        return schedules.stream()
-                .map(ScheduleResponseDto::fromEntity)
-                .collect(Collectors.toList());
+        return scheduleList.stream().map(ScheduleResponseDto::fromEntity).collect(Collectors.toList());
     }
 
     // 스케줄 세부 정보 가져오기
@@ -81,118 +71,45 @@ public class ScheduleService {
         return responseDtoList;
     }
 
-    // 스케줄에 속한 모든 구성원 가져오기
-    public List<UserResponseDto> getUsersByScheduleNo(String userId, Integer scheduleNo) {
-
-        // 자신이 속한 group만 조회 가능
-        if (!groupUserRepository.existsBySchedule_ScheduleNoAndUser_UserId(scheduleNo, userId))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "자신이 속한 그룹만 조회 가능합니다");
-
-        List<GroupUser> groupUsers = groupUserRepository.findBySchedule_ScheduleNo(scheduleNo);
-
-        return groupUsers.stream()
-                .map(groupUser -> UserResponseDto.fromEntity(groupUser.getUser()))
-                .collect(Collectors.toList());
-    }
-
     // 세부 스케줄과 함께 스케줄 추가
     @Transactional
     public Integer saveScheduleWithDetails(String userId, ScheduleSaveRequestDto scheduleSaveRequestDto) {
-        // 1. User 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
 
-        // 2. Schedule 생성 및 저장
         Schedule schedule = scheduleSaveRequestDto.toEntity(scheduleSaveRequestDto, user);
-        Schedule savedSchedule = scheduleRepository.save(schedule);
+        scheduleRepository.save(schedule);
 
-        // 3. ScheduleDetail 저장
-        for (ScheduleDetailRequestDto detailDto : scheduleSaveRequestDto.getDetails()) {
-            ScheduleDetail detail = detailDto.toEntity(savedSchedule);
-            scheduleDetailRepository.save(detail);
-        }
-
-        return savedSchedule.getScheduleNo();
+        return schedule.getScheduleNo();
     }
 
     // 스케줄 수정
     @Transactional
-    public void updateSchedule(String userId, Integer scheduleNo, ScheduleUpdateRequestDto requestDto) {
+    public void updateSchedule(String userId, Integer scheduleNo, ScheduleSaveRequestDto requestDto) {
+        if (!scheduleRepository.existsByScheduleNoAndUser_UserId(scheduleNo, userId))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "자신이 만든 스케줄만 수정 가능합니다");
 
-        groupUserRepository.findByUser_UserId(userId);
+        Schedule schedule = scheduleRepository.findById(scheduleNo)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "스케줄을 찾을 수 없습니다"));
 
-        // userId와 scheduleNo로 GroupUser 검색 (해당 유저가 참여 중인 스케줄인지 확인)
-        GroupUser groupUser = groupUserRepository.findByUser_UserIdAndSchedule_ScheduleNo(userId, scheduleNo)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 스케줄에 대한 참여 정보를 찾을 수 없습니다"));
+        schedule.getDetails().clear(); // 기존 상세일정 삭제
 
-        Schedule schedule = groupUser.getSchedule();
-
-        scheduleDetailRepository.deleteByScheduleScheduleNo(scheduleNo); // 기존 상세일정 삭제
+        List<ScheduleDetail> scheduleDetails = requestDto.getDetails().stream().map(dto -> dto.toEntity(schedule)).toList();
 
         //일정 저장
-        schedule.setScheduleWithoutUserId(requestDto.getScheduleName(), requestDto.getScheduleAbout());
-        scheduleRepository.save(schedule);
-
-        //디테일 저장
-        for (ScheduleDetailRequestDto detailDto : requestDto.getDetails()) {
-            ScheduleDetail detail = detailDto.toEntity(schedule);
-            scheduleDetailRepository.save(detail);
-        }
+        schedule.setScheduleWithoutUserId(requestDto.getScheduleName(), requestDto.getScheduleAbout(), scheduleDetails);
     }
 
     // 스케줄 삭제
     @Transactional
     public void deleteSchedule(String userId, Integer scheduleNo) {
-
-        // 자신이 만든 schedule만 삭제 가능
         if (!scheduleRepository.existsByScheduleNoAndUser_UserId(scheduleNo, userId))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "자신이 만든 스케줄만 삭제 가능합니다");
 
-        scheduleDetailRepository.deleteByScheduleScheduleNo(scheduleNo);
+        // 공유된 스케줄도 전부 삭제
+        groupScheduleRepository.deleteByScheduleScheduleNo(scheduleNo);
+
         scheduleRepository.deleteById(scheduleNo);
-    }
-
-    // 스케줄 공유
-    public void shareSchedule(String userId, ScheduleShareRequestDto scheduleShareRequestDto) {
-        // 자신이 만든 schedule만 공유 가능
-        if (!scheduleRepository.existsByScheduleNoAndUser_UserId(scheduleShareRequestDto.getScheduleNo(), userId))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "자신이 만든 스케줄만 공유 가능합니다");
-
-        for (String friendId : scheduleShareRequestDto.getUserIds()) {
-            if (!friendshipRepository.existsByUser_UserIdAndOpponent_UserIdAndStatus(userId, friendId, FriendshipStatus.ACCEPTED)) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "친구가 아닌 사용자가 포함되어 있습니다: " + friendId);
-            }
-
-            User friendUser = userRepository.findById(friendId)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
-
-            Schedule schedule = scheduleRepository.findById(scheduleShareRequestDto.getScheduleNo())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "스케줄을 찾을 수 없습니다"));
-
-            // groupUser에 추가가 안되어있으면 추가
-            if (!groupUserRepository.existsBySchedule_ScheduleNoAndUser_UserId(schedule.getScheduleNo(), friendId)) {
-                groupUserRepository.save(new GroupUser(schedule, friendUser));
-            }
-        }
-    }
-
-    // 스케줄 공유 취소
-    public void unshareSchedule(String userId, ScheduleShareRequestDto scheduleShareRequestDto) {
-        Schedule schedule = scheduleRepository.findById(scheduleShareRequestDto.getScheduleNo())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "스케줄을 찾을 수 없습니다"));
-
-        // 자신이 만든 schedule만 공유 취소 가능
-        if (!scheduleRepository.existsByScheduleNoAndUser_UserId(scheduleShareRequestDto.getScheduleNo(), userId))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "자신이 만든 스케줄만 공유 취소 가능합니다");
-
-        for (String friendId : scheduleShareRequestDto.getUserIds()) {
-            if (!groupUserRepository.existsBySchedule_ScheduleNoAndUser_UserId(scheduleShareRequestDto.getScheduleNo(), friendId)) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 사용자가 스케줄에 없습니다: " + friendId);
-            }
-
-            groupUserRepository.deleteById(new GroupUserId(scheduleShareRequestDto.getScheduleNo(), friendId));
-        }
-
     }
 
     // 스케줄 생성

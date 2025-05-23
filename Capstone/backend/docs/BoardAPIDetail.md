@@ -11,13 +11,15 @@
 
 # Board API 예시
 ## API 바로가기
-| API 호출                              | 설명        |
-|-------------------------------------|-----------|
-| [GET /boards](#게시글-조회)              | 게시글 조회    |
-| [GET /boards/{boardNo}](#게시글-상세-조회) | 게시글 상세 조회 |
-| [POST /boards](#게시글-등록)             | 게시글 등록    |
-| [PUT /boards/{boardNo}](#게시글-수정)    | 게시글 수정    |
-| [DELETE /boards/{boardNo}](#게시글-삭제) | 게시글 삭제    |
+| API 호출                                 | 설명        |
+|----------------------------------------|-----------|
+| [GET /boards](#게시글-조회)                 | 게시글 조회    |
+| [GET /boards/{boardNo}](#게시글-상세-조회)    | 게시글 상세 조회 |
+| [POST /boards](#게시글-등록)                | 게시글 등록    |
+| [PUT /boards/{boardNo}](#게시글-수정)       | 게시글 수정    |
+| [DELETE /boards/{boardNo}](#게시글-삭제)    | 게시글 삭제    |
+| [POST /boards/{boardNo}/like](#좋아요-처리) | 좋아요 처리    |
+| [POST /boards/{boardNo}/hate](#싫어요-처리) | 싫어요 처리    |
 
 ---
 

@@ -46,4 +46,8 @@ public class ScheduleDetail {
         this.scheduleEndTime = scheduleEndTime;
         this.schedule = schedule;
     }
+
+    public void setSchedule(Schedule schedule) {
+        this.schedule = schedule;
+    }
 }

@@ -2,6 +2,7 @@ package com.capstone.meetingmap.schedule.dto;
 
 import com.capstone.meetingmap.schedule.entity.Schedule;
 import com.capstone.meetingmap.schedule.entity.ScheduleDetail;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,8 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class ScheduleDetailRequestDto {
     private String scheduleContent;
     private String scheduleAddress;
@@ -19,17 +22,6 @@ public class ScheduleDetailRequestDto {
     private LocalDateTime scheduleStartTime;
     private LocalDateTime scheduleEndTime;
     private Integer scheduleNo; // 외래키
-
-    @Builder
-    public ScheduleDetailRequestDto(String scheduleContent, String scheduleAddress, BigDecimal latitude, BigDecimal longitude, LocalDateTime scheduleStartTime, LocalDateTime scheduleEndTime, Integer scheduleNo) {
-        this.scheduleContent = scheduleContent;
-        this.scheduleAddress = scheduleAddress;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.scheduleStartTime = scheduleStartTime;
-        this.scheduleEndTime = scheduleEndTime;
-        this.scheduleNo = scheduleNo;
-    }
 
     //dto를 엔티티로 변환
     public ScheduleDetail toEntity(Schedule schedule) {

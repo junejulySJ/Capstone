@@ -13,11 +13,11 @@
 ## API 바로가기
 | API 호출                                                 | 설명             |
 |--------------------------------------------------------|----------------|
-| [GET /schedules](#스케줄-조회)                              | 스케줄 조회         |
+| [GET /schedules](#자신이-만든-스케줄-조회)                       | 자신이 만든 스케줄 조회  |
 | [GET /schedules/{scheduleNo}/details](#스케줄-상세-정보-조회)   | 스케줄 상세 정보 조회   |
 | [GET /schedules/{scheduleNo}/members](#스케줄에-참여한-회원-조회) | 스케줄에 참여한 회원 조회 |
 | [POST /schedules/create](#스케줄-생성)                      | 스케줄 생성         |
-| [POST /schedules](#스케줄-저장)                             | 스케줄 저장         |
+| [POST /schedules](#스케줄-저장)                             | 스케줄 저장 ✏️      |
 | [POST /schedules/share](#스케줄-공유)                       | 스케줄 공유         |
 | [POST /schedules/unshare](#스케줄-공유-취소)                  | 스케줄 공유 취소      |
 | [PUT /schedules](#스케줄-수정)                              | 스케줄 수정         |
@@ -27,13 +27,13 @@
 
 ## API 상세
 
-### 스케줄 조회
+### 자신이 만든 스케줄 조회
 
 **GET** `/schedules`
 
-> 로그인한 회원의 스케줄을 조회합니다.
+> 로그인한 회원이 만든 스케줄을 조회합니다.
 
-## [Example](ScheduleAPIDetail.md#스케줄-조회)
+## [Example](ScheduleAPIDetail.md#자신이-만든-스케줄-조회)
 
 #### 요청 쿠키
 | 쿠키          | 설명  | 값 예시            |
@@ -178,6 +178,11 @@
 | scheduleName  | O     | 스케줄 이름    | "스터디 회의"                     |
 | scheduleAbout | O     | 스케줄 설명    | "다음 주 프로젝트 스터디 회의 진행"        |
 | details       | O     | 스케줄 세부 내용 | [{scheduleContent:...}, ...] |
+
+#### 응답 헤더 ✏️
+| 헤더       | 설명          | 값 예시             |
+|----------|-------------|------------------|
+| Location | 스케줄이 생성된 주소 | /api/schedules/7 |
 
 ---
 

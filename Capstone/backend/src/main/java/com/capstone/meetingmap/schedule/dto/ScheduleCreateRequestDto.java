@@ -35,8 +35,8 @@ public class ScheduleCreateRequestDto {
     @NotNull(message = "추가 추천 여부는 반드시 필요합니다")
     private Boolean additionalRecommendation;
 
-    @NotNull(message = "AI 추천 여부는 반드시 필요합니다")
-    private Boolean aiRecommendation;
+    /*@NotNull(message = "AI 추천 여부는 반드시 필요합니다")
+    private Boolean aiRecommendation;*/
 
     private Integer totalPlaceCount;
     private String theme;

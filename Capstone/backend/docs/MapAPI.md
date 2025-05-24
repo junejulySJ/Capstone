@@ -117,18 +117,25 @@
 | contentId | O     | 장소 ID | 2559938 |
 
 #### 응답 바디 파라미터 ✏️
-| 파라미터             | 설명      | 값 예시                                         |
-|------------------|---------|----------------------------------------------|
-| address          | 장소 주소   | "종로구 관훈동 18"                                 |
-| contentId        | 장소 ID   | "google_ChIJv3WOusKifDURkNGSz-MjBAw"         |
-| thumbnails       | 이미지 리스트 | ["https://lh3.googleusercontent.com...",...] |
-| latitude         | 장소 위도   | "37.5735896"                                 |
-| longitude        | 장소 경도   | "126.9856075"                                |
-| name             | 장소 이름   | "다경향실"                                       |
-| rating           | 평점      | "4.4"                                        |
-| userRatingsTotal | 총 평점 개수 | "7"                                          |
-| phoneNumber      | 전화번호    | "02-723-3651"                                |
-| url              | 주소      | null                                         |
+| 파라미터                    | 설명        | 값 예시                                                            |
+|-------------------------|-----------|-----------------------------------------------------------------|
+| address                 | 장소 주소     | "종로구 관훈동 18"                                                    |
+| contentId               | 장소 ID     | "google_ChIJv3WOusKifDURkNGSz-MjBAw"                            |
+| thumbnails              | 이미지 리스트   | ["https://lh3.googleusercontent.com...",...]                    |
+| latitude                | 장소 위도     | "37.5735896"                                                    |
+| longitude               | 장소 경도     | "126.9856075"                                                   |
+| name                    | 장소 이름     | "다경향실"                                                          |
+| rating                  | 평점        | "4.4"                                                           |
+| userRatingsTotal        | 총 평점 개수   | "7"                                                             |
+| phoneNumber             | 전화번호      | "02-723-3651"                                                   |
+| url                     | 주소        | null                                                            |
+| reviews                 | 리뷰        | [{author,language,rating,...}]                                  |
+| author                  | 리뷰 작성자    | "정창욱"                                                           |
+| language                | 리뷰 언어     | "ko"                                                            |
+| rating                  | 리뷰 평점     | "5"                                                             |
+| relativeTimeDescription | 리뷰 대략 작성일 | "7년 전"                                                          |
+| text                    | 리뷰 내용     | "87년에 문을 연 인사동의 터줏대감. 중국의 대익차대리점을 겸하고있어서 정통보이차와 국산차를 모두 맛볼수있다." |
+| time                    | 리뷰 작성일    | "2017-06-23T13:45:39"                                           |
 
 ---
 

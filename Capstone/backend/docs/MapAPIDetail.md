@@ -265,7 +265,41 @@ axios.get(`${API_BASE_URL}/map/detail?contentId=2559938`)
   "rating": "4.0",
   "userRatingsTotal": "4",
   "phoneNumber": "",
-  "url": ""
+  "url": "",
+  "reviews": [
+    {
+      "author": "Brandon Y",
+      "language": "ko",
+      "rating": "5",
+      "relativeTimeDescription": "2년 전",
+      "text": "직원분들이 너무 친절해서 좋았어요. 아이도 재밌어합니다~",
+      "time": "2022-05-28T18:58:27"
+    },
+    {
+      "author": "Teguh FM",
+      "language": "en",
+      "rating": "5",
+      "relativeTimeDescription": "5달 전",
+      "text": "맛있는 비건 음식. 분위기도 좋고 서비스도 아주 좋았어요.",
+      "time": "2024-12-24T15:54:33"
+    },
+    {
+      "author": "Neal Lee",
+      "language": "en",
+      "rating": "1",
+      "relativeTimeDescription": "7달 전",
+      "text": "이 장소는 작고 그다지 흥미롭지 않습니다.  장비가 오래되었습니다.  방문하지 않고 돈을 낭비하지 않았으면 좋았을 텐데요.",
+      "time": "2024-10-21T16:37:46"
+    },
+    {
+      "author": "ゴリラーマン金太郎",
+      "language": "ja",
+      "rating": "5",
+      "relativeTimeDescription": "6달 전",
+      "text": "크리스마스 트리와 도서관 최고로 아름다운",
+      "time": "2024-11-21T17:06:16"
+    }
+  ]
 }
 ```
 
@@ -277,27 +311,69 @@ axios.get(`${API_BASE_URL}/map/detail?contentId=google_ChIJh18aOsSifDURnxMisYWvn
 #### Response 예시 2 (구글로 검색된 장소)
 ```json
 {
-    "address": "종로구 화동 북촌로5가길 24",
-    "contentId": "google_ChIJh18aOsSifDURnxMisYWvnUM",
-    "thumbnails": [
-        "https://lh3.googleusercontent.com/place-photos/AJnk2cyTwVpDznD82TegtGdVvDgJaKTdoVcKJZDZ9UTaVkFKl6LlhBGUCkr0_43srlhmDnMaopkpsyBu5d-mICTobawgA09piS_8oIOyBihjle90qN2lpeJ9cwb0W4Cg3SaMQbSuyVrKT0Pr3ZaVL8I=s1600-w800",
-        "https://lh3.googleusercontent.com/place-photos/AJnk2czTJ7wh19HwaVDMPsxbrgsXjz3LuD91QWExgS41eadzZ886g7gkhl_nYGaXh7AKDFOCXBXo_bKubt1yTEqvUGlpEQ5SJj3oP3yxEB_punTBRm23FE-Xpa8F5E9anSEpm3L-qvEVwLThFX3HCA=s1600-w800",
-        "https://lh3.googleusercontent.com/place-photos/AJnk2cy31G4a3FNqtaLRJs0kOrXBztAlrWq3BzPtOMlOwe2hrW3w25XT8j6KyB9Ems83-0eIx0cs_3Uti9LuhWw2I5zEUuB00-TE5ceEZoChX5j0F5cfrttPPCrcaphg0oskJsOuuL_teplJulfG=s1600-w800",
-        "https://lh3.googleusercontent.com/place-photos/AJnk2cza-aTmvrp4NNvQGorfcbDY0sobeiK2K4EtaVuaG9T7wHUHLzobUkELKDvvjb6Y8dDFAVzYuwp7Uv0Ej46tQKpP18Lr4_pWkYhyHSMDjcHFm9GUQYRSjwqaKcz2jkoWAFbze31q9k0xmkiNY5E=s1600-w800",
-        "https://lh3.googleusercontent.com/place-photos/AJnk2cxbUL57GZshQNyD004BMzneaMoMvWohdciqXg4fRUMKiygbcq-RlZxOYEoP4bZtBnAnXvADvcaOvLdDbhiB_s2HCe8Rir_ZW70Y8wd1G3vdyXv2EYs2YC6LwSV8YLNAbzAtHyBpjuSgajm62A=s1600-w800",
-        "https://lh3.googleusercontent.com/place-photos/AJnk2czAky9mWlIEee2TMdqkWn_7cJ9-eEBtHLjlkuyE3GPTlBnYWuv2hemqCi1fbBB46wR0ENpwWG4rwsdq9Rfz8YGxBKlHwbQqDNzxYypdGjW2JkYGEmhXlFAE0uInkwLgh4FmwToTqouK-_4RWsM=s1600-w800",
-        "https://lh3.googleusercontent.com/place-photos/AJnk2czH1ugZgh_pezCjhgFuajPlPnexcAozjjgWVcrkwu9lkgdBFf2WdC6chyChFqUYi1oQbOFz2F2t627s0Ky2oRUsUSf6eXZqWHpcwQgHr11chVgxjTB46Lj2vg3HYrguAxq9wpbYCIwLZeQv=s1600-w800",
-        "https://lh3.googleusercontent.com/place-photos/AJnk2cyr-UYGiaCBVlPPIGv8_qKcfjpkyA7AOFESSoX-jg9TnYsatBkQaOdkxJTnhwqrXJInGH_nqRU08IGIm3X5TGsLplIOAm0kGcXmHtRNH8hRTN-508VnJyhuKmtb5RFDrfAfLK_SzpvKC61hxg=s1600-w800",
-        "https://lh3.googleusercontent.com/place-photos/AJnk2cwL3Pb2UjhnW6xhOKZ2wEswt4WyO6BQXepGXtoPMSv7hze3dGSdVvDfVOEarWc3Yz-ENk9814nxkQbVWa1j8V9PERkpm4WHwFLB1Ho25jZNQ3Kd_f4ROhhYFRPNO6V3XteOb1cmrBNYZemp_w=s1600-w800",
-        "https://lh3.googleusercontent.com/place-photos/AJnk2cyioKj6GYOSl4DBbdycAcJN5V9nRxcTfM0RRVnjVnhzO9vzPAoSHZ7XgOKBBUHPOkZ2nQvNyzBDXy7iUCzZriu6fFCP8wcAbrFHqHvHZFjvDHe2bIsBOOmT2p7loYliQEOKu4hqydIHqh0-MA=s1600-w800"
-    ],
-    "latitude": "37.5805437",
-    "longitude": "126.9819587",
-    "name": "엔젤524",
-    "rating": "3.8",
-    "userRatingsTotal": "32",
-    "phoneNumber": "02-720-3359",
-    "url": null
+  "address": "종로구 화동 북촌로5가길 24",
+  "contentId": "google_ChIJh18aOsSifDURnxMisYWvnUM",
+  "thumbnails": [
+    "https://lh3.googleusercontent.com/place-photos/AJnk2cyTwVpDznD82TegtGdVvDgJaKTdoVcKJZDZ9UTaVkFKl6LlhBGUCkr0_43srlhmDnMaopkpsyBu5d-mICTobawgA09piS_8oIOyBihjle90qN2lpeJ9cwb0W4Cg3SaMQbSuyVrKT0Pr3ZaVL8I=s1600-w800",
+    "https://lh3.googleusercontent.com/place-photos/AJnk2czTJ7wh19HwaVDMPsxbrgsXjz3LuD91QWExgS41eadzZ886g7gkhl_nYGaXh7AKDFOCXBXo_bKubt1yTEqvUGlpEQ5SJj3oP3yxEB_punTBRm23FE-Xpa8F5E9anSEpm3L-qvEVwLThFX3HCA=s1600-w800",
+    "https://lh3.googleusercontent.com/place-photos/AJnk2cy31G4a3FNqtaLRJs0kOrXBztAlrWq3BzPtOMlOwe2hrW3w25XT8j6KyB9Ems83-0eIx0cs_3Uti9LuhWw2I5zEUuB00-TE5ceEZoChX5j0F5cfrttPPCrcaphg0oskJsOuuL_teplJulfG=s1600-w800",
+    "https://lh3.googleusercontent.com/place-photos/AJnk2cza-aTmvrp4NNvQGorfcbDY0sobeiK2K4EtaVuaG9T7wHUHLzobUkELKDvvjb6Y8dDFAVzYuwp7Uv0Ej46tQKpP18Lr4_pWkYhyHSMDjcHFm9GUQYRSjwqaKcz2jkoWAFbze31q9k0xmkiNY5E=s1600-w800",
+    "https://lh3.googleusercontent.com/place-photos/AJnk2cxbUL57GZshQNyD004BMzneaMoMvWohdciqXg4fRUMKiygbcq-RlZxOYEoP4bZtBnAnXvADvcaOvLdDbhiB_s2HCe8Rir_ZW70Y8wd1G3vdyXv2EYs2YC6LwSV8YLNAbzAtHyBpjuSgajm62A=s1600-w800",
+    "https://lh3.googleusercontent.com/place-photos/AJnk2czAky9mWlIEee2TMdqkWn_7cJ9-eEBtHLjlkuyE3GPTlBnYWuv2hemqCi1fbBB46wR0ENpwWG4rwsdq9Rfz8YGxBKlHwbQqDNzxYypdGjW2JkYGEmhXlFAE0uInkwLgh4FmwToTqouK-_4RWsM=s1600-w800",
+    "https://lh3.googleusercontent.com/place-photos/AJnk2czH1ugZgh_pezCjhgFuajPlPnexcAozjjgWVcrkwu9lkgdBFf2WdC6chyChFqUYi1oQbOFz2F2t627s0Ky2oRUsUSf6eXZqWHpcwQgHr11chVgxjTB46Lj2vg3HYrguAxq9wpbYCIwLZeQv=s1600-w800",
+    "https://lh3.googleusercontent.com/place-photos/AJnk2cyr-UYGiaCBVlPPIGv8_qKcfjpkyA7AOFESSoX-jg9TnYsatBkQaOdkxJTnhwqrXJInGH_nqRU08IGIm3X5TGsLplIOAm0kGcXmHtRNH8hRTN-508VnJyhuKmtb5RFDrfAfLK_SzpvKC61hxg=s1600-w800",
+    "https://lh3.googleusercontent.com/place-photos/AJnk2cwL3Pb2UjhnW6xhOKZ2wEswt4WyO6BQXepGXtoPMSv7hze3dGSdVvDfVOEarWc3Yz-ENk9814nxkQbVWa1j8V9PERkpm4WHwFLB1Ho25jZNQ3Kd_f4ROhhYFRPNO6V3XteOb1cmrBNYZemp_w=s1600-w800",
+    "https://lh3.googleusercontent.com/place-photos/AJnk2cyioKj6GYOSl4DBbdycAcJN5V9nRxcTfM0RRVnjVnhzO9vzPAoSHZ7XgOKBBUHPOkZ2nQvNyzBDXy7iUCzZriu6fFCP8wcAbrFHqHvHZFjvDHe2bIsBOOmT2p7loYliQEOKu4hqydIHqh0-MA=s1600-w800"
+  ],
+  "latitude": "37.5805437",
+  "longitude": "126.9819587",
+  "name": "엔젤524",
+  "rating": "3.8",
+  "userRatingsTotal": "32",
+  "phoneNumber": "02-720-3359",
+  "url": null,
+  "reviews": [
+    {
+      "author": "황혜영",
+      "language": "ko",
+      "rating": "5",
+      "relativeTimeDescription": "7년 전",
+      "text": "추억이 가득한 장소",
+      "time": "2017-05-28T17:47:30"
+    },
+    {
+      "author": "백승환",
+      "language": "ko",
+      "rating": "5",
+      "relativeTimeDescription": "8년 전",
+      "text": "깨끗한 인테리어",
+      "time": "2017-01-08T12:57:46"
+    },
+    {
+      "author": "클라이밍 암벽등반 영상 사진 채널",
+      "language": "ko",
+      "rating": "4",
+      "relativeTimeDescription": "8년 전",
+      "text": "식당 많은 곳",
+      "time": "2016-12-09T12:40:59"
+    },
+    {
+      "author": "Jow S",
+      "language": "ko",
+      "rating": "3",
+      "relativeTimeDescription": "8년 전",
+      "text": "굳~~**",
+      "time": "2016-10-05T22:48:20"
+    },
+    {
+      "author": "Michael Hsu",
+      "language": "zh-Hant",
+      "rating": "3",
+      "relativeTimeDescription": "8년 전",
+      "text": "쇼핑하기 좋은 거리는 매우 짧고 좁고, 차들이 항상 지나가기 때문에 마음 편히 쇼핑을 할 수 없습니다.",
+      "time": "2016-09-18T18:56:30"
+    }
+  ]
 }
 ```
 

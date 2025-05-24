@@ -1,7 +1,8 @@
 package com.capstone.meetingmap.map.service;
 
-import com.capstone.meetingmap.api.google.dto.DetailCommonItemWithRating;
+import com.capstone.meetingmap.api.google.dto.DetailCommonItemWithRatingAndReview;
 import com.capstone.meetingmap.api.google.dto.RatingResponse;
+import com.capstone.meetingmap.api.google.dto.ReviewResponse;
 import com.capstone.meetingmap.api.google.service.GoogleApiService;
 import com.capstone.meetingmap.api.kakao.dto.SearchKeywordResponse;
 import com.capstone.meetingmap.api.kakao.service.KakaoApiService;
@@ -162,8 +163,9 @@ public class MapService {
             imageItems.add(0, detailImageItem);
 
             RatingResponse ratingResponse = googleApiService.searchPlaceWithRating(commonItem.getTitle());
-            DetailCommonItemWithRating itemWithRating = DetailCommonItemWithRating.fromTourApiPlaceDetailResponse(commonItem, ratingResponse);
-            return DetailCommonResponseDto.fromTourApiPlace(itemWithRating, imageItems);
+            ReviewResponse reviewResponse = googleApiService.searchPlaceWithReview(commonItem.getTitle());
+            DetailCommonItemWithRatingAndReview itemWithRatingAndReview = DetailCommonItemWithRatingAndReview.fromTourApiPlaceDetailResponse(commonItem, ratingResponse, reviewResponse);
+            return DetailCommonResponseDto.fromTourApiPlace(itemWithRatingAndReview, imageItems);
         }
     }
 

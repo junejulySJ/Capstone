@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -117,5 +118,18 @@ public class GoogleApiService {
                 response.getResult().getPhotos().stream()
                                 .map(photo -> getPhoto(photo.getPhoto_reference(), 800))
                                         .collect(Collectors.toList()));
+    }
+
+    // 장소 세부 검색으로 리뷰 추출
+    public ReviewResponse searchPlaceWithReview(String placeName) {
+        GoogleApiResponse<GooglePlaceResult> textSearchResponse = getTextSearch(placeName);
+        String contentId = textSearchResponse.getResults().get(0).getPlace_id();
+
+        GoogleApiDetailResponse<GooglePlaceDetailResult> response = getDetailSearch(contentId);
+        if (response == null || response.getResult() == null || response.getResult().getReviews().isEmpty())
+            return ReviewResponse.builder()
+                    .reviews(Collections.emptyList())
+                    .build();
+        return ReviewResponse.fromGoogleApiDetailResponse(response.getResult());
     }
 }

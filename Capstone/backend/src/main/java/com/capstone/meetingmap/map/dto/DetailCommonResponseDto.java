@@ -1,6 +1,6 @@
 package com.capstone.meetingmap.map.dto;
 
-import com.capstone.meetingmap.api.google.dto.DetailCommonItemWithRating;
+import com.capstone.meetingmap.api.google.dto.DetailCommonItemWithRatingAndReview;
 import com.capstone.meetingmap.api.google.dto.GoogleApiDetailResponse;
 import com.capstone.meetingmap.api.google.dto.GooglePlaceDetailResult;
 import com.capstone.meetingmap.api.tourapi.dto.DetailImageItem;
@@ -9,6 +9,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,8 +30,36 @@ public class DetailCommonResponseDto {
     private String userRatingsTotal;
     private String phoneNumber;
     private String url;
+    private List<Review> reviews;
 
-    public static DetailCommonResponseDto fromTourApiPlace(DetailCommonItemWithRating commonItem, List<DetailImageItem> imageItems) {
+    @Getter
+    @NoArgsConstructor
+    @Builder
+    @AllArgsConstructor
+    public static class Review {
+        private String author;
+        private String language;
+        private String rating;
+        private String relativeTimeDescription;
+        private String text;
+        private LocalDateTime time;
+
+        public static Review fromReview(GooglePlaceDetailResult.Review review) {
+            return Review.builder()
+                    .author(review.getAuthor_name())
+                    .language(review.getOriginal_language())
+                    .rating(String.valueOf(review.getRating()))
+                    .relativeTimeDescription(review.getRelative_time_description())
+                    .text(review.getText())
+                    .time(LocalDateTime.ofInstant(
+                            Instant.ofEpochSecond(review.getTime()),
+                            ZoneId.of("Asia/Seoul") // 원하는 시간대 (예: 한국)
+                    ))
+                    .build();
+        }
+    }
+
+    public static DetailCommonResponseDto fromTourApiPlace(DetailCommonItemWithRatingAndReview commonItem, List<DetailImageItem> imageItems) {
         return DetailCommonResponseDto.builder()
                 .address((commonItem.getAddr1() + " " + commonItem.getAddr2()).trim())
                 .contentId(commonItem.getContentId())
@@ -40,6 +71,7 @@ public class DetailCommonResponseDto {
                 .userRatingsTotal(String.valueOf(commonItem.getUserRatingsTotal()))
                 .phoneNumber(commonItem.getTel())
                 .url(commonItem.getHomepage())
+                .reviews(commonItem.getReviews().stream().map(Review::fromReview).collect(Collectors.toList()))
                 .build();
     }
 
@@ -55,6 +87,7 @@ public class DetailCommonResponseDto {
                 .userRatingsTotal(String.valueOf(response.getResult().getUser_ratings_total()))
                 .phoneNumber(response.getResult().getFormatted_phone_number())
                 .url(response.getResult().getWebsite())
+                .reviews(response.getResult().getReviews().stream().map(Review::fromReview).collect(Collectors.toList()))
                 .build();
     }
 }

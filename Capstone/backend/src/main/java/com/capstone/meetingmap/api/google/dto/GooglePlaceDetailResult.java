@@ -125,7 +125,7 @@ public class GooglePlaceDetailResult {
         private Integer rating;
         private String relative_time_description;
         private String text;
-        private Integer time;
+        private Long time;
         private Boolean translated;
     }
 }

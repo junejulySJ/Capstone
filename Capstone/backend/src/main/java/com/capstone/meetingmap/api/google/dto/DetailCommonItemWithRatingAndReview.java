@@ -4,9 +4,11 @@ import com.capstone.meetingmap.api.tourapi.dto.DetailCommonItem;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Builder
-public class DetailCommonItemWithRating {
+public class DetailCommonItemWithRatingAndReview {
     private String contentId;
     private String contentTypeId;
     private String bookTour;
@@ -30,10 +32,11 @@ public class DetailCommonItemWithRating {
     private String overview;
     private Double rating;
     private Integer userRatingsTotal;
+    private List<GooglePlaceDetailResult.Review> reviews;
 
     // tourAPI 세부 검색 결과에 rating, user_ratings_total 붙여서 반환
-    public static DetailCommonItemWithRating fromTourApiPlaceDetailResponse(DetailCommonItem detailCommonItem, RatingResponse ratingResponse) {
-        return DetailCommonItemWithRating.builder()
+    public static DetailCommonItemWithRatingAndReview fromTourApiPlaceDetailResponse(DetailCommonItem detailCommonItem, RatingResponse ratingResponse, ReviewResponse reviewResponse) {
+        return DetailCommonItemWithRatingAndReview.builder()
                 .contentId(detailCommonItem.getContentid())
                 .contentTypeId(detailCommonItem.getContenttypeid())
                 .bookTour(detailCommonItem.getBooktour())
@@ -57,6 +60,7 @@ public class DetailCommonItemWithRating {
                 .overview(detailCommonItem.getOverview())
                 .rating(ratingResponse.getRating())
                 .userRatingsTotal(ratingResponse.getUserRatingsTotal())
+                .reviews(reviewResponse.getReviews())
                 .build();
     }
 }

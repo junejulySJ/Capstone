@@ -21,7 +21,7 @@ public class GroupBoardController {
         this.groupBoardService = groupBoardService;
     }
 
-    // 그룹 전체 게시글 보기
+    // 그룹 전체 게시글 조회
     @GetMapping
     public ResponseEntity<?> search(
             @PathVariable("groupNo") Integer groupNo,
@@ -39,7 +39,7 @@ public class GroupBoardController {
         return ResponseEntity.ok(groupBoardService.searchArticles(groupNo, keyword, userId, pageable));
     }
 
-    // 그룹 게시글 상세보기
+    // 그룹 게시글 상세 조회
     @GetMapping("/{groupBoardNo}")
     public ResponseEntity<?> viewDetail(@PathVariable Integer groupNo, @PathVariable("groupBoardNo") Integer groupBoardNo) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();

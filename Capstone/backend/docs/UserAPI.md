@@ -8,6 +8,9 @@
 - [Path API](PathAPI.md) [(Example)](PathAPIDetail.md)
 - [Board API](BoardAPI.md) [(Example)](BoardAPIDetail.md)
 - [Comment API](CommentAPI.md) [(Example)](CommentAPIDetail.md)
+- [Group API](GroupAPI.md) [(Example)](GroupAPIDetail.md)
+- [GroupBoard API](GroupBoardAPI.md) [(Example)](GroupBoardAPIDetail.md)
+- [GroupComment API](GroupCommentAPI.md) [(Example)](GroupCommentAPIDetail.md)
 
 # User API
 ## API 바로가기

@@ -8,6 +8,9 @@
 - [Path API](PathAPI.md) [(Example)](PathAPIDetail.md)
 - [Board API](BoardAPI.md) [(Example)](BoardAPIDetail.md)
 - [Comment API](CommentAPI.md) [(Example)](CommentAPIDetail.md)
+- [Group API](GroupAPI.md) [(Example)](GroupAPIDetail.md)
+- [GroupBoard API](GroupBoardAPI.md) [(Example)](GroupBoardAPIDetail.md)
+- [GroupComment API](GroupCommentAPI.md) [(Example)](GroupCommentAPIDetail.md)
 
 # Auth API
 주요 기능:

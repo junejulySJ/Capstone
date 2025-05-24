@@ -17,9 +17,9 @@
 - [Path API](docs/PathAPI.md) [(Example)](docs/PathAPIDetail.md)
 - [Board API](docs/BoardAPI.md) [(Example)](docs/BoardAPIDetail.md) ✏️
 - [Comment API](docs/CommentAPI.md) [(Example)](docs/CommentAPIDetail.md) ✏️
-- Group API (Example)
-- GroupBoard API (Example)
-- GroupComment API (Example)
+- [Group API](docs/GroupAPI.md) [(Example)](docs/GroupAPIDetail.md) ✏️
+- [GroupBoard API](docs/GroupBoardAPI.md) [(Example)](docs/GroupBoardAPIDetail.md) ✏️
+- [GroupComment API](docs/GroupCommentAPI.md) [(Example)](docs/GroupCommentAPIDetail.md) ✏️
 
 # ※아래 방법 중 하나를 진행해야 정상적으로 실행됩니다.
 

@@ -51,8 +51,12 @@ public class GroupService {
 
     // 그룹 조회
     public GroupResponseDto getGroup(Integer groupNo, String userId) {
-        Group group = groupRepository.findByGroupNoAndGroupCreatedUser_UserId(groupNo, userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "그룹 정보를 찾을 수 없거나 권한이 없습니다"));
+        // 자신이 속한 group만 조회 가능
+        if (!groupMemberRepository.existsByGroup_GroupNoAndUser_UserId(groupNo, userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "자신이 속한 그룹만 조회 가능합니다");
+        }
+        Group group = groupRepository.findById(groupNo)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "그룹을 찾을 수 없습니다"));
         return GroupResponseDto.fromEntity(group);
     }
 

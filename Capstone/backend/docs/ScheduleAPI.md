@@ -8,6 +8,9 @@
 - [Path API](PathAPI.md) [(Example)](PathAPIDetail.md)
 - [Board API](BoardAPI.md) [(Example)](BoardAPIDetail.md)
 - [Comment API](CommentAPI.md) [(Example)](CommentAPIDetail.md)
+- [Group API](GroupAPI.md) [(Example)](GroupAPIDetail.md)
+- [GroupBoard API](GroupBoardAPI.md) [(Example)](GroupBoardAPIDetail.md)
+- [GroupComment API](GroupCommentAPI.md) [(Example)](GroupCommentAPIDetail.md)
 
 # Schedule API
 ## API 바로가기
@@ -105,7 +108,7 @@
 | scheduleEndTime          | O                      | 스케줄 종료 시간(input type="datetime-local")                        | "2025-06-01T18:00:00"          |
 | transport                | O                      | 이동 수단                                                         | "pedestrian", "car", "transit" |
 | additionalRecommendation | O                      | 추가 추천 여부                                                      | true/false                     |
-| aiRecommendation         | O                      | AI 추천 여부, 추가 추천 여부보다 우선순위가 높음                                 | true/false                     |
+| aiRecommendation         | X                      | AI 추천 여부, 추가 추천 여부보다 우선순위가 높음                                 | true/false                     |
 | totalPlaceCount          | 추가(AI) 추천 여부가 true면 O  | 선택한 장소를 포함한 스케줄에 포함될 총 장소 개수                                  | 4                              |
 | theme                    | 추가(AI) 추천 여부가 true면 O  | 추천에 사용될 테마                                                    | "tour" 등                       |
 | stayMinutesMean          | 추가(AI) 추천 여부가 true면 O  | 추천될 장소들의 평균 머무는 시간(분 단위)                                      | 60                             |

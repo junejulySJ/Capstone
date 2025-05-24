@@ -124,7 +124,7 @@ public class GroupController {
     }
 
     // 그룹 내 스케줄 공유
-    @PostMapping("{groupNo}/schedules")
+    @PostMapping("/{groupNo}/schedules")
     public ResponseEntity<?> shareSchedule(@PathVariable Integer groupNo, @Valid @RequestBody ScheduleShareRequestDto scheduleShareRequestDto) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -134,7 +134,7 @@ public class GroupController {
     }
 
     // 그룹 내 공유된 스케줄 조회
-    @GetMapping("{groupNo}/schedules")
+    @GetMapping("/{groupNo}/schedules")
     public ResponseEntity<?> getSharedSchedules(@PathVariable Integer groupNo) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -144,7 +144,7 @@ public class GroupController {
     }
 
     // 그룹 내 공유된 스케줄 상세 조회
-    @GetMapping("{groupNo}/schedules/{scheduleNo}")
+    @GetMapping("/{groupNo}/schedules/{scheduleNo}")
     public ResponseEntity<?> getSharedScheduleDetail(@PathVariable Integer groupNo, @PathVariable Integer scheduleNo) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -154,7 +154,7 @@ public class GroupController {
     }
 
     // 공유 스케줄 삭제
-    @DeleteMapping("{groupNo}/schedules/{scheduleNo}")
+    @DeleteMapping("/{groupNo}/schedules/{scheduleNo}")
     public ResponseEntity<?> deleteSchedule(@PathVariable Integer groupNo, @PathVariable Integer scheduleNo) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
 

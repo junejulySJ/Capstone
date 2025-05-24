@@ -1,6 +1,6 @@
 package com.capstone.meetingmap.map.dto;
 
-import com.capstone.meetingmap.api.kakao.dto.AddressFromKeywordResponse;
+import com.capstone.meetingmap.api.kakao.dto.SearchKeywordResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,9 +18,9 @@ public class AddressAutocompleteDto {
     private String placeName;
     private String address;
 
-    public static List<AddressAutocompleteDto> fromKakaoApiResponse(AddressFromKeywordResponse response) {
+    public static List<AddressAutocompleteDto> fromKakaoApiResponse(SearchKeywordResponse response) {
         List<AddressAutocompleteDto> addressAutocompleteDtoList = new ArrayList<>();
-        for (AddressFromKeywordResponse.Documents document : response.getDocuments()) {
+        for (SearchKeywordResponse.Documents document : response.getDocuments()) {
             String roadAddress = document.getRoad_address_name();
             if (roadAddress != null && roadAddress.contains("서울")) {
                 AddressAutocompleteDto dto = AddressAutocompleteDto.builder()

@@ -1,4 +1,4 @@
-package com.capstone.meetingmap.map.dto.tourapi;
+package com.capstone.meetingmap.api.tourapi.dto;
 
 import lombok.Data;
 
@@ -21,5 +21,8 @@ public class DetailCommonItem {
     private String addr1;
     private String addr2;
     private String zipcode;
+    private String mapx;
+    private String mapy;
+    private String mlevel;
     private String overview;
 }

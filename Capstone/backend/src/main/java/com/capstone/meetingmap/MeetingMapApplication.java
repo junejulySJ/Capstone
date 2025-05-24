@@ -4,6 +4,7 @@ import com.capstone.meetingmap.api.google.properties.GoogleApiProperties;
 import com.capstone.meetingmap.api.kakao.properties.KakaoApiProperties;
 import com.capstone.meetingmap.api.openai.properties.OpenAiApiProperties;
 import com.capstone.meetingmap.api.tmap.properties.TMapApiProperties;
+import com.capstone.meetingmap.api.tourapi.properties.TourApiProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

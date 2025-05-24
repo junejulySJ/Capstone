@@ -1,14 +1,13 @@
 package com.capstone.meetingmap.map.controller;
 
-import com.capstone.meetingmap.api.kakao.dto.AddressFromKeywordResponse;
 import com.capstone.meetingmap.api.kakao.dto.PointCoord;
+import com.capstone.meetingmap.api.kakao.dto.SearchKeywordResponse;
+import com.capstone.meetingmap.api.kakao.dto.searchAddressByCoordinateResponse;
+import com.capstone.meetingmap.api.kakao.dto.searchCoordinateByAddressResponse;
 import com.capstone.meetingmap.api.kakao.service.KakaoApiService;
 import com.capstone.meetingmap.map.dto.*;
-import com.capstone.meetingmap.map.dto.kakaoapi.KakaoAddressSearchResponse;
-import com.capstone.meetingmap.map.dto.kakaoapi.KakaoCoordinateSearchResponse;
 import com.capstone.meetingmap.map.service.ConvexHullService;
 import com.capstone.meetingmap.map.service.MapService;
-import com.capstone.meetingmap.map.service.TourApiMapService;
 import com.capstone.meetingmap.util.AddressUtil;
 import com.capstone.meetingmap.util.ClampUtil;
 import com.capstone.meetingmap.util.MiddlePointUtil;
@@ -27,13 +26,11 @@ import java.util.List;
 @RequestMapping("/api/map")
 public class MapController {
 
-    private final TourApiMapService tourApiMapService;
     private final ConvexHullService convexHullService;
     private final MapService mapService;
     private final KakaoApiService kakaoApiService;
 
-    public MapController(TourApiMapService tourApiMapService, ConvexHullService convexHullService, MapService mapService, KakaoApiService kakaoApiService) {
-        this.tourApiMapService = tourApiMapService;
+    public MapController(ConvexHullService convexHullService, MapService mapService, KakaoApiService kakaoApiService) {
         this.convexHullService = convexHullService;
         this.mapService = mapService;
         this.kakaoApiService = kakaoApiService;
@@ -67,21 +64,21 @@ public class MapController {
 
                 // start에 맞는 API 호출
                 Object startResponse = startIsAddress
-                        ? kakaoApiService.getCoordinateFromRegion(start)
-                        : kakaoApiService.getAddressFromKeyword(start);
+                        ? kakaoApiService.searchCoordinateByAddress(start)
+                        : kakaoApiService.searchKeyword(start);
 
                 // end에 맞는 API 호출
                 Object endResponse = endIsAddress
-                        ? kakaoApiService.getCoordinateFromRegion(end)
-                        : kakaoApiService.getAddressFromKeyword(end);
+                        ? kakaoApiService.searchCoordinateByAddress(end)
+                        : kakaoApiService.searchKeyword(end);
 
                 String lat, lon;
-                if (endResponse instanceof KakaoAddressSearchResponse) { // 주소 검색 결과이면
-                    lat = ((KakaoAddressSearchResponse) endResponse).getDocuments().get(0).getY();
-                    lon = ((KakaoAddressSearchResponse) endResponse).getDocuments().get(0).getX();
+                if (endResponse instanceof searchCoordinateByAddressResponse) { // 주소 검색 결과이면
+                    lat = ((searchCoordinateByAddressResponse) endResponse).getDocuments().get(0).getY();
+                    lon = ((searchCoordinateByAddressResponse) endResponse).getDocuments().get(0).getX();
                 } else {  // 장소명 검색 결과이면
-                    lat = ((AddressFromKeywordResponse) endResponse).getDocuments().get(0).getY();
-                    lon = ((AddressFromKeywordResponse) endResponse).getDocuments().get(0).getX();
+                    lat = ((SearchKeywordResponse) endResponse).getDocuments().get(0).getY();
+                    lon = ((SearchKeywordResponse) endResponse).getDocuments().get(0).getX();
                 }
 
                 // 장소 조회
@@ -112,7 +109,7 @@ public class MapController {
 
                     xyDto = XYDto.buildXYDtoByGeometry(adjustedMiddlePoint, coordList);
                 }
-                KakaoCoordinateSearchResponse response = kakaoApiService.getAddressFromCoordinate(xyDto.getMiddleX(), xyDto.getMiddleY());
+                searchAddressByCoordinateResponse response = kakaoApiService.searchAddressByCoordinate(xyDto.getMiddleX(), xyDto.getMiddleY());
 
                 List<PlaceResponseDto> places = mapService.getAllPlaces(sort, String.valueOf(xyDto.getMiddleY()), String.valueOf(xyDto.getMiddleX()), category);
 
@@ -122,10 +119,10 @@ public class MapController {
         }
     }
 
-    // 세부 정보 출력
+    // 장소 세부 정보 조회
     @GetMapping("/detail")
     public ResponseEntity<DetailCommonResponseDto> getPlaceDetail(@RequestParam(value = "contentId") String contentId) {
-        DetailCommonResponseDto detailCommonResponseDto = tourApiMapService.getPlaceDetail(contentId);
+        DetailCommonResponseDto detailCommonResponseDto = mapService.getPlaceDetail(contentId);
         return ResponseEntity.ok(detailCommonResponseDto);
     }
 

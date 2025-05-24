@@ -12,7 +12,7 @@
 - [User API](docs/UserAPI.md) [(Example)](docs/UserAPIDetail.md) ✏️
 - [Auth API](docs/AuthAPI.md)
 - [Friendship API](docs/FriendshipAPI.md)
-- [Map API](docs/MapAPI.md) [(Example)](docs/MapAPIDetail.md)
+- [Map API](docs/MapAPI.md) [(Example)](docs/MapAPIDetail.md) ✏️
 - [Schedule API](docs/ScheduleAPI.md) [(Example)](docs/ScheduleAPIDetail.md) ✏️
 - [Path API](docs/PathAPI.md) [(Example)](docs/PathAPIDetail.md)
 - [Board API](docs/BoardAPI.md) [(Example)](docs/BoardAPIDetail.md) ✏️

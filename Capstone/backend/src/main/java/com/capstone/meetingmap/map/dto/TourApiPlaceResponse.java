@@ -1,6 +1,6 @@
 package com.capstone.meetingmap.map.dto;
 
-import com.capstone.meetingmap.map.dto.tourapi.LocationBasedListItem;
+import com.capstone.meetingmap.api.tourapi.dto.LocationBasedListItem;
 import com.capstone.meetingmap.map.entity.PlaceCategoryDetail;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TourApiPlaceResponse {
     private String address;
-    private String sigunguCode;
     private String contentId;
     private String category;
     private String thumbnail;
@@ -24,7 +23,6 @@ public class TourApiPlaceResponse {
     public static TourApiPlaceResponse fromLocationBasedListItem(LocationBasedListItem item, PlaceCategoryDetail placeCategoryDetail) {
         return TourApiPlaceResponse.builder()
                 .address((item.getAddr1() == null ? "" : item.getAddr1()) + " " + (item.getAddr2() == null ? "" : item.getAddr2()).trim())
-                .sigunguCode(item.getSigungucode())
                 .contentId(item.getContentid())
                 .category(placeCategoryDetail.getPlaceCategoryDetailCode())
                 .thumbnail(item.getFirstimage())

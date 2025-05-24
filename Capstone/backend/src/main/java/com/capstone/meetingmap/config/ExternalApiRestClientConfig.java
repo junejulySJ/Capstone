@@ -4,6 +4,7 @@ import com.capstone.meetingmap.api.google.properties.GoogleApiProperties;
 import com.capstone.meetingmap.api.kakao.properties.KakaoApiProperties;
 import com.capstone.meetingmap.api.openai.properties.OpenAiApiProperties;
 import com.capstone.meetingmap.api.tmap.properties.TMapApiProperties;
+import com.capstone.meetingmap.api.tourapi.properties.TourApiProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -59,6 +60,22 @@ public class ExternalApiRestClientConfig {
                 .baseUrl(tMapApiProperties.getBaseUrl())
                 .defaultHeader("appKey", tMapApiProperties.getKey())
                 .requestInterceptor(loggingInterceptor())
+                .build();
+    }
+
+    @Bean
+    public RestClient tourApiRestClient(final TourApiProperties tourApiProperties) {
+        return RestClient.builder()
+                .baseUrl(tourApiProperties.getBaseUrl())
+                .requestInterceptor(
+                        combineInterceptors(
+                                queryParamAppender("serviceKey", tourApiProperties.getKey()),
+                                queryParamAppender("MobileOS", "ETC"),
+                                queryParamAppender("MobileApp", "MeetingMap"),
+                                queryParamAppender("_type", "json"),
+                                loggingInterceptor()
+                        )
+                )
                 .build();
     }
 

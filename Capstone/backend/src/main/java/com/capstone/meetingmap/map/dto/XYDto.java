@@ -1,5 +1,6 @@
 package com.capstone.meetingmap.map.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,17 +11,12 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class XYDto {
     private List<XYCoordinate> coordinates;
     private Double middleX;
     private Double middleY;
-
-    @Builder
-    public XYDto(List<XYCoordinate> coordinates, Double middleX, Double middleY) {
-        this.coordinates = coordinates;
-        this.middleX = middleX;
-        this.middleY = middleY;
-    }
 
     public static XYDto buildXYDtoByGeometry(Point middlePoint, List<Coordinate> coordinates) {
         return XYDto.builder()

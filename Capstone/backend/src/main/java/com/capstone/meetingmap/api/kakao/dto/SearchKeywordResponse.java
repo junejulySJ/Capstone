@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class AddressFromKeywordResponse {
+public class SearchKeywordResponse {
     private List<Documents> documents;
     private Meta meta;
 

@@ -1,4 +1,4 @@
-package com.capstone.meetingmap.map.dto.googleapi;
+package com.capstone.meetingmap.api.google.dto;
 
 import lombok.Data;
 

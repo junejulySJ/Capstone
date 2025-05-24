@@ -1,7 +1,7 @@
 package com.capstone.meetingmap.map.dto;
 
-import com.capstone.meetingmap.api.kakao.dto.AddressFromKeywordResponse;
-import com.capstone.meetingmap.map.dto.kakaoapi.KakaoAddressSearchResponse;
+import com.capstone.meetingmap.api.kakao.dto.SearchKeywordResponse;
+import com.capstone.meetingmap.api.kakao.dto.searchCoordinateByAddressResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,29 +34,29 @@ public class TwoPointsResponseDto<T> {
     public static TwoPointsResponseDto<List<PlaceResponseDto>> addDestinationResponse(Object startResponse, Object endResponse, List<PlaceResponseDto> placeDto) {
         String startName, startAddress, startLatitude, startLongitude;
         String endName, endAddress, endLatitude, endLongitude;
-        if (startResponse instanceof KakaoAddressSearchResponse) {
-            KakaoAddressSearchResponse.Document startDoc = ((KakaoAddressSearchResponse) startResponse).getDocuments().get(0);
+        if (startResponse instanceof searchCoordinateByAddressResponse) {
+            searchCoordinateByAddressResponse.Document startDoc = ((searchCoordinateByAddressResponse) startResponse).getDocuments().get(0);
             startName = (startDoc.getRoad_address().getAddress_name() != null ? startDoc.getRoad_address().getAddress_name() : startDoc.getAddress_name());
             startAddress = (startDoc.getRoad_address().getAddress_name() != null ? startDoc.getRoad_address().getAddress_name() : startDoc.getAddress().getAddress_name());
-            startLatitude = ((KakaoAddressSearchResponse) startResponse).getDocuments().get(0).getY();
-            startLongitude = ((KakaoAddressSearchResponse) startResponse).getDocuments().get(0).getX();
+            startLatitude = ((searchCoordinateByAddressResponse) startResponse).getDocuments().get(0).getY();
+            startLongitude = ((searchCoordinateByAddressResponse) startResponse).getDocuments().get(0).getX();
         } else {
-            startName = ((AddressFromKeywordResponse) startResponse).getDocuments().get(0).getPlace_name();
-            startAddress = ((AddressFromKeywordResponse) startResponse).getDocuments().get(0).getRoad_address_name();
-            startLatitude = ((AddressFromKeywordResponse) startResponse).getDocuments().get(0).getY();
-            startLongitude = ((AddressFromKeywordResponse) startResponse).getDocuments().get(0).getX();
+            startName = ((SearchKeywordResponse) startResponse).getDocuments().get(0).getPlace_name();
+            startAddress = ((SearchKeywordResponse) startResponse).getDocuments().get(0).getRoad_address_name();
+            startLatitude = ((SearchKeywordResponse) startResponse).getDocuments().get(0).getY();
+            startLongitude = ((SearchKeywordResponse) startResponse).getDocuments().get(0).getX();
         }
-        if (endResponse instanceof KakaoAddressSearchResponse) {
-            KakaoAddressSearchResponse.Document endDoc = ((KakaoAddressSearchResponse) endResponse).getDocuments().get(0);
+        if (endResponse instanceof searchCoordinateByAddressResponse) {
+            searchCoordinateByAddressResponse.Document endDoc = ((searchCoordinateByAddressResponse) endResponse).getDocuments().get(0);
             endName = (endDoc.getRoad_address().getAddress_name() != null ? endDoc.getRoad_address().getAddress_name() : endDoc.getAddress_name());
             endAddress = (endDoc.getRoad_address().getAddress_name() != null ? endDoc.getRoad_address().getAddress_name() : endDoc.getAddress().getAddress_name());
-            endLatitude = ((KakaoAddressSearchResponse) endResponse).getDocuments().get(0).getY();
-            endLongitude = ((KakaoAddressSearchResponse) endResponse).getDocuments().get(0).getX();
+            endLatitude = ((searchCoordinateByAddressResponse) endResponse).getDocuments().get(0).getY();
+            endLongitude = ((searchCoordinateByAddressResponse) endResponse).getDocuments().get(0).getX();
         } else {
-            endName = ((AddressFromKeywordResponse) endResponse).getDocuments().get(0).getPlace_name();
-            endAddress = ((AddressFromKeywordResponse) endResponse).getDocuments().get(0).getRoad_address_name();
-            endLatitude = ((AddressFromKeywordResponse) endResponse).getDocuments().get(0).getY();
-            endLongitude = ((AddressFromKeywordResponse) endResponse).getDocuments().get(0).getX();
+            endName = ((SearchKeywordResponse) endResponse).getDocuments().get(0).getPlace_name();
+            endAddress = ((SearchKeywordResponse) endResponse).getDocuments().get(0).getRoad_address_name();
+            endLatitude = ((SearchKeywordResponse) endResponse).getDocuments().get(0).getY();
+            endLongitude = ((SearchKeywordResponse) endResponse).getDocuments().get(0).getX();
         }
 
         return TwoPointsResponseDto.<List<PlaceResponseDto>>builder()

@@ -11,12 +11,12 @@
 
 # Schedule API 예시
 ## API 바로가기
-| API 호출                               | 설명                 |
-|--------------------------------------|--------------------|
-| [GET /map/category](#카테고리-조회)        | 카테고리 조회            |
-| [GET /map](#지도-출력)                   | 지도 출력              |
-| [GET /map/detail](#장소-세부-정보-출력수정-예정) | 장소 세부 정보 출력(수정 예정) |
-| [GET /map/autocomplete](#장소명-자동완성)   | 장소명 자동완성           |
+| API 호출                             | 설명          |
+|------------------------------------|-------------|
+| [GET /map/category](#카테고리-조회)      | 카테고리 조회     |
+| [GET /map](#지도-출력)                 | 지도 출력       |
+| [GET /map/detail](#장소-세부-정보-출력)    | 장소 세부 정보 출력 |
+| [GET /map/autocomplete](#장소명-자동완성) | 장소명 자동완성    |
 
 ---
 
@@ -117,7 +117,6 @@ axios.get(`${API_BASE_URL}/map?search=destination&sort=user_ratings_total_dsc&st
   "list": [
     {
       "address": "종로구 관훈동 18",
-      "sigunguCode": "23",
       "contentId": "google_ChIJv3WOusKifDURkNGSz-MjBAw",
       "category": "cafe",
       "thumbnail": "https://lh3.googleusercontent.com/place-photos/AJnk2cym7sgAzlB4C_F8_VbXTi9JhfjM5agM1d2rQ7DxsaV0jNN6fySIJfM-U-opSGaYCim7L47cDr2jU8RioU4X-cmsqtRyxRVcLxwvCBv0bUKoktNSDGC_4BNcIpMuPdKQAlkqCJLGWdyNy_CN2aA=s1600-w800",
@@ -129,7 +128,6 @@ axios.get(`${API_BASE_URL}/map?search=destination&sort=user_ratings_total_dsc&st
     },
     {
       "address": "서울특별시 종로구 사직로9길 22 (필운동) ",
-      "sigunguCode": "23",
       "contentId": "2783352",
       "category": "cafe",
       "thumbnail": "http://tong.visitkorea.or.kr/cms/resource/84/2790084_image2_1.jpg",
@@ -180,7 +178,6 @@ axios.get(`${API_BASE_URL}/map?search=middle-point&sort=rating_dsc&name=동작�
   "list": [
     {
       "address": "서울특별시 중구 명동8나길 28 (충무로1가) ",
-      "sigunguCode": "24",
       "contentId": "1489369",
       "category": "food-korean",
       "thumbnail": "http://tong.visitkorea.or.kr/cms/resource/38/3474938_image2_1.jpg",
@@ -192,7 +189,6 @@ axios.get(`${API_BASE_URL}/map?search=middle-point&sort=rating_dsc&name=동작�
     },
     {
       "address": "서울특별시 중구 세종대로 76 ",
-      "sigunguCode": "24",
       "contentId": "398344",
       "category": "food-korean",
       "thumbnail": "http://tong.visitkorea.or.kr/cms/resource/75/1290675_image2_1.jpg",
@@ -248,29 +244,60 @@ axios.get(`${API_BASE_URL}/map?search=location&sort=title_asc&latitude=37.574583
 
 ---
 
-### 장소 세부 정보 출력(수정 예정)
+### 장소 세부 정보 출력
 
-#### Request 예시 1
+#### Request 예시 1 (TourAPI로 검색된 장소)
 ```javascript
 axios.get(`${API_BASE_URL}/map/detail?contentId=2559938`)
 ```
 
-#### Response 예시 1
+#### Response 예시 1 (TourAPI로 검색된 장소)
 ```json
 {
-    "contentid": "2559938",
-    "contenttypeid": "12",
-    "createdtime": "20180907015112",
-    "homepage": "",
-    "modifiedtime": "20250327160800",
-    "tel": "",
-    "telname": "",
-    "title": "브이알존 코엑스 직영점",
-    "firstimage": "http://tong.visitkorea.or.kr/cms/resource/26/2559926_image2_1.jpg",
-    "firstimage2": "http://tong.visitkorea.or.kr/cms/resource/26/2559926_image2_1.jpg",
-    "addr": "서울특별시 강남구 봉은사로 524 (삼성동) 지하1층",
-    "zipcode": "06164",
-    "overview": "VRZONE은 단순히 360도로 보이는 가상현실체험을 제공하지 않고 VRZONE에서 직접 개발부터 유통하는 VR콘텐츠를 체험할 수 있다. 데드프리즌은 의문의 사고로 좀비들이 득실거리는 병원에서 탈출하는 FPS VR 콘텐츠이며, 퓨처스트라이크는 연구소에서 실험 중 사고로 돌연변이 곤충들이 탈출하여 도시가 황폐화되어 곤충들을 박멸하는 FPS VR 콘텐츠이다. 가디언 히어로즈는 지구를 침략하려는 외계인들과 싸워 이기는 FPS VR 콘텐츠이다. VR 라이더는 약 20여 가지의 VR 콘텐츠로 놀이기구를 탑승하는 VR체험 시뮬레이터다. 놀이기구를 VR로 재현함과 상상만 해왔던 장소를 탐험하는 상상 그 이상의 현실을 구현한다."
+  "address": "서울특별시 강남구 봉은사로 524 (삼성동) 지하1층",
+  "contentId": "2559938",
+  "thumbnails": [
+    "http://tong.visitkorea.or.kr/cms/resource/26/2559926_image2_1.jpg"
+  ],
+  "latitude": "37.5129952125",
+  "longitude": "127.0571487082",
+  "name": "브이알존 코엑스 직영점",
+  "rating": "4.0",
+  "userRatingsTotal": "4",
+  "phoneNumber": "",
+  "url": ""
+}
+```
+
+#### Request 예시 2 (구글로 검색된 장소)
+```javascript
+axios.get(`${API_BASE_URL}/map/detail?contentId=google_ChIJh18aOsSifDURnxMisYWvnUM`)
+```
+
+#### Response 예시 2 (구글로 검색된 장소)
+```json
+{
+    "address": "종로구 화동 북촌로5가길 24",
+    "contentId": "google_ChIJh18aOsSifDURnxMisYWvnUM",
+    "thumbnails": [
+        "https://lh3.googleusercontent.com/place-photos/AJnk2cyTwVpDznD82TegtGdVvDgJaKTdoVcKJZDZ9UTaVkFKl6LlhBGUCkr0_43srlhmDnMaopkpsyBu5d-mICTobawgA09piS_8oIOyBihjle90qN2lpeJ9cwb0W4Cg3SaMQbSuyVrKT0Pr3ZaVL8I=s1600-w800",
+        "https://lh3.googleusercontent.com/place-photos/AJnk2czTJ7wh19HwaVDMPsxbrgsXjz3LuD91QWExgS41eadzZ886g7gkhl_nYGaXh7AKDFOCXBXo_bKubt1yTEqvUGlpEQ5SJj3oP3yxEB_punTBRm23FE-Xpa8F5E9anSEpm3L-qvEVwLThFX3HCA=s1600-w800",
+        "https://lh3.googleusercontent.com/place-photos/AJnk2cy31G4a3FNqtaLRJs0kOrXBztAlrWq3BzPtOMlOwe2hrW3w25XT8j6KyB9Ems83-0eIx0cs_3Uti9LuhWw2I5zEUuB00-TE5ceEZoChX5j0F5cfrttPPCrcaphg0oskJsOuuL_teplJulfG=s1600-w800",
+        "https://lh3.googleusercontent.com/place-photos/AJnk2cza-aTmvrp4NNvQGorfcbDY0sobeiK2K4EtaVuaG9T7wHUHLzobUkELKDvvjb6Y8dDFAVzYuwp7Uv0Ej46tQKpP18Lr4_pWkYhyHSMDjcHFm9GUQYRSjwqaKcz2jkoWAFbze31q9k0xmkiNY5E=s1600-w800",
+        "https://lh3.googleusercontent.com/place-photos/AJnk2cxbUL57GZshQNyD004BMzneaMoMvWohdciqXg4fRUMKiygbcq-RlZxOYEoP4bZtBnAnXvADvcaOvLdDbhiB_s2HCe8Rir_ZW70Y8wd1G3vdyXv2EYs2YC6LwSV8YLNAbzAtHyBpjuSgajm62A=s1600-w800",
+        "https://lh3.googleusercontent.com/place-photos/AJnk2czAky9mWlIEee2TMdqkWn_7cJ9-eEBtHLjlkuyE3GPTlBnYWuv2hemqCi1fbBB46wR0ENpwWG4rwsdq9Rfz8YGxBKlHwbQqDNzxYypdGjW2JkYGEmhXlFAE0uInkwLgh4FmwToTqouK-_4RWsM=s1600-w800",
+        "https://lh3.googleusercontent.com/place-photos/AJnk2czH1ugZgh_pezCjhgFuajPlPnexcAozjjgWVcrkwu9lkgdBFf2WdC6chyChFqUYi1oQbOFz2F2t627s0Ky2oRUsUSf6eXZqWHpcwQgHr11chVgxjTB46Lj2vg3HYrguAxq9wpbYCIwLZeQv=s1600-w800",
+        "https://lh3.googleusercontent.com/place-photos/AJnk2cyr-UYGiaCBVlPPIGv8_qKcfjpkyA7AOFESSoX-jg9TnYsatBkQaOdkxJTnhwqrXJInGH_nqRU08IGIm3X5TGsLplIOAm0kGcXmHtRNH8hRTN-508VnJyhuKmtb5RFDrfAfLK_SzpvKC61hxg=s1600-w800",
+        "https://lh3.googleusercontent.com/place-photos/AJnk2cwL3Pb2UjhnW6xhOKZ2wEswt4WyO6BQXepGXtoPMSv7hze3dGSdVvDfVOEarWc3Yz-ENk9814nxkQbVWa1j8V9PERkpm4WHwFLB1Ho25jZNQ3Kd_f4ROhhYFRPNO6V3XteOb1cmrBNYZemp_w=s1600-w800",
+        "https://lh3.googleusercontent.com/place-photos/AJnk2cyioKj6GYOSl4DBbdycAcJN5V9nRxcTfM0RRVnjVnhzO9vzPAoSHZ7XgOKBBUHPOkZ2nQvNyzBDXy7iUCzZriu6fFCP8wcAbrFHqHvHZFjvDHe2bIsBOOmT2p7loYliQEOKu4hqydIHqh0-MA=s1600-w800"
+    ],
+    "latitude": "37.5805437",
+    "longitude": "126.9819587",
+    "name": "엔젤524",
+    "rating": "3.8",
+    "userRatingsTotal": "32",
+    "phoneNumber": "02-720-3359",
+    "url": null
 }
 ```
 

@@ -1,9 +1,9 @@
 package com.capstone.meetingmap.api.kakao.service;
 
-import com.capstone.meetingmap.api.kakao.dto.AddressFromKeywordResponse;
+import com.capstone.meetingmap.api.kakao.dto.SearchKeywordResponse;
 import com.capstone.meetingmap.api.kakao.dto.PointCoord;
-import com.capstone.meetingmap.map.dto.kakaoapi.KakaoAddressSearchResponse;
-import com.capstone.meetingmap.map.dto.kakaoapi.KakaoCoordinateSearchResponse;
+import com.capstone.meetingmap.api.kakao.dto.searchCoordinateByAddressResponse;
+import com.capstone.meetingmap.api.kakao.dto.searchAddressByCoordinateResponse;
 import com.capstone.meetingmap.util.AddressUtil;
 import org.locationtech.jts.geom.Coordinate;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,7 +22,7 @@ public class KakaoApiService {
     }
 
     // 키워드로 장소 검색 api 호출
-    public AddressFromKeywordResponse getAddressFromKeyword(String query) {
+    public SearchKeywordResponse searchKeyword(String query) {
         return kakaoRestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/v2/local/search/keyword.json")
@@ -30,22 +30,22 @@ public class KakaoApiService {
                         .queryParam("size", 10)
                         .build())
                 .retrieve()
-                .body(AddressFromKeywordResponse.class);
+                .body(SearchKeywordResponse.class);
     }
 
     // 주소를 좌표로 변환하는 카카오 api 호출
-    public KakaoAddressSearchResponse getCoordinateFromRegion(String address) {
+    public searchCoordinateByAddressResponse searchCoordinateByAddress(String address) {
         return kakaoRestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/v2/local/search/address.json")
                         .queryParam("query", address)
                         .build())
                 .retrieve()
-                .body(KakaoAddressSearchResponse.class);
+                .body(searchCoordinateByAddressResponse.class);
     }
 
     // 좌표를 주소로 변환하는 카카오 api 요청
-    public KakaoCoordinateSearchResponse getAddressFromCoordinate(double x, double y) {
+    public searchAddressByCoordinateResponse searchAddressByCoordinate(double x, double y) {
         return kakaoRestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/v2/local/geo/coord2address.json")
@@ -53,12 +53,12 @@ public class KakaoApiService {
                         .queryParam("y", String.valueOf(y))
                         .build())
                 .retrieve()
-                .body(KakaoCoordinateSearchResponse.class);
+                .body(searchAddressByCoordinateResponse.class);
     }
 
     // 좌표를 주소로 변환하는 카카오 api 요청
     public String getAddressFromLocation(double longitude, double latitude) {
-        KakaoCoordinateSearchResponse response = getAddressFromCoordinate(longitude, latitude);
+        searchAddressByCoordinateResponse response = searchAddressByCoordinate(longitude, latitude);
 
         return (response.getDocuments().get(0).getRoad_address() != null
                 ? response.getDocuments().get(0).getRoad_address().getAddress_name()
@@ -82,7 +82,7 @@ public class KakaoApiService {
         boolean isAddress = AddressUtil.isAddressQuery(name);
 
         // 그에 맞는 API 호출
-        Object response = isAddress ? getCoordinateFromRegion(name) : getAddressFromKeyword(name);
+        Object response = isAddress ? searchCoordinateByAddress(name) : searchKeyword(name);
 
         return PointCoord.fromResponse(response);
     }

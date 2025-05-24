@@ -1,10 +1,10 @@
 package com.capstone.meetingmap.path.dto;
 
-import com.capstone.meetingmap.api.kakao.dto.AddressFromKeywordResponse;
+import com.capstone.meetingmap.api.kakao.dto.SearchKeywordResponse;
 import com.capstone.meetingmap.api.kakao.dto.PointCoord;
 import com.capstone.meetingmap.api.tmap.dto.RouteResponse;
 import com.capstone.meetingmap.map.dto.XYDto;
-import com.capstone.meetingmap.map.dto.kakaoapi.KakaoAddressSearchResponse;
+import com.capstone.meetingmap.api.kakao.dto.searchCoordinateByAddressResponse;
 import com.capstone.meetingmap.schedule.dto.ScheduleDetailCreateDto;
 import com.capstone.meetingmap.util.ParseUtil;
 import lombok.AllArgsConstructor;
@@ -59,19 +59,19 @@ public class PathResponseDto {
     // 장소 이름으로 경로 조회하는 함수로부터
     public static PathResponseDto fromDocuments(String start, String end, RouteResponse routeResponse, Object first, Object last, List<List<Double>> coordinates) {
         String firstX, firstY, lastX, lastY;
-        if (first instanceof KakaoAddressSearchResponse.Document) {
-            firstX = ((KakaoAddressSearchResponse.Document) first).getX();
-            firstY = ((KakaoAddressSearchResponse.Document) first).getY();
+        if (first instanceof searchCoordinateByAddressResponse.Document) {
+            firstX = ((searchCoordinateByAddressResponse.Document) first).getX();
+            firstY = ((searchCoordinateByAddressResponse.Document) first).getY();
         } else {
-            firstX = ((AddressFromKeywordResponse.Documents) first).getX();
-            firstY = ((AddressFromKeywordResponse.Documents) first).getY();
+            firstX = ((SearchKeywordResponse.Documents) first).getX();
+            firstY = ((SearchKeywordResponse.Documents) first).getY();
         }
-        if (last instanceof KakaoAddressSearchResponse.Document) {
-            lastX = ((KakaoAddressSearchResponse.Document) last).getX();
-            lastY = ((KakaoAddressSearchResponse.Document) last).getY();
+        if (last instanceof searchCoordinateByAddressResponse.Document) {
+            lastX = ((searchCoordinateByAddressResponse.Document) last).getX();
+            lastY = ((searchCoordinateByAddressResponse.Document) last).getY();
         } else {
-            lastX = ((AddressFromKeywordResponse.Documents) last).getX();
-            lastY = ((AddressFromKeywordResponse.Documents) last).getY();
+            lastX = ((SearchKeywordResponse.Documents) last).getX();
+            lastY = ((SearchKeywordResponse.Documents) last).getY();
         }
 
         return PathResponseDto.builder()

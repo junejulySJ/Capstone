@@ -1,6 +1,7 @@
 package com.capstone.meetingmap.map.dto;
 
-import com.capstone.meetingmap.map.dto.googleapi.GooglePlaceResult;
+import com.capstone.meetingmap.api.google.dto.GooglePlaceResult;
+import com.capstone.meetingmap.api.google.dto.RatingResponse;
 import com.capstone.meetingmap.map.entity.PlaceCategoryDetail;
 import com.capstone.meetingmap.schedule.dto.SelectedPlace;
 import lombok.*;

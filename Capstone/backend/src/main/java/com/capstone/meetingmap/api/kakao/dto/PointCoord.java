@@ -1,6 +1,5 @@
 package com.capstone.meetingmap.api.kakao.dto;
 
-import com.capstone.meetingmap.map.dto.kakaoapi.KakaoAddressSearchResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,17 +15,17 @@ public class PointCoord {
     String lon;
 
     public static PointCoord fromResponse(Object response) {
-        if (response instanceof KakaoAddressSearchResponse) { // 주소 검색 결과이면
+        if (response instanceof searchCoordinateByAddressResponse) { // 주소 검색 결과이면
             return PointCoord.builder()
-                    .doc(((KakaoAddressSearchResponse) response).getDocuments().get(0))
-                    .lat(((KakaoAddressSearchResponse) response).getDocuments().get(0).getY())
-                    .lon(((KakaoAddressSearchResponse) response).getDocuments().get(0).getX())
+                    .doc(((searchCoordinateByAddressResponse) response).getDocuments().get(0))
+                    .lat(((searchCoordinateByAddressResponse) response).getDocuments().get(0).getY())
+                    .lon(((searchCoordinateByAddressResponse) response).getDocuments().get(0).getX())
                     .build();
         } else {  // 장소명 검색 결과이면
             return PointCoord.builder()
-                    .doc(((AddressFromKeywordResponse) response).getDocuments().get(0))
-                    .lat(((AddressFromKeywordResponse) response).getDocuments().get(0).getY())
-                    .lon(((AddressFromKeywordResponse) response).getDocuments().get(0).getX())
+                    .doc(((SearchKeywordResponse) response).getDocuments().get(0))
+                    .lat(((SearchKeywordResponse) response).getDocuments().get(0).getY())
+                    .lon(((SearchKeywordResponse) response).getDocuments().get(0).getX())
                     .build();
         }
     }

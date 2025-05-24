@@ -1,11 +1,11 @@
-package com.capstone.meetingmap.map.dto.kakaoapi;
+package com.capstone.meetingmap.api.kakao.dto;
 
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class KakaoCoordinateSearchResponse {
+public class searchAddressByCoordinateResponse {
     private Meta meta;
     private List<Document> documents;
 

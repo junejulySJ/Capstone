@@ -1,6 +1,6 @@
 package com.capstone.meetingmap.map.dto;
 
-import com.capstone.meetingmap.map.dto.tourapi.CodeItem;
+import com.capstone.meetingmap.api.tourapi.dto.CodeItem;
 import com.capstone.meetingmap.map.entity.PlaceCategory;
 import com.capstone.meetingmap.map.entity.PlaceCategoryDetail;
 import lombok.AllArgsConstructor;

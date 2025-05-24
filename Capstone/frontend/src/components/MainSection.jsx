@@ -163,7 +163,14 @@ export default function MainSection() {
         <h1 className="logo-text">MeetingMap</h1>
       </header>
 
-      <section className="image-slider" style={{ backgroundImage: `url(${images[currentImage]})` }}>
+      <section className="image-slider">
+        {images.map((image, index) => (
+          <div
+            key={index}
+            className={`slider-background ${index === currentImage ? 'visible' : ''}`}
+            style={{ backgroundImage: `url(${image})` }}
+          />
+        ))}
         <div className="main-box">
           <p className="subtitle">Enjoy your journey!</p>
 

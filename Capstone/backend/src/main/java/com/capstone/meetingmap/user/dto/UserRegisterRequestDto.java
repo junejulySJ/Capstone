@@ -44,6 +44,9 @@ public class UserRegisterRequestDto {
                 .userNick(userNick)
                 .userAddress(userAddress)
                 .userRole(userRole)
+                .onlyFriendsCanSeeActivity(false)
+                .emailNotificationAgree(false)
+                .pushNotificationAgree(false)
                 .build();
     }
 }

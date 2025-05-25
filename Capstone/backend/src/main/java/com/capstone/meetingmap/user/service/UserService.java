@@ -69,11 +69,14 @@ public class UserService {
 
         User user = User.builder()
                 .userId(userId)
-                .userPasswd("")
                 .userEmail(kakaoUser.getKakaoAccount().getEmail())
+                .userPasswd("")
                 .userNick(kakaoUser.getKakaoAccount().getProfile().getNickname())
                 .userImg(kakaoUser.getKakaoAccount().getProfile().getProfileImageUrl())
                 .userRole(userRole)
+                .onlyFriendsCanSeeActivity(false)
+                .emailNotificationAgree(false)
+                .pushNotificationAgree(false)
                 .build();
         userRepository.save(user);
 
@@ -101,8 +104,6 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
 
-        User updatedUser;
-
         // 프로필 사진 처리
         if (profileImage != null && !profileImage.isEmpty()) {
             try {
@@ -114,7 +115,7 @@ public class UserService {
             }
         }
 
-        user.updateInfo(userUpdateRequestDto.getUserEmail(), userUpdateRequestDto.getUserNick(), userUpdateRequestDto.getUserAddress());
+        user.updateInfo(userUpdateRequestDto);
     }
 
     // 회원 비밀번호 변경

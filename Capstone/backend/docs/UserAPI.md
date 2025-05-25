@@ -20,7 +20,7 @@
 | [POST /user/register](#회원가입)         | 회원가입        |
 | [GET /user](#회원-정보-조회)               | 회원 정보 조회    |
 | [GET /user/list](#전체-회원-조회)          | 전체 회원 조회    |
-| [PUT /user](#회원-정보-변경)               | 회원 정보 변경    |
+| [PUT /user](#회원-정보-변경)               | 회원 정보 변경 ✏️ |
 | [GET /user/boards](#작성한-글-조회)        | 작성한 글 조회    |
 | [GET /user/boards/liked](#좋아요한-글-조회) | 좋아요한 글 조회   |
 | [GET /user/groups](#속한-그룹-조회)        | 속한 그룹 조회 ✏️ |
@@ -133,7 +133,7 @@
 
 > 회원 본인의 정보를 변경합니다.
 
-## [Example](UserAPIDetail.md#회원-정보-변경)
+## [Example](UserAPIDetail.md#회원-정보-변경) ✏️
 
 #### 요청 쿠키
 | 쿠키          | 설명  | 값 예시            |
@@ -142,13 +142,16 @@
 - 로그인을 진행하면 자동으로 쿠키가 등록되어 보내집니다.
 
 #### 요청 바디 파라미터(**※반드시 FormData로 보낼 것**)
-| 파라미터         | 설명           | 값 예시                             |
-|--------------|--------------|----------------------------------|
-| user         | 요청 user json | {userEmail,userNick,userAddress} |
-| userEmail    | 회원 이메일       | "hong@example.com"               |
-| userNick     | 회원 닉네임       | "홍길동"                            |
-| userAddress  | 회원 주소        | "서울특별시 중구 세종대로 110"              |
-| profileImage | 프로필 사진       | 파일                               |
+| 파라미터                      | 설명             | 값 예시                             |
+|---------------------------|----------------|----------------------------------|
+| user                      | 요청 user json   | {userEmail,userNick,userAddress} |
+| userEmail                 | 회원 이메일         | "hong@example.com"               |
+| userNick                  | 회원 닉네임         | "홍길동"                            |
+| userAddress               | 회원 주소          | "서울특별시 중구 세종대로 110"              |
+| onlyFriendsCanSeeActivity | 내 활동을 친구에게만 공개 | true                             |
+| emailNotificationAgree    | 이메일 알림 수신 동의   | false                            |
+| pushNotificationAgree     | 앱 푸시 알림 허용     | false                            |
+| profileImage              | 프로필 사진         | 파일                               |
 
 ---
 

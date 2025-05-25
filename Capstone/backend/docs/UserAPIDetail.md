@@ -130,13 +130,65 @@ axios.get(`${API_BASE_URL}/user`, { withCredentials: true })
 
 ### 회원 정보 변경
 
-#### Request 예시
+#### Request 예시 1 (이메일, 닉네임, 주소 변경)
 ```javascript
-axios.put(`${API_BASE_URL}/user`, {
-        "userEmail": "hong1@example.com",
-        "userNick": "홍길동",
-        "userAddress": "서울특별시 용산구 남산공원길 105",
-    }, { withCredentials: true })
+const userData = {
+    "userEmail": "hong1@example.com",
+    "userNick": "홍길동",
+    "userAddress": "서울특별시 용산구 남산공원길 105"
+};
+
+const formData = new FormData();
+
+// JSON 데이터를 Blob으로 만들어서 추가
+formData.append(
+    "user",
+    new Blob([JSON.stringify(jsonData)], { type: "application/json" })
+);
+
+axios.put(`${API_BASE_URL}/user`, formData, {
+    headers: {
+        "Content-Type": "multipart/form-data",
+    },
+    withCredentials: true
+})
+```
+
+#### Request 예시 2 (프로필 사진 변경)
+```javascript
+import React, { useState } from "react";
+
+const [file, setFile] = useState();
+
+const formData = new FormData();
+
+// 파일이 있으면 formData에 추가
+if (file) {
+    formData.append("profileImage", file);
+}
+
+axios.put(`${API_BASE_URL}/user`, formData, {
+    headers: {
+        "Content-Type": "multipart/form-data",
+    },
+    withCredentials: true
+})
+```
+
+#### Request 예시 3 (각종 설정 변경)
+```javascript
+const userData = {
+    "emailNotificationAgree": true
+};
+
+const formData = new FormData();
+
+axios.put(`${API_BASE_URL}/user`, formData, {
+    headers: {
+        "Content-Type": "multipart/form-data",
+    },
+    withCredentials: true
+})
 ```
 
 ---

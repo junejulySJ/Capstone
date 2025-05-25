@@ -21,8 +21,8 @@
 | [POST /boards](#게시글-등록)                | 게시글 등록    |
 | [PUT /boards/{boardNo}](#게시글-수정)       | 게시글 수정    |
 | [DELETE /boards/{boardNo}](#게시글-삭제)    | 게시글 삭제    |
-| [POST /boards/{boardNo}/like](#좋아요-처리) | 좋아요 처리    |
-| [POST /boards/{boardNo}/hate](#싫어요-처리) | 싫어요 처리    |
+| [POST /boards/{boardNo}/like](#좋아요-토글) | 좋아요 토글 ✏️ |
+| [POST /boards/{boardNo}/hate](#싫어요-토글) | 싫어요 토글 ✏️ |
 
 ---
 
@@ -212,13 +212,13 @@
 
 ---
 
-### 좋아요 처리
+### 좋아요 토글
 
 **POST** `/boards/{boardNo}/like`
 > 게시글에 좋아요를 추가합니다.  
-> 좋아요는 1 게시글 당 1 번만 가능합니다.
+> 1 게시글 당 좋아요 또는 싫어요 1개만 가능합니다.
 
-## [Example](BoardAPIDetail.md#좋아요-처리)
+## [Example](BoardAPIDetail.md#좋아요-토글)
 
 #### 요청 쿠키
 | 쿠키          | 설명  | 값 예시            |
@@ -233,13 +233,13 @@
 
 ---
 
-### 싫어요 처리
+### 싫어요 토글
 
 **POST** `/boards/{boardNo}/hate`
 > 게시글에 싫어요를 추가합니다.  
-> 싫어요는 1 게시글 당 1 번만 가능합니다.
+> 1 게시글 당 좋아요 또는 싫어요 1개만 가능합니다.
 
-## [Example](BoardAPIDetail.md#싫어요-처리)
+## [Example](BoardAPIDetail.md#싫어요-토글)
 
 #### 요청 쿠키
 | 쿠키          | 설명  | 값 예시            |

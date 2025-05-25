@@ -17,19 +17,19 @@ public class BoardInteractionController {
         this.boardHateService = boardHateService;
     }
 
-    // 좋아요 처리
+    // 좋아요 토글
     @PostMapping("/{boardNo}/like")
     public ResponseEntity<?> addLike(@PathVariable Integer boardNo) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-        boardLikeService.addLike(boardNo, userId);
+        boardLikeService.toggleLike(boardNo, userId);
         return ResponseEntity.ok().build();
     }
 
-    // 싫어요 처리
+    // 싫어요 토글
     @PostMapping("/{boardNo}/hate")
     public ResponseEntity<?> addHate(@PathVariable Integer boardNo) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-        boardHateService.addHate(boardNo, userId);
+        boardHateService.toggleHate(boardNo, userId);
         return ResponseEntity.ok().build();
     }
 }

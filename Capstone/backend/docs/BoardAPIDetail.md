@@ -21,8 +21,8 @@
 | [POST /boards](#게시글-등록)                | 게시글 등록    |
 | [PUT /boards/{boardNo}](#게시글-수정)       | 게시글 수정    |
 | [DELETE /boards/{boardNo}](#게시글-삭제)    | 게시글 삭제    |
-| [POST /boards/{boardNo}/like](#좋아요-처리) | 좋아요 처리    |
-| [POST /boards/{boardNo}/hate](#싫어요-처리) | 싫어요 처리    |
+| [POST /boards/{boardNo}/like](#좋아요-토글) | 좋아요 토글    |
+| [POST /boards/{boardNo}/hate](#싫어요-토글) | 싫어요 토글    |
 
 ---
 
@@ -392,7 +392,7 @@ axios.delete(`${API_BASE_URL}/boards/1`, { withCredentials: true })
 
 ---
 
-### 좋아요 처리
+### 좋아요 토글
 
 #### Request 예시
 ```javascript
@@ -401,7 +401,7 @@ axios.post(`${API_BASE_URL}/boards/1/like`, { withCredentials: true })
 
 ---
 
-### 싫어요 처리
+### 싫어요 토글
 
 #### Request 예시
 ```javascript

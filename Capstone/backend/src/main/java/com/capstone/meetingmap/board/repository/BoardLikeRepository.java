@@ -7,10 +7,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BoardLikeRepository extends JpaRepository<BoardLike, BoardInteractionId> {
-    boolean existsByBoard_BoardNoAndUser_UserId(Integer boardNo, String userId);
+    Optional<BoardLike> findByBoard_BoardNoAndUser_UserId(Integer boardNo, String userId);
 
     @Query("SELECT bl.board.boardNo FROM BoardLike bl WHERE bl.user.userId = :userId")
     List<Integer> findBoardNosByUserId(@Param("userId") String userId);
+
+    void deleteByBoard_BoardNoAndUser_UserId(Integer boardNo, String userId);
 }

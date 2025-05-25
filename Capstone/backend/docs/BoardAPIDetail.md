@@ -17,6 +17,7 @@
 | API 호출                                 | 설명        |
 |----------------------------------------|-----------|
 | [GET /boards](#게시글-조회)                 | 게시글 조회    |
+| [GET /boards/category](#카테고리-조회)       | 카테고리 조회   |
 | [GET /boards/{boardNo}](#게시글-상세-조회)    | 게시글 상세 조회 |
 | [POST /boards](#게시글-등록)                | 게시글 등록    |
 | [PUT /boards/{boardNo}](#게시글-수정)       | 게시글 수정    |
@@ -267,6 +268,34 @@ axios.get(`${API_BASE_URL}/boards?category=1&keyword=질문&page=0&size=10&sortB
     "empty": false
 }
 ```
+
+---
+
+### 카테고리 조회
+
+#### Request 예시
+```javascript
+axios.get(`${API_BASE_URL}/boards/category`)
+```
+
+#### Response 예시
+```json
+[
+  {
+    "categoryNo": 0,
+    "categoryName": "공지"
+  },
+  {
+    "categoryNo": 1,
+    "categoryName": "Q&A"
+  },
+  {
+    "categoryNo": 2,
+    "categoryName": "자유"
+  }
+]
+```
+
 ---
 
 ### 게시글 상세 조회
@@ -297,7 +326,6 @@ axios.get(`${API_BASE_URL}/boards/1`)
     "boardFiles": []
 }
 ```
-
 
 ---
 

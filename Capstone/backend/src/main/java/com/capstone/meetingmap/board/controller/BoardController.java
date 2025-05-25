@@ -44,6 +44,12 @@ public class BoardController {
         return ResponseEntity.ok(boardService.searchArticles(categoryNo, keyword, pageable));
     }
 
+    // 카테고리 조회
+    @GetMapping("/category")
+    public ResponseEntity<?> getCategory() {
+        return ResponseEntity.ok(boardService.getCategories());
+    }
+
     // 게시글 상세보기
     @GetMapping("/{boardNo}")
     public ResponseEntity<?> viewDetail(@PathVariable("boardNo") Integer boardNo) {

@@ -1,4 +1,4 @@
-package com.capstone.meetingmap.category.entity;
+package com.capstone.meetingmap.board.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

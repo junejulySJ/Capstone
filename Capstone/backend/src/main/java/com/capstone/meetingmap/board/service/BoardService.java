@@ -9,8 +9,9 @@ import com.capstone.meetingmap.board.repository.BoardFileRepository;
 import com.capstone.meetingmap.board.repository.BoardLikeRepository;
 import com.capstone.meetingmap.board.repository.BoardRepository;
 import com.capstone.meetingmap.board.repository.BoardViewRepository;
-import com.capstone.meetingmap.category.entity.Category;
-import com.capstone.meetingmap.category.repository.CategoryRepository;
+import com.capstone.meetingmap.board.dto.CategoryResponseDto;
+import com.capstone.meetingmap.board.entity.Category;
+import com.capstone.meetingmap.board.repository.CategoryRepository;
 import com.capstone.meetingmap.comment.repository.CommentRepository;
 import com.capstone.meetingmap.user.entity.User;
 import com.capstone.meetingmap.user.repository.UserRepository;
@@ -24,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BoardService {
@@ -72,6 +74,11 @@ public class BoardService {
         return boardViewRepository.findAll(pageable);
     }
 
+    // 카테고리 조회
+    public List<CategoryResponseDto> getCategories() {
+        return categoryRepository.findAll().stream().map(CategoryResponseDto::fromEntity).collect(Collectors.toList());
+    }
+
     // 특정 회원의 게시글 보기
     public Page<BoardView> searchArticlesByUserDesc(String userId, Pageable pageable) {
         return boardViewRepository.findAllByUserId(userId, pageable);
@@ -85,7 +92,6 @@ public class BoardService {
         }
         return boardViewRepository.findByBoardNoIn(likedBoardNos, pageable);
     }
-
 
     // 게시글 상세보기
     @Transactional

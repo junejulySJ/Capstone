@@ -1,21 +1,18 @@
-package com.capstone.meetingmap.category.dto;
+package com.capstone.meetingmap.board.dto;
 
-import com.capstone.meetingmap.category.entity.Category;
+import com.capstone.meetingmap.board.entity.Category;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class CategoryResponseDto {
     private Integer categoryNo;
     private String categoryName;
-
-    @Builder
-    public CategoryResponseDto(Integer categoryNo, String categoryName) {
-        this.categoryNo = categoryNo;
-        this.categoryName = categoryName;
-    }
 
     //엔티티를 dto로 변환
     public static CategoryResponseDto fromEntity(Category category) {

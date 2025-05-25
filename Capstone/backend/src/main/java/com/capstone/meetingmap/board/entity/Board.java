@@ -1,7 +1,6 @@
 package com.capstone.meetingmap.board.entity;
 
 import com.capstone.meetingmap.board.dto.BoardRequestDto;
-import com.capstone.meetingmap.category.entity.Category;
 import com.capstone.meetingmap.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

@@ -1,7 +1,7 @@
 package com.capstone.meetingmap.board.dto;
 
 import com.capstone.meetingmap.board.entity.Board;
-import com.capstone.meetingmap.category.entity.Category;
+import com.capstone.meetingmap.board.entity.Category;
 import com.capstone.meetingmap.user.entity.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

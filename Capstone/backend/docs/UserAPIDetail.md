@@ -331,6 +331,40 @@ axios.get(`${API_BASE_URL}/user/boards/liked`, { withCredentials: true })
 
 ---
 
+### 저장한 글 조회
+
+#### Request 예시
+```javascript
+axios.get(`${API_BASE_URL}/user/boards/scraped`, { withCredentials: true })
+```
+
+#### Response 예시
+```json
+[
+  {
+    "scrapNo": 1,
+    "boardNo": 37,
+    "userId": "user1",
+    "userNick": "사용자1",
+    "userType": 1,
+    "userTypeName": "User",
+    "boardTitle": "test글",
+    "boardDescription": "test글입니다",
+    "boardViewCount": 3,
+    "boardWriteDate": "2025-05-20T23:21:49",
+    "boardUpdateDate": "2025-05-21T17:43:30",
+    "boardLike": 1,
+    "boardHate": 0,
+    "categoryNo": 1,
+    "categoryName": "Q&A",
+    "commentCount": 2,
+    "userImg": "https://capstone-meetingmap.s3.eu-north-1.amazonaws.com/8c0405c9-6369-4dec-ae70-4e197217fbb4_ai-generated-9510467_640.jpg"
+  }
+]
+```
+
+---
+
 ### 속한 그룹 조회
 
 #### Request 예시

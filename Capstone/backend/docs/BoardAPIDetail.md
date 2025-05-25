@@ -14,16 +14,17 @@
 
 # Board API 예시
 ## API 바로가기
-| API 호출                                 | 설명        |
-|----------------------------------------|-----------|
-| [GET /boards](#게시글-조회)                 | 게시글 조회    |
-| [GET /boards/category](#카테고리-조회)       | 카테고리 조회   |
-| [GET /boards/{boardNo}](#게시글-상세-조회)    | 게시글 상세 조회 |
-| [POST /boards](#게시글-등록)                | 게시글 등록    |
-| [PUT /boards/{boardNo}](#게시글-수정)       | 게시글 수정    |
-| [DELETE /boards/{boardNo}](#게시글-삭제)    | 게시글 삭제    |
-| [POST /boards/{boardNo}/like](#좋아요-토글) | 좋아요 토글    |
-| [POST /boards/{boardNo}/hate](#싫어요-토글) | 싫어요 토글    |
+| API 호출                                    | 설명         |
+|-------------------------------------------|------------|
+| [GET /boards](#게시글-조회)                    | 게시글 조회     |
+| [GET /boards/category](#카테고리-조회)          | 카테고리 조회    |
+| [GET /boards/{boardNo}](#게시글-상세-조회)       | 게시글 상세 조회  |
+| [POST /boards](#게시글-등록)                   | 게시글 등록     |
+| [PUT /boards/{boardNo}](#게시글-수정)          | 게시글 수정     |
+| [DELETE /boards/{boardNo}](#게시글-삭제)       | 게시글 삭제     |
+| [POST /boards/{boardNo}/like](#좋아요-토글)    | 좋아요 토글     |
+| [POST /boards/{boardNo}/hate](#싫어요-토글)    | 싫어요 토글     |
+| [POST /boards/{boardNo}/scrap](#저장스크랩-토글) | 저장(스크랩) 토글 |
 
 ---
 
@@ -434,4 +435,13 @@ axios.post(`${API_BASE_URL}/boards/1/like`, { withCredentials: true })
 #### Request 예시
 ```javascript
 axios.post(`${API_BASE_URL}/boards/1/hate`, { withCredentials: true })
+```
+
+---
+
+### 저장(스크랩) 토글
+
+#### Request 예시
+```javascript
+axios.post(`${API_BASE_URL}/boards/1/scrap`, { withCredentials: true })
 ```

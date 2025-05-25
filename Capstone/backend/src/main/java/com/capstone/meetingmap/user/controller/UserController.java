@@ -1,6 +1,7 @@
 package com.capstone.meetingmap.user.controller;
 
 import com.capstone.meetingmap.board.entity.BoardView;
+import com.capstone.meetingmap.board.dto.BoardScrapView;
 import com.capstone.meetingmap.board.service.BoardService;
 import com.capstone.meetingmap.group.dto.GroupResponseDto;
 import com.capstone.meetingmap.group.service.GroupService;
@@ -96,7 +97,7 @@ public class UserController {
 
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        Page<BoardView> boardView = boardService.searchArticlesByUserDesc(userId, pageable);
+        Page<BoardView> boardView = boardService.searchArticlesByUser(userId, pageable);
         return ResponseEntity.ok(boardView);
     }
 
@@ -113,8 +114,18 @@ public class UserController {
 
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        Page<BoardView> boardView = boardService.searchArticlesByLikedDesc(userId, pageable);
+        Page<BoardView> boardView = boardService.searchArticlesByLiked(userId, pageable);
         return ResponseEntity.ok(boardView);
+    }
+
+    // 저장한 글 조회
+    @GetMapping("/boards/scraped")
+    public ResponseEntity<?> getScrapedBoards() {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        List<BoardScrapView> scrapBoardView = boardService.searchArticlesByScraped(userId);
+
+        return ResponseEntity.ok(scrapBoardView);
     }
 
     // 속한 그룹 조회

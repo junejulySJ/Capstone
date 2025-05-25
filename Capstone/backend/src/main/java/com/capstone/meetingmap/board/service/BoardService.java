@@ -2,16 +2,10 @@ package com.capstone.meetingmap.board.service;
 
 import com.capstone.meetingmap.board.dto.BoardDetailResponseDto;
 import com.capstone.meetingmap.board.dto.BoardRequestDto;
-import com.capstone.meetingmap.board.entity.Board;
-import com.capstone.meetingmap.board.entity.BoardFile;
-import com.capstone.meetingmap.board.entity.BoardView;
-import com.capstone.meetingmap.board.repository.BoardFileRepository;
-import com.capstone.meetingmap.board.repository.BoardLikeRepository;
-import com.capstone.meetingmap.board.repository.BoardRepository;
-import com.capstone.meetingmap.board.repository.BoardViewRepository;
+import com.capstone.meetingmap.board.dto.BoardScrapView;
+import com.capstone.meetingmap.board.entity.*;
+import com.capstone.meetingmap.board.repository.*;
 import com.capstone.meetingmap.board.dto.CategoryResponseDto;
-import com.capstone.meetingmap.board.entity.Category;
-import com.capstone.meetingmap.board.repository.CategoryRepository;
 import com.capstone.meetingmap.comment.repository.CommentRepository;
 import com.capstone.meetingmap.user.entity.User;
 import com.capstone.meetingmap.user.repository.UserRepository;
@@ -24,7 +18,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,8 +33,9 @@ public class BoardService {
     private final BoardFileService boardFileService;
     private final BoardFileRepository boardFileRepository;
     private final BoardLikeRepository boardLikeRepository;
+    private final BoardScrapRepository boardScrapRepository;
 
-    public BoardService(CategoryRepository categoryRepository, BoardRepository boardRepository, UserRepository userRepository, BoardViewRepository boardViewRepository, CommentRepository commentRepository, BoardFileService boardFileService, BoardFileRepository boardFileRepository, BoardLikeRepository boardLikeRepository) {
+    public BoardService(CategoryRepository categoryRepository, BoardRepository boardRepository, UserRepository userRepository, BoardViewRepository boardViewRepository, CommentRepository commentRepository, BoardFileService boardFileService, BoardFileRepository boardFileRepository, BoardLikeRepository boardLikeRepository, BoardScrapRepository boardScrapRepository) {
         this.categoryRepository = categoryRepository;
         this.boardRepository = boardRepository;
         this.userRepository = userRepository;
@@ -47,6 +44,7 @@ public class BoardService {
         this.boardFileService = boardFileService;
         this.boardFileRepository = boardFileRepository;
         this.boardLikeRepository = boardLikeRepository;
+        this.boardScrapRepository = boardScrapRepository;
     }
 
     // 게시글 보기
@@ -80,17 +78,26 @@ public class BoardService {
     }
 
     // 특정 회원의 게시글 보기
-    public Page<BoardView> searchArticlesByUserDesc(String userId, Pageable pageable) {
+    public Page<BoardView> searchArticlesByUser(String userId, Pageable pageable) {
         return boardViewRepository.findAllByUserId(userId, pageable);
     }
 
     // 특정 회원이 좋아요한 게시글 보기
-    public Page<BoardView> searchArticlesByLikedDesc(String userId, Pageable pageable) {
+    public Page<BoardView> searchArticlesByLiked(String userId, Pageable pageable) {
         List<Integer> likedBoardNos = boardLikeRepository.findBoardNosByUserId(userId);
         if (likedBoardNos.isEmpty()) {
             return Page.empty(pageable);
         }
         return boardViewRepository.findByBoardNoIn(likedBoardNos, pageable);
+    }
+
+    // 특정 회원이 저장(스크랩)한 게시글 보기
+    public List<BoardScrapView> searchArticlesByScraped(String userId) {
+        List<Integer> scrapedBoardNos = boardScrapRepository.findBoardNosByUserId(userId);
+        if (scrapedBoardNos.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return boardScrapRepository.findScrapedBoardViewsByUserIdOrderByBoardUpdateDateDesc(userId);
     }
 
     // 게시글 상세보기
@@ -186,5 +193,28 @@ public class BoardService {
 
         // 게시글 삭제
         boardRepository.deleteById(boardNo);
+    }
+
+    // 스크랩 토글
+    @Transactional
+    public void scrap(Integer boardNo, String userId) {
+        Optional<BoardScrap> existingScrap = boardScrapRepository.findByUser_UserIdAndBoard_BoardNo(userId, boardNo);
+
+        if (existingScrap.isPresent()) {
+            // 스크랩이 이미 있으면 제거
+            boardScrapRepository.delete(existingScrap.get());
+        } else {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
+
+            Board board = boardRepository.findById(boardNo)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 게시글을 찾을 수 없습니다"));
+
+            BoardScrap boardScrap = BoardScrap.builder()
+                    .user(user)
+                    .board(board)
+                    .build();
+            boardScrapRepository.save(boardScrap);
+        }
     }
 }

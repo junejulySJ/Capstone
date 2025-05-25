@@ -100,4 +100,14 @@ public class BoardController {
 
         return ResponseEntity.noContent().build();
     }
+
+    // 저장(스크랩) 토글
+    @PostMapping("/{boardNo}/scrap")
+    public ResponseEntity<?> scrap(@PathVariable Integer boardNo) {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        boardService.scrap(boardNo, userId);
+
+        return ResponseEntity.noContent().build();
+    }
 }

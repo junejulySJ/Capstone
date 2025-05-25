@@ -14,18 +14,19 @@
 
 # User API
 ## API 바로가기
-| API 호출                               | 설명          |
-|--------------------------------------|-------------|
-| [POST /user/check-id](#아이디-중복-검사)    | 아이디 중복 검사   |
-| [POST /user/register](#회원가입)         | 회원가입        |
-| [GET /user](#회원-정보-조회)               | 회원 정보 조회    |
-| [GET /user/list](#전체-회원-조회)          | 전체 회원 조회    |
-| [PUT /user](#회원-정보-변경)               | 회원 정보 변경 ✏️ |
-| [GET /user/boards](#작성한-글-조회)        | 작성한 글 조회    |
-| [GET /user/boards/liked](#좋아요한-글-조회) | 좋아요한 글 조회   |
-| [GET /user/groups](#속한-그룹-조회)        | 속한 그룹 조회 ✏️ |
-| [POST /user/password](#비밀번호-변경)      | 비밀번호 변경 ✏️  |
-| [DELETE /user](#회원-탈퇴)               | 회원 탈퇴 ✏️    |
+| API 호출                                | 설명          |
+|---------------------------------------|-------------|
+| [POST /user/check-id](#아이디-중복-검사)     | 아이디 중복 검사   |
+| [POST /user/register](#회원가입)          | 회원가입        |
+| [GET /user](#회원-정보-조회)                | 회원 정보 조회    |
+| [GET /user/list](#전체-회원-조회)           | 전체 회원 조회    |
+| [PUT /user](#회원-정보-변경)                | 회원 정보 변경 ✏️ |
+| [GET /user/boards](#작성한-글-조회)         | 작성한 글 조회    |
+| [GET /user/boards/liked](#좋아요한-글-조회)  | 좋아요한 글 조회   |
+| [GET /user/boards/scraped](#저장한-글-조회) | 저장한 글 조회 ✏️ |
+| [GET /user/groups](#속한-그룹-조회)         | 속한 그룹 조회 ✏️ |
+| [POST /user/password](#비밀번호-변경)       | 비밀번호 변경 ✏️  |
+| [DELETE /user](#회원-탈퇴)                | 회원 탈퇴 ✏️    |
 
 ---
 
@@ -260,6 +261,44 @@
 | size             | 요청한 페이지 크기          | 10                       |
 | number           | 현재 페이지 번호           | 0                        |
 | empty            | 현재 페이지가 비어있는지       | false                    |
+
+
+---
+
+### 저장한 글 조회
+
+**PUT** `/user/boards/scraped`
+
+> 회원 본인이 저장을 누른 게시글을 조회합니다.
+
+## [Example](UserAPIDetail.md#저장한-글-조회)
+
+#### 요청 쿠키
+| 쿠키          | 설명  | 값 예시            |
+|-------------|-----|-----------------|
+| accessToken | jwt | eyJhbGciOiJI... |
+- 로그인을 진행하면 자동으로 쿠키가 등록되어 보내집니다.
+
+#### 응답 바디 파라미터
+| 파라미터             | 설명           | 값 예시                     |
+|------------------|--------------|--------------------------|
+| scrapNo          | 스크랩 번호       | 1                        |
+| boardNo          | 게시글 번호       | 1                        |
+| userId           | 작성한 회원 ID    | "user1"                  |
+| userNick         | 작성한 회원 닉네임   | "걷는남자"                   |
+| userType         | 작성한 회원 종류    | 0(관리자), 1(일반 사용자)        |
+| userTypeName     | 작성한 회원 종류 이름 | Admin(관리자), User(일반 사용자) |
+| boardTitle       | 게시글 제목       | "서울숲 산책 코스 추천"           |
+| boardDescription | 게시글 설명       | "조용하고 분위기 있어서 좋았어요."     |
+| boardViewCount   | 게시글 조회수      | 1                        |
+| boardWriteDate   | 게시글 작성일      | "2025-05-09T23:21:49"    |
+| boardUpdateDate  | 게시글 수정일      | "2025-05-09T23:51:40"    |
+| boardLike        | 게시글 좋아요 수    | 0                        |
+| boardHate        | 게시글 싫어요 수    | 0                        |
+| categoryNo       | 게시글 카테고리 번호  | 1                        |
+| categoryName     | 게시글 카테고리 이름  | "자유게시판"                  |
+| commentCount     | 게시글 댓글 수     | 0                        |
+| userImg          | 회원 프로필 사진 주소 | null                     |
 
 ---
 

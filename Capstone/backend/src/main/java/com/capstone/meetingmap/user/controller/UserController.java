@@ -86,35 +86,19 @@ public class UserController {
 
     // 작성한 글 조회
     @GetMapping("/boards")
-    public ResponseEntity<?> getMyBoards(
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "10") Integer size,
-            @RequestParam(defaultValue = "boardWriteDate") String sortBy,
-            @RequestParam(defaultValue = "desc") String direction
-    ) {
-        Sort sort = direction.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of(page, size, sort);
-
+    public ResponseEntity<?> getMyBoards() {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        Page<BoardView> boardView = boardService.searchArticlesByUser(userId, pageable);
+        List<BoardView> boardView = boardService.searchArticlesByUser(userId);
         return ResponseEntity.ok(boardView);
     }
 
     // 좋아요한 글 조회
     @GetMapping("/boards/liked")
-    public ResponseEntity<?> getLikedBoards(
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "10") Integer size,
-            @RequestParam(defaultValue = "boardWriteDate") String sortBy,
-            @RequestParam(defaultValue = "desc") String direction
-    ) {
-        Sort sort = direction.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of(page, size, sort);
-
+    public ResponseEntity<?> getLikedBoards() {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        Page<BoardView> boardView = boardService.searchArticlesByLiked(userId, pageable);
+        List<BoardView> boardView = boardService.searchArticlesByLiked(userId);
         return ResponseEntity.ok(boardView);
     }
 
@@ -130,7 +114,7 @@ public class UserController {
 
     // 속한 그룹 조회
     @GetMapping("/groups")
-    public ResponseEntity<?> getMyBoards() {
+    public ResponseEntity<?> getMyGroups() {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
 
         List<GroupResponseDto> groupResponseDtoList = groupService.getGroupsByUserId(userId);

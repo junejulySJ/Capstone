@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class CommentService {
 
@@ -29,8 +32,8 @@ public class CommentService {
     }
 
     // 댓글 보기
-    public Page<CommentResponseDto> searchComments(Integer boardNo, Pageable pageable) {
-        return commentRepository.findAllByBoard_BoardNo(boardNo, pageable).map(CommentResponseDto::fromEntity);
+    public List<CommentResponseDto> searchComments(Integer boardNo) {
+        return commentRepository.findAllByBoard_BoardNoOrderByCommentWriteDateDesc(boardNo).stream().map(CommentResponseDto::fromEntity).collect(Collectors.toList());
     }
 
     // 댓글 작성

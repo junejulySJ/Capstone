@@ -27,15 +27,14 @@
 
 ### 특정 게시글 댓글 조회
 
-#### Request 예시 1 (특정 게시글 댓글 전체 조회)
+#### Request 예시
 ```javascript
 axios.get(`${API_BASE_URL}/boards/37/comments`)
 ```
 
-#### Response 예시 1 (특정 게시글 댓글 전체 조회)
+#### Response 예시
 ```json
-{
-  "content": [
+[
     {
       "commentNo": 3,
       "userId": "user1",
@@ -47,82 +46,7 @@ axios.get(`${API_BASE_URL}/boards/37/comments`)
       "userImg": null,
       "boardNo": 37
     }
-  ],
-  "pageable": {
-    "pageNumber": 0,
-    "pageSize": 10,
-    "sort": {
-      "empty": false,
-      "sorted": true,
-      "unsorted": false
-    },
-    "offset": 0,
-    "paged": true,
-    "unpaged": false
-  },
-  "last": true,
-  "totalPages": 1,
-  "totalElements": 1,
-  "size": 10,
-  "number": 0,
-  "sort": {
-    "empty": false,
-    "sorted": true,
-    "unsorted": false
-  },
-  "first": true,
-  "numberOfElements": 1,
-  "empty": false
-}
-```
-
-#### Request 예시 2 (댓글 10개만 작성일 기준 내림차순 조회)
-```javascript
-axios.get(`${API_BASE_URL}/boards/37/comments?page=0&size=10&sortBy=commentWriteDate&direction=desc`)
-```
-
-#### Response 예시 2 (댓글 10개만 작성일 기준 내림차순 조회)
-```json
-{
-  "content": [
-    {
-      "commentNo": 3,
-      "userId": "user1",
-      "userNick": "사용자1",
-      "userType": 1,
-      "userTypeName": "User",
-      "commentContent": "댓글 내용",
-      "commentWriteDate": "2025-05-21T15:50:45",
-      "userImg": null,
-      "boardNo": 37
-    }
-  ],
-  "pageable": {
-    "pageNumber": 0,
-    "pageSize": 10,
-    "sort": {
-      "empty": false,
-      "sorted": true,
-      "unsorted": false
-    },
-    "offset": 0,
-    "paged": true,
-    "unpaged": false
-  },
-  "last": true,
-  "totalPages": 1,
-  "totalElements": 1,
-  "size": 10,
-  "number": 0,
-  "sort": {
-    "empty": false,
-    "sorted": true,
-    "unsorted": false
-  },
-  "first": true,
-  "numberOfElements": 1,
-  "empty": false
-}
+]
 ```
 
 ---

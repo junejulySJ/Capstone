@@ -18,8 +18,8 @@ public interface BoardViewRepository extends JpaRepository<BoardView, Integer> {
                                                @Param("keyword") String keyword,
                                                Pageable pageable);
 
-    Page<BoardView> findAllByUserId(String userId, Pageable pageable);
-    Page<BoardView> findByBoardNoIn(List<Integer> boardNos, Pageable pageable);
+    List<BoardView> findAllByUserIdOrderByBoardUpdateDateDesc(String userId);
+    List<BoardView> findByBoardNoIn(List<Integer> boardNos);
     Page<BoardView> findAllByBoardTitleContainingIgnoreCaseOrBoardDescriptionContainingIgnoreCase(String titleKeyword, String descriptionKeyword, Pageable pageable);
     Page<BoardView> findAllByCategoryNo(Integer categoryNo, Pageable pageable);
 }

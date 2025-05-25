@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/groups/{groupNo}/boards/{groupBoardNo}/comments")
@@ -25,20 +26,10 @@ public class GroupCommentController {
 
     // 특정 게시글 댓글 조회
     @GetMapping
-    public ResponseEntity<Page<GroupCommentResponseDto>> getComments(
-            @PathVariable Integer groupNo,
-            @PathVariable Integer groupBoardNo,
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "10") Integer size,
-            @RequestParam(defaultValue = "groupCommentWriteDate") String sortBy,
-            @RequestParam(defaultValue = "desc") String direction
-    ) {
-        Sort sort = direction.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of(page, size, sort);
-
+    public ResponseEntity<?> getComments(@PathVariable Integer groupNo, @PathVariable Integer groupBoardNo) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        return ResponseEntity.ok(groupCommentService.searchComments(groupNo, groupBoardNo, userId, pageable));
+        return ResponseEntity.ok(groupCommentService.searchComments(groupNo, groupBoardNo, userId));
     }
 
     // 그룹 게시글 댓글 등록

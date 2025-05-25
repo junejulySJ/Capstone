@@ -78,17 +78,17 @@ public class BoardService {
     }
 
     // 특정 회원의 게시글 보기
-    public Page<BoardView> searchArticlesByUser(String userId, Pageable pageable) {
-        return boardViewRepository.findAllByUserId(userId, pageable);
+    public List<BoardView> searchArticlesByUser(String userId) {
+        return boardViewRepository.findAllByUserIdOrderByBoardUpdateDateDesc(userId);
     }
 
     // 특정 회원이 좋아요한 게시글 보기
-    public Page<BoardView> searchArticlesByLiked(String userId, Pageable pageable) {
-        List<Integer> likedBoardNos = boardLikeRepository.findBoardNosByUserId(userId);
+    public List<BoardView> searchArticlesByLiked(String userId) {
+        List<Integer> likedBoardNos = boardLikeRepository.findBoardNosByUserIdOrderByBoardNoDesc(userId);
         if (likedBoardNos.isEmpty()) {
-            return Page.empty(pageable);
+            return Collections.emptyList();
         }
-        return boardViewRepository.findByBoardNoIn(likedBoardNos, pageable);
+        return boardViewRepository.findByBoardNoIn(likedBoardNos);
     }
 
     // 특정 회원이 저장(스크랩)한 게시글 보기

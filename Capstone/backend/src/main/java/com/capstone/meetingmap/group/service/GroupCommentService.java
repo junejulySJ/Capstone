@@ -18,6 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class GroupCommentService {
 
@@ -36,11 +39,11 @@ public class GroupCommentService {
     }
 
     // 댓글 보기
-    public Page<GroupCommentResponseDto> searchComments(Integer groupNo, Integer groupBoardNo, String userId, Pageable pageable) {
+    public List<GroupCommentResponseDto> searchComments(Integer groupNo, Integer groupBoardNo, String userId) {
         if (!groupMemberRepository.existsByGroup_GroupNoAndUser_UserId(groupNo, userId))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "자신이 속한 그룹의 글만 조회할 수 있습니다");
 
-        return groupCommentRepository.findAllByGroupBoard_GroupBoardNo(groupBoardNo, pageable).map(GroupCommentResponseDto::fromEntity);
+        return groupCommentRepository.findAllByGroupBoard_GroupBoardNoOrderByGroupCommentWriteDateDesc(groupBoardNo).stream().map(GroupCommentResponseDto::fromEntity).collect(Collectors.toList());
     }
 
     // 댓글 작성

@@ -202,8 +202,7 @@ axios.get(`${API_BASE_URL}/user/boards`, { withCredentials: true })
 
 #### Response 예시
 ```json
-{
-  "content": [
+[
     {
         "boardNo": 16,
         "userId": "user1",
@@ -240,33 +239,7 @@ axios.get(`${API_BASE_URL}/user/boards`, { withCredentials: true })
         "commentCount": 0,
         "userImg": "https://capstone-meetingmap.s3.eu-north-1.amazonaws.com/8c0405c9-6369-4dec-ae70-4e197217fbb4_ai-generated-9510467_640.jpg"
     }
-  ],
-    "pageable": {
-        "pageNumber": 0,
-        "pageSize": 10,
-        "sort": {
-            "empty": false,
-            "unsorted": false,
-            "sorted": true
-        },
-        "offset": 0,
-        "unpaged": false,
-        "paged": true
-    },
-    "totalPages": 1,
-    "totalElements": 9,
-    "last": true,
-    "size": 10,
-    "number": 0,
-    "sort": {
-        "empty": false,
-        "unsorted": false,
-        "sorted": true
-    },
-    "first": true,
-    "numberOfElements": 9,
-    "empty": false
-}
+]
 ```
 
 ---
@@ -280,53 +253,26 @@ axios.get(`${API_BASE_URL}/user/boards/liked`, { withCredentials: true })
 
 #### Response 예시
 ```json
-{
-    "content": [
-        {
-            "boardNo": 37,
-            "userId": "user1",
-            "userNick": "사용자1",
-            "userType": 1,
-            "userTypeName": "User",
-            "boardTitle": "test글",
-            "boardDescription": "test글입니다",
-            "boardViewCount": 3,
-            "boardWriteDate": "2025-05-20T23:21:49",
-            "boardUpdateDate": "2025-05-21T17:43:30",
-            "boardLike": 1,
-            "boardHate": 0,
-            "categoryNo": 1,
-            "categoryName": "Q&A",
-            "commentCount": 2,
-            "userImg": null
-        }
-    ],
-    "pageable": {
-        "pageNumber": 0,
-        "pageSize": 10,
-        "sort": {
-            "empty": false,
-            "sorted": true,
-            "unsorted": false
-        },
-        "offset": 0,
-        "paged": true,
-        "unpaged": false
-    },
-    "last": true,
-    "totalElements": 1,
-    "totalPages": 1,
-    "size": 10,
-    "number": 0,
-    "sort": {
-        "empty": false,
-        "sorted": true,
-        "unsorted": false
-    },
-    "numberOfElements": 1,
-    "first": true,
-    "empty": false
-}
+[
+    {
+        "boardNo": 37,
+        "userId": "user1",
+        "userNick": "사용자1",
+        "userType": 1,
+        "userTypeName": "User",
+        "boardTitle": "test글",
+        "boardDescription": "test글입니다",
+        "boardViewCount": 3,
+        "boardWriteDate": "2025-05-20T23:21:49",
+        "boardUpdateDate": "2025-05-21T17:43:30",
+        "boardLike": 1,
+        "boardHate": 0,
+        "categoryNo": 1,
+        "categoryName": "Q&A",
+        "commentCount": 2,
+        "userImg": null
+    }
+]
 ```
 
 ---

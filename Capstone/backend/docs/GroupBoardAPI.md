@@ -97,6 +97,7 @@
 
 > 해당 그룹의 특정 게시글 상세 내용을 조회합니다.  
 > 해당 그룹의 멤버만 조회할 수 있습니다.
+> 댓글 정보 조회는 [GroupComment API](GroupCommentAPI.md)에서 할 수 있습니다.
 
 ## [Example](GroupBoardAPIDetail.md#그룹-게시글-상세-조회)
 

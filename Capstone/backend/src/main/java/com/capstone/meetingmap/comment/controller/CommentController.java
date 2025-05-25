@@ -29,17 +29,8 @@ public class CommentController {
 
     // 특정 게시글 댓글 조회
     @GetMapping("/api/boards/{boardNo}/comments")
-    public ResponseEntity<Page<CommentResponseDto>> getComments(
-            @PathVariable Integer boardNo,
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "10") Integer size,
-            @RequestParam(defaultValue = "commentWriteDate") String sortBy,
-            @RequestParam(defaultValue = "desc") String direction
-    ) {
-        Sort sort = direction.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of(page, size, sort);
-
-        return ResponseEntity.ok(commentService.searchComments(boardNo, pageable));
+    public ResponseEntity<?> getComments(@PathVariable Integer boardNo) {
+        return ResponseEntity.ok(commentService.searchComments(boardNo));
     }
 
     // 댓글 작성

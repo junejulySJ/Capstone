@@ -27,98 +27,24 @@
 
 ### 특정 게시글 댓글 조회
 
-#### Request 예시 1 (전체글 조회)
+#### Request 예시
 ```javascript
 axios.get(`${API_BASE_URL}/groups/3/boards/3/comments?page=0&size=10&sortBy=groupCommentWriteDate&direction=desc`, { withCredentials: true })
 ```
 
-#### Response 예시 1 (전체글 조회)
+#### Response 예시
 ```json
-{
-    "content": [
-        {
-            "groupCommentNo": 3,
-            "userId": "user2",
-            "userNick": "사용자2",
-            "groupCommentContent": "testcomment",
-            "groupCommentWriteDate": "2025-05-24T21:44:09",
-            "userImg": null,
-            "groupBoardNo": 3
-        }
-    ],
-    "pageable": {
-        "pageNumber": 0,
-        "pageSize": 10,
-        "sort": {
-            "empty": false,
-            "sorted": true,
-            "unsorted": false
-        },
-        "offset": 0,
-        "paged": true,
-        "unpaged": false
-    },
-    "last": true,
-    "totalElements": 1,
-    "totalPages": 1,
-    "first": true,
-    "size": 10,
-    "number": 0,
-    "sort": {
-        "empty": false,
-        "sorted": true,
-        "unsorted": false
-    },
-    "numberOfElements": 1,
-    "empty": false
-}
-```
-
-#### Request 예시 2 (10개만 작성일 기준 내림차순 조회)
-```javascript
-axios.get(`${API_BASE_URL}/groups/3/boards/3/comments?page=0&size=10&sortBy=groupCommentWriteDate&direction=desc`, { withCredentials: true })
-```
-
-#### Response 예시 2 (10개만 작성일 기준 내림차순 조회)
-```json
-{
-    "content": [
-        {
-            "groupCommentNo": 3,
-            "userId": "user2",
-            "userNick": "사용자2",
-            "groupCommentContent": "testcomment",
-            "groupCommentWriteDate": "2025-05-24T21:44:09",
-            "userImg": null,
-            "groupBoardNo": 3
-        }
-    ],
-    "pageable": {
-        "pageNumber": 0,
-        "pageSize": 10,
-        "sort": {
-            "empty": false,
-            "sorted": true,
-            "unsorted": false
-        },
-        "offset": 0,
-        "paged": true,
-        "unpaged": false
-    },
-    "last": true,
-    "totalElements": 1,
-    "totalPages": 1,
-    "first": true,
-    "size": 10,
-    "number": 0,
-    "sort": {
-        "empty": false,
-        "sorted": true,
-        "unsorted": false
-    },
-    "numberOfElements": 1,
-    "empty": false
-}
+[
+    {
+        "groupCommentNo": 3,
+        "userId": "user2",
+        "userNick": "사용자2",
+        "groupCommentContent": "testcomment",
+        "groupCommentWriteDate": "2025-05-24T21:44:09",
+        "userImg": null,
+        "groupBoardNo": 3
+    }
+]
 ```
 
 ---

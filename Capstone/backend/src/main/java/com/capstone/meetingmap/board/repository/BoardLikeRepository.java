@@ -12,8 +12,8 @@ import java.util.Optional;
 public interface BoardLikeRepository extends JpaRepository<BoardLike, BoardInteractionId> {
     Optional<BoardLike> findByBoard_BoardNoAndUser_UserId(Integer boardNo, String userId);
 
-    @Query("SELECT bl.board.boardNo FROM BoardLike bl WHERE bl.user.userId = :userId")
-    List<Integer> findBoardNosByUserId(@Param("userId") String userId);
+    @Query("SELECT bl.board.boardNo FROM BoardLike bl WHERE bl.user.userId = :userId ORDER BY bl.board.boardNo DESC")
+    List<Integer> findBoardNosByUserIdOrderByBoardNoDesc(@Param("userId") String userId);
 
     void deleteByBoard_BoardNoAndUser_UserId(Integer boardNo, String userId);
 }

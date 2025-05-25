@@ -14,19 +14,19 @@
 
 # User API
 ## API 바로가기
-| API 호출                                | 설명          |
-|---------------------------------------|-------------|
-| [POST /user/check-id](#아이디-중복-검사)     | 아이디 중복 검사   |
-| [POST /user/register](#회원가입)          | 회원가입        |
-| [GET /user](#회원-정보-조회)                | 회원 정보 조회    |
-| [GET /user/list](#전체-회원-조회)           | 전체 회원 조회    |
-| [PUT /user](#회원-정보-변경)                | 회원 정보 변경 ✏️ |
-| [GET /user/boards](#작성한-글-조회)         | 작성한 글 조회    |
-| [GET /user/boards/liked](#좋아요한-글-조회)  | 좋아요한 글 조회   |
-| [GET /user/boards/scraped](#저장한-글-조회) | 저장한 글 조회 ✏️ |
-| [GET /user/groups](#속한-그룹-조회)         | 속한 그룹 조회 ✏️ |
-| [POST /user/password](#비밀번호-변경)       | 비밀번호 변경 ✏️  |
-| [DELETE /user](#회원-탈퇴)                | 회원 탈퇴 ✏️    |
+| API 호출                                | 설명           |
+|---------------------------------------|--------------|
+| [POST /user/check-id](#아이디-중복-검사)     | 아이디 중복 검사    |
+| [POST /user/register](#회원가입)          | 회원가입         |
+| [GET /user](#회원-정보-조회)                | 회원 정보 조회     |
+| [GET /user/list](#전체-회원-조회)           | 전체 회원 조회     |
+| [PUT /user](#회원-정보-변경)                | 회원 정보 변경 ✏️  |
+| [GET /user/boards](#작성한-글-조회)         | 작성한 글 조회 ✏️  |
+| [GET /user/boards/liked](#좋아요한-글-조회)  | 좋아요한 글 조회 ✏️ |
+| [GET /user/boards/scraped](#저장한-글-조회) | 저장한 글 조회 ✏️  |
+| [GET /user/groups](#속한-그룹-조회)         | 속한 그룹 조회 ✏️  |
+| [POST /user/password](#비밀번호-변경)       | 비밀번호 변경 ✏️   |
+| [DELETE /user](#회원-탈퇴)                | 회원 탈퇴 ✏️     |
 
 ---
 
@@ -173,7 +173,6 @@
 #### 응답 바디 파라미터
 | 파라미터             | 설명                  | 값 예시                     |
 |------------------|---------------------|--------------------------|
-| content          | 게시글 목록              | [{boardNo,userId,...}]   |
 | boardNo          | 게시글 번호              | 1                        |
 | userId           | 작성한 회원 ID           | "user1"                  |
 | userNick         | 작성한 회원 닉네임          | "걷는남자"                   |
@@ -190,23 +189,6 @@
 | categoryName     | 게시글 카테고리 이름         | "자유게시판"                  |
 | commentCount     | 게시글 댓글 수            | 0                        |
 | userImg          | 회원 프로필 사진 주소        | null                     |
-| pageNumber       | 페이지 번호              | 0                        |
-| pageSize         | 한 번에 출력할 개수         | 10                       |
-| sort             | 정렬 정보               | {empty,sorted,unsorted}  |
-| empty            | 정렬 기준이 빈 값인지        | false                    |
-| sorted           | 정렬이 적용되었는지          | true                     |
-| unsorted         | 정렬이 미적용되었는지         | false                    |
-| offset           | 전체 페이지 인덱스          | 0                        |
-| paged            | 페이징이 적용되었는지         | true                     |
-| unpaged          | 페이징이 미적용되었는지        | false                    |
-| last             | 마지막 페이지인지           | false                    |
-| totalElements    | 전체 데이터 수            | 14                       |
-| totalPages       | 전체 페이지 수            | 2                        |
-| first            | 처음 페이지인지            | true                     |
-| numberOfElements | 현재 페이지에 들어 있는 데이터 수 | 10                       |
-| size             | 요청한 페이지 크기          | 10                       |
-| number           | 현재 페이지 번호           | 0                        |
-| empty            | 현재 페이지가 비어있는지       | false                    |
 
 ---
 
@@ -227,7 +209,6 @@
 #### 응답 바디 파라미터
 | 파라미터             | 설명                  | 값 예시                     |
 |------------------|---------------------|--------------------------|
-| content          | 게시글 목록              | [{boardNo,userId,...}]   |
 | boardNo          | 게시글 번호              | 1                        |
 | userId           | 작성한 회원 ID           | "user1"                  |
 | userNick         | 작성한 회원 닉네임          | "걷는남자"                   |

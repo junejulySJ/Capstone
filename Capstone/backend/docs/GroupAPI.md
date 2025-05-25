@@ -14,22 +14,21 @@
 
 # Group API
 ## API 바로가기
-| API 호출                                                              | 설명                    |
-|---------------------------------------------------------------------|-----------------------|
-| [GET /groups/{groupNo}](#그룹-조회)                                     | 그룹 조회                 |
-| [GET /groups/{groupNo}/members](#그룹-멤버-조회)                          | 그룹 멤버 조회              |
-| [GET /groups/members](#소속되어있는-전체-그룹-멤버-조회)                          | 소속되어있는 전체 그룹 멤버 조회 ✏️ |
-| [POST /groups](#그룹-생성)                                              | 그룹 생성                 |
-| [PUT /groups/{groupNo}](#그룹-수정)                                     | 그룹 수정                 |
-| [DELETE /groups/{groupNo}](#그룹-삭제)                                  | 그룹 삭제                 |
-| [DELETE /groups/{groupNo}/members/{deleteUserId}](#그룹-멤버-강제-탈퇴)     | 그룹 멤버 강제 탈퇴           |
-| [POST /groups/invitations](#그룹-초대)                                  | 그룹 초대 ✏️              |
-| [GET /groups/invitations](#그룹-초대-목록-조회)                             | 그룹 초대 목록 조회           |
-| [POST /groups/invitations/{invitationNo}/{status}](#그룹-초대-수락거절)     | 그룹 초대 수락/거절           |
-| [POST /groups/{groupNo}/schedules](#그룹-내-스케줄-공유)                    | 그룹 내 스케줄 공유           |
-| [GET /groups/{groupNo}/schedules](#그룹-내-공유된-스케줄-조회)                 | 그룹 내 공유된 스케줄 조회       |
-| [GET /groups/{groupNo}/schedules/{scheduleNo}](#그룹-내-공유된-스케줄-상세-조회) | 그룹 내 공유된 스케줄 상세 조회    |
-| [DELETE /groups/{groupNo}/schedules/{scheduleNo}](#공유-스케줄-삭제)       | 공유 스케줄 삭제             |
+| API 호출                                                          | 설명                    |
+|-----------------------------------------------------------------|-----------------------|
+| [GET /groups/{groupNo}](#그룹-조회)                                 | 그룹 조회                 |
+| [GET /groups/{groupNo}/members](#그룹-멤버-조회)                      | 그룹 멤버 조회              |
+| [GET /groups/members](#소속되어있는-전체-그룹-멤버-조회)                      | 소속되어있는 전체 그룹 멤버 조회 ✏️ |
+| [POST /groups](#그룹-생성)                                          | 그룹 생성                 |
+| [PUT /groups/{groupNo}](#그룹-수정)                                 | 그룹 수정                 |
+| [DELETE /groups/{groupNo}](#그룹-삭제)                              | 그룹 삭제                 |
+| [DELETE /groups/{groupNo}/members/{deleteUserId}](#그룹-멤버-강제-탈퇴) | 그룹 멤버 강제 탈퇴           |
+| [POST /groups/invitations](#그룹-초대)                              | 그룹 초대 ✏️              |
+| [GET /groups/invitations](#그룹-초대-목록-조회)                         | 그룹 초대 목록 조회           |
+| [POST /groups/invitations/{invitationNo}/{status}](#그룹-초대-수락거절) | 그룹 초대 수락/거절           |
+| [POST /groups/{groupNo}/schedules](#그룹-내-스케줄-공유)                | 그룹 내 스케줄 공유           |
+| [GET /groups/{groupNo}/schedules](#그룹-내-공유된-스케줄-조회)             | 그룹 내 공유된 스케줄 조회 ✏️    |
+| [DELETE /groups/{groupNo}/schedules/{scheduleNo}](#공유-스케줄-삭제)   | 공유 스케줄 삭제             |
 
 ---
 
@@ -323,6 +322,7 @@
 
 **GET** `/groups/{groupNo}/schedules`
 > 그룹에 공유된 스케줄들을 조회합니다.  
+> 스케줄의 상세 정보까지 한번에 조회합니다.  
 > 그룹의 모든 멤버가 조회 가능합니다.
 
 ## [Example](GroupAPIDetail.md#그룹-내-공유된-스케줄-조회)
@@ -339,47 +339,22 @@
 | groupNo | 그룹 번호 | 2                  |
 
 #### 응답 바디 파라미터
-| 파라미터                | 설명         | 값 예시                  |
-|---------------------|------------|-----------------------|
-| scheduleNo          | 스케줄 번호     | 1                     |
-| scheduleName        | 스케줄 이름     | "스터디 회의"              |
-| scheduleAbout       | 스케줄 설명     | "다음 주 프로젝트 스터디 회의 진행" |
-| scheduleCreatedDate | 스케줄 생성 시간  | "2025-03-04T10:00:00" |
-| userId              | 스케줄 생성자 ID | "user1"               |
-
----
-
-### 그룹 내 공유된 스케줄 상세 조회
-
-**GET** `/groups/{groupNo}/schedules/{scheduleNo}`
-> 그룹에 공유된 스케줄의 상세 정보를 조회합니다.  
-> 그룹의 모든 멤버가 조회 가능합니다.
-
-## [Example](GroupAPIDetail.md#그룹-내-공유된-스케줄-상세-조회)
-
-#### 요청 쿠키
-| 쿠키          | 설명  | 값 예시            |
-|-------------|-----|-----------------|
-| accessToken | jwt | eyJhbGciOiJI... |
-- 로그인을 진행하면 자동으로 쿠키가 등록되어 보내집니다.
-
-#### 요청 경로 파라미터
-| 파라미터       | 설명     | 값 예시 |
-|------------|--------|------|
-| groupNo    | 그룹 번호  | 2    |
-| scheduleNo | 스케줄 번호 | 7    |
-
-#### 응답 바디 파라미터
-| 파라미터              | 설명         | 값 예시                  |
-|-------------------|------------|-----------------------|
-| scheduleDetailNo  | 스케줄 상세 번호  | 1                     |
-| scheduleContent   | 스케줄 내용     | "스터디 장소 도착"           |
-| scheduleAddress   | 장소 주소      | "서울특별시 마포구 와우산로 94"   |
-| latitude          | 장소 위도      | 37.550900             |
-| longitude         | 장소 경도      | 126.925300            |
-| scheduleStartTime | 스케줄 시작 시간  | "2025-03-04T13:00:00" |
-| scheduleEndTime   | 스케줄 종료 시간  | "2025-03-04T13:30:00" |
-| scheduleNo        | 포함된 스케줄 번호 | 1                     |
+| 파라미터                | 설명         | 값 예시                   |
+|---------------------|------------|------------------------|
+| scheduleNo          | 스케줄 번호     | 1                      |
+| scheduleName        | 스케줄 이름     | "스터디 회의"               |
+| scheduleAbout       | 스케줄 설명     | "다음 주 프로젝트 스터디 회의 진행"  |
+| scheduleCreatedDate | 스케줄 생성 시간  | "2025-03-04T10:00:00"  |
+| userId              | 스케줄 생성자 ID | "user1"                |
+| details             | 스케줄 상세     | {scheduleDetailNo,...} |
+| scheduleDetailNo    | 스케줄 상세 번호  | 1                      |
+| scheduleContent     | 스케줄 내용     | "스터디 장소 도착"            |
+| scheduleAddress     | 장소 주소      | "서울특별시 마포구 와우산로 94"    |
+| latitude            | 장소 위도      | 37.550900              |
+| longitude           | 장소 경도      | 126.925300             |
+| scheduleStartTime   | 스케줄 시작 시간  | "2025-03-04T13:00:00"  |
+| scheduleEndTime     | 스케줄 종료 시간  | "2025-03-04T13:30:00"  |
+| scheduleNo          | 포함된 스케줄 번호 | 1                      |
 
 ---
 

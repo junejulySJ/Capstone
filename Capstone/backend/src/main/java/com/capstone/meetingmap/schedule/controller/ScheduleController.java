@@ -26,12 +26,6 @@ public class ScheduleController {
         return scheduleService.getSchedulesByUserId(userId);
     }
 
-    // 상세 정보 조회
-    @GetMapping("/{scheduleNo}/details")
-    public List<ScheduleDetailResponseDto> getScheduleDetails(@PathVariable Integer scheduleNo) {
-        return scheduleService.getScheduleDetails(scheduleNo);
-    }
-
     // 스케줄 저장
     @PostMapping
     public ResponseEntity<?> saveSchedule(@RequestBody ScheduleSaveRequestDto request) {

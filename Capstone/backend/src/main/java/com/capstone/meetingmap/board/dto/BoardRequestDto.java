@@ -2,6 +2,7 @@ package com.capstone.meetingmap.board.dto;
 
 import com.capstone.meetingmap.board.entity.Board;
 import com.capstone.meetingmap.board.entity.Category;
+import com.capstone.meetingmap.schedule.entity.Schedule;
 import com.capstone.meetingmap.user.entity.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,14 +28,17 @@ public class BoardRequestDto {
     @NotNull(message = "카테고리가 선택되어 있어야 합니다")
     private Integer categoryNo;
 
+    private Integer scheduleNo;
+
     //dto를 엔티티로 변환
-    public Board toEntity(Category category, User user) {
+    public Board toEntity(Category category, User user, Schedule schedule) {
         return Board.builder()
                 .boardTitle(boardTitle)
                 .boardDescription(boardDescription)
                 .boardContent(boardContent)
                 .category(category)
                 .user(user)
+                .schedule(schedule)
                 .build();
     }
 }

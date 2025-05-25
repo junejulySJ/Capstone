@@ -18,8 +18,8 @@
 |---------------------------------------|--------------|
 | [POST /user/check-id](#아이디-중복-검사)     | 아이디 중복 검사    |
 | [POST /user/register](#회원가입)          | 회원가입         |
-| [GET /user](#회원-정보-조회)                | 회원 정보 조회     |
-| [GET /user/list](#전체-회원-조회)           | 전체 회원 조회     |
+| [GET /user](#회원-정보-조회)                | 회원 정보 조회 ✏️  |
+| [GET /user/list](#전체-회원-조회)           | 전체 회원 조회 ✏️  |
 | [PUT /user](#회원-정보-변경)                | 회원 정보 변경 ✏️  |
 | [GET /user/boards](#작성한-글-조회)         | 작성한 글 조회 ✏️  |
 | [GET /user/boards/liked](#좋아요한-글-조회)  | 좋아요한 글 조회 ✏️ |
@@ -90,14 +90,17 @@
 - 로그인을 진행하면 자동으로 쿠키가 등록되어 보내집니다.
 
 #### 응답 바디 파라미터
-| 파라미터        | 설명        | 값 예시                |
-|-------------|-----------|---------------------|
-| userId      | 회원 ID     | "exampleUser"       |
-| userEmail   | 회원 이메일    | "hong@example.com"  |
-| userNick    | 회원 닉네임    | "홍길동"               |
-| userImg     | 회원 프로필 사진 | "hong.png"          |
-| userAddress | 회원 주소     | "서울특별시 중구 세종대로 110" |
-| userType    | 회원 유형     | 1(일반 사용자)           |
+| 파라미터                      | 설명             | 값 예시                |
+|---------------------------|----------------|---------------------|
+| userId                    | 회원 ID          | "exampleUser"       |
+| userEmail                 | 회원 이메일         | "hong@example.com"  |
+| userNick                  | 회원 닉네임         | "홍길동"               |
+| userImg                   | 회원 프로필 사진      | "hong.png"          |
+| userAddress               | 회원 주소          | "서울특별시 중구 세종대로 110" |
+| userType                  | 회원 유형          | 1(일반 사용자)           |
+| onlyFriendsCanSeeActivity | 내 활동을 친구에게만 공개 | true                |
+| emailNotificationAgree    | 이메일 알림 수신 동의   | false               |
+| pushNotificationAgree     | 앱 푸시 알림 허용     | false               |
 
 ---
 
@@ -133,6 +136,8 @@
 **PUT** `/user`
 
 > 회원 본인의 정보를 변경합니다.
+> 프로필 사진은 첨부파일 형태로 받아서 등록할 수 있습니다.  
+> user는 Blob 객체로 받아서 type: "application/json"을 명시해주어야 합니다.
 
 ## [Example](UserAPIDetail.md#회원-정보-변경) ✏️
 

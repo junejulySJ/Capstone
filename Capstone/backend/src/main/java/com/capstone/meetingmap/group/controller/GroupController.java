@@ -2,10 +2,9 @@ package com.capstone.meetingmap.group.controller;
 
 import com.capstone.meetingmap.group.dto.*;
 import com.capstone.meetingmap.group.service.GroupService;
-import com.capstone.meetingmap.schedule.dto.ScheduleDetailResponseDto;
 import com.capstone.meetingmap.schedule.dto.ScheduleResponseDto;
 import com.capstone.meetingmap.schedule.dto.ScheduleShareRequestDto;
-import com.capstone.meetingmap.user.dto.UserResponseDto;
+import com.capstone.meetingmap.user.dto.UserMemberResponseDto;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,9 +42,9 @@ public class GroupController {
     public ResponseEntity<?> getMembers(@PathVariable Integer groupNo) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        List<UserResponseDto> userResponseDtoList = groupService.getGroupMembers(groupNo, userId);
+        List<UserMemberResponseDto> userMemberResponseDtoList = groupService.getGroupMembers(groupNo, userId);
 
-        return ResponseEntity.ok(userResponseDtoList);
+        return ResponseEntity.ok(userMemberResponseDtoList);
     }
 
     // 소속되어있는 전체 그룹 멤버 조회
@@ -148,16 +147,6 @@ public class GroupController {
         List<ScheduleResponseDto> scheduleResponseDtoList = groupService.getSharedSchedules(groupNo, userId);
 
         return ResponseEntity.ok(scheduleResponseDtoList);
-    }
-
-    // 그룹 내 공유된 스케줄 상세 조회
-    @GetMapping("/{groupNo}/schedules/{scheduleNo}")
-    public ResponseEntity<?> getSharedScheduleDetail(@PathVariable Integer groupNo, @PathVariable Integer scheduleNo) {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        List<ScheduleDetailResponseDto> scheduleDetailResponseDtoList = groupService.getSharedScheduleDetail(groupNo, scheduleNo, userId);
-
-        return ResponseEntity.ok(scheduleDetailResponseDtoList);
     }
 
     // 공유 스케줄 삭제

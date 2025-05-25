@@ -1,6 +1,7 @@
 package com.capstone.meetingmap.board.dto;
 
 import com.capstone.meetingmap.board.entity.Board;
+import com.capstone.meetingmap.schedule.dto.ScheduleResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,6 +31,7 @@ public class BoardDetailResponseDto {
     private Long boardHate;
     private Integer categoryNo;
     private String categoryName;
+    private ScheduleResponseDto schedule;
     private List<BoardFileResponseDto> boardFiles;
 
     //엔티티를 dto로 변환
@@ -50,6 +52,7 @@ public class BoardDetailResponseDto {
                 .boardHate((long) board.getHates().size())
                 .categoryNo(board.getCategory().getCategoryNo())
                 .categoryName(board.getCategory().getCategoryName())
+                .schedule(ScheduleResponseDto.fromEntity(board.getSchedule()))
                 .boardFiles(board.getBoardFiles().stream().map(BoardFileResponseDto::fromEntity).collect(Collectors.toList()))
                 .build();
     }

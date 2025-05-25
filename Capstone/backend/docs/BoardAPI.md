@@ -18,9 +18,9 @@
 |-------------------------------------------|---------------|
 | [GET /boards](#게시글-조회)                    | 게시글 조회        |
 | [GET /boards/category](#카테고리-조회)          | 카테고리 조회 ✏️    |
-| [GET /boards/{boardNo}](#게시글-상세-조회)       | 게시글 상세 조회     |
-| [POST /boards](#게시글-등록)                   | 게시글 등록        |
-| [PUT /boards/{boardNo}](#게시글-수정)          | 게시글 수정        |
+| [GET /boards/{boardNo}](#게시글-상세-조회)       | 게시글 상세 조회 ✏️  |
+| [POST /boards](#게시글-등록)                   | 게시글 등록 ✏️     |
+| [PUT /boards/{boardNo}](#게시글-수정)          | 게시글 수정 ✏️     |
 | [DELETE /boards/{boardNo}](#게시글-삭제)       | 게시글 삭제        |
 | [POST /boards/{boardNo}/like](#좋아요-토글)    | 좋아요 토글 ✏️     |
 | [POST /boards/{boardNo}/hate](#싫어요-토글)    | 싫어요 토글 ✏️     |
@@ -124,27 +124,42 @@
 | boardNo | 게시글 번호 | 37   |
 
 #### 응답 바디 파라미터
-| 파라미터             | 설명           | 값 예시                                                                                     |
-|------------------|--------------|------------------------------------------------------------------------------------------|
-| boardNo          | 게시글 번호       | 1                                                                                        |
-| userId           | 작성한 회원 ID    | "user1"                                                                                  |
-| userNick         | 작성한 회원 닉네임   | "걷는남자"                                                                                   |
-| userType         | 작성한 회원 종류    | 0(관리자), 1(일반 사용자)                                                                        |
-| userTypeName     | 작성한 회원 종류 이름 | Admin(관리자), User(일반 사용자)                                                                 |
-| boardTitle       | 게시글 제목       | "서울숲 산책 코스 추천"                                                                           |
-| boardDescription | 게시글 설명       | "조용하고 분위기 있어서 좋았어요."                                                                     |
-| boardContent     | 게시글 내용       | "데이트할 때 뭔가 특별한 걸 하고 싶지 않을 때, 서울숲 산책이 최고인 것 같아요. 조용하고 공원도 넓고, 근처에 카페랑 식당도 많아서 코스 짜기 좋아요." |
-| boardViewCount   | 게시글 조회수      | 1                                                                                        |
-| boardWriteDate   | 게시글 작성일      | "2025-05-09T23:21:49"                                                                    |
-| boardUpdateDate  | 게시글 수정일      | "2025-05-09T23:51:40"                                                                    |
-| boardLike        | 게시글 좋아요 수    | 0                                                                                        |
-| boardHate        | 게시글 싫어요 수    | 0                                                                                        |
-| categoryNo       | 게시글 카테고리 번호  | 1                                                                                        |
-| categoryName     | 게시글 카테고리 이름  | "자유게시판"                                                                                  |
-| boardFiles       | 게시글 첨부파일들    | [{fileNo,fileName,fileUrl},...]                                                          |
-| fileNo           | 파일 번호        | 1                                                                                        |
-| fileName         | 파일명          | "Seoul_Forest_서울숲.jpg"                                                                   |
-| fileUrl          | 파일 주소        | "/uploads/53220240-9d46-42bb-b325-b9b0342b7f26_Seoul_Forest_서울숲.jpg"                     |
+| 파라미터                | 설명           | 값 예시                                                                                     |
+|---------------------|--------------|------------------------------------------------------------------------------------------|
+| boardNo             | 게시글 번호       | 1                                                                                        |
+| userId              | 작성한 회원 ID    | "user1"                                                                                  |
+| userNick            | 작성한 회원 닉네임   | "걷는남자"                                                                                   |
+| userType            | 작성한 회원 종류    | 0(관리자), 1(일반 사용자)                                                                        |
+| userTypeName        | 작성한 회원 종류 이름 | Admin(관리자), User(일반 사용자)                                                                 |
+| boardTitle          | 게시글 제목       | "서울숲 산책 코스 추천"                                                                           |
+| boardDescription    | 게시글 설명       | "조용하고 분위기 있어서 좋았어요."                                                                     |
+| boardContent        | 게시글 내용       | "데이트할 때 뭔가 특별한 걸 하고 싶지 않을 때, 서울숲 산책이 최고인 것 같아요. 조용하고 공원도 넓고, 근처에 카페랑 식당도 많아서 코스 짜기 좋아요." |
+| boardViewCount      | 게시글 조회수      | 1                                                                                        |
+| boardWriteDate      | 게시글 작성일      | "2025-05-09T23:21:49"                                                                    |
+| boardUpdateDate     | 게시글 수정일      | "2025-05-09T23:51:40"                                                                    |
+| boardLike           | 게시글 좋아요 수    | 0                                                                                        |
+| boardHate           | 게시글 싫어요 수    | 0                                                                                        |
+| categoryNo          | 게시글 카테고리 번호  | 1                                                                                        |
+| categoryName        | 게시글 카테고리 이름  | "자유게시판"                                                                                  |
+| schedule            | 스케줄          | {scheduleNo, scheduleAbout, ...}                                                         |
+| scheduleNo          | 스케줄 번호       | 1                                                                                        |
+| scheduleName        | 스케줄 이름       | "스터디 회의"                                                                                 |
+| scheduleAbout       | 스케줄 설명       | "다음 주 프로젝트 스터디 회의 진행"                                                                    |
+| scheduleCreatedDate | 스케줄 생성 시간    | "2025-03-04T10:00:00"                                                                    |
+| userId              | 스케줄 생성자 ID   | "user1"                                                                                  |
+| details             | 스케줄 상세       | {scheduleDetailNo,...}                                                                   |
+| scheduleDetailNo    | 스케줄 상세 번호    | 1                                                                                        |
+| scheduleContent     | 스케줄 내용       | "스터디 장소 도착"                                                                              |
+| scheduleAddress     | 장소 주소        | "서울특별시 마포구 와우산로 94"                                                                      |
+| latitude            | 장소 위도        | 37.550900                                                                                |
+| longitude           | 장소 경도        | 126.925300                                                                               |
+| scheduleStartTime   | 스케줄 시작 시간    | "2025-03-04T13:00:00"                                                                    |
+| scheduleEndTime     | 스케줄 종료 시간    | "2025-03-04T13:30:00"                                                                    |
+| scheduleNo          | 포함된 스케줄 번호   | 1                                                                                        |
+| boardFiles          | 게시글 첨부파일들    | [{fileNo,fileName,fileUrl},...]                                                          |
+| fileNo              | 파일 번호        | 1                                                                                        |
+| fileName            | 파일명          | "Seoul_Forest_서울숲.jpg"                                                                   |
+| fileUrl             | 파일 주소        | "/uploads/53220240-9d46-42bb-b325-b9b0342b7f26_Seoul_Forest_서울숲.jpg"                     |
 
 ---
 
@@ -153,6 +168,7 @@
 **POST** `/boards`
 
 > 게시글을 등록합니다.  
+> 회원 본인이 만든 스케줄도 등록할 수 있습니다.  
 > 파일은 첨부파일 형태로 받아서 등록할 수 있습니다.  
 > json은 Blob 객체로 받아서 type: "application/json"을 명시해주어야 합니다.
 
@@ -172,6 +188,7 @@
 | boardDescription | 게시글 설명      | "조용하고 분위기 있어서 좋았어요."                                                                     |
 | boardContent     | 게시글 내용      | "데이트할 때 뭔가 특별한 걸 하고 싶지 않을 때, 서울숲 산책이 최고인 것 같아요. 조용하고 공원도 넓고, 근처에 카페랑 식당도 많아서 코스 짜기 좋아요." |
 | categoryNo       | 게시글 카테고리 번호 | 1                                                                                        |
+| scheduleNo       | 스케줄 번호      | 7                                                                                        |
 | files            | 파일          | 파일                                                                                       |
 
 #### 응답 헤더
@@ -185,7 +202,8 @@
 
 **PUT** `/boards/{boardNo}`
 > 게시글을 수정합니다.  
-> 삭제할 파일이 있다면 deleteFileNos에 리스트로 넣어서 보내면 됩니다.  
+> 삭제할 파일이 있다면 deleteFileNos에 파일 번호를 리스트로 넣어서 보내면 됩니다.  
+> files에 파일을 넣으면 새롭게 파일이 업로드되니 기존 파일을 그대로 유지하려면 files는 비어있어야 합니다.  
 > json은 Blob 객체로 받아서 type: "application/json"을 명시해주어야 합니다.
 
 ## [Example](BoardAPIDetail.md#게시글-수정)
@@ -205,6 +223,7 @@
 | boardDescription | 게시글 설명      | "조용하고 분위기 있어서 좋았어요."                                                                     |
 | boardContent     | 게시글 내용      | "데이트할 때 뭔가 특별한 걸 하고 싶지 않을 때, 서울숲 산책이 최고인 것 같아요. 조용하고 공원도 넓고, 근처에 카페랑 식당도 많아서 코스 짜기 좋아요." |
 | categoryNo       | 게시글 카테고리 번호 | 1                                                                                        |
+| scheduleNo       | 스케줄 번호      | 7                                                                                        |
 | files            | 파일          | 파일                                                                                       |
 | deleteFileNos    | 삭제할 파일 번호들  | 1                                                                                        |
 

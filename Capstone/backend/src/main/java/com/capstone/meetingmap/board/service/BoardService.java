@@ -7,6 +7,8 @@ import com.capstone.meetingmap.board.entity.*;
 import com.capstone.meetingmap.board.repository.*;
 import com.capstone.meetingmap.board.dto.CategoryResponseDto;
 import com.capstone.meetingmap.comment.repository.CommentRepository;
+import com.capstone.meetingmap.schedule.entity.Schedule;
+import com.capstone.meetingmap.schedule.repository.ScheduleRepository;
 import com.capstone.meetingmap.user.entity.User;
 import com.capstone.meetingmap.user.repository.UserRepository;
 import org.springframework.data.domain.Page;
@@ -34,8 +36,9 @@ public class BoardService {
     private final BoardFileRepository boardFileRepository;
     private final BoardLikeRepository boardLikeRepository;
     private final BoardScrapRepository boardScrapRepository;
+    private final ScheduleRepository scheduleRepository;
 
-    public BoardService(CategoryRepository categoryRepository, BoardRepository boardRepository, UserRepository userRepository, BoardViewRepository boardViewRepository, CommentRepository commentRepository, BoardFileService boardFileService, BoardFileRepository boardFileRepository, BoardLikeRepository boardLikeRepository, BoardScrapRepository boardScrapRepository) {
+    public BoardService(CategoryRepository categoryRepository, BoardRepository boardRepository, UserRepository userRepository, BoardViewRepository boardViewRepository, CommentRepository commentRepository, BoardFileService boardFileService, BoardFileRepository boardFileRepository, BoardLikeRepository boardLikeRepository, BoardScrapRepository boardScrapRepository, ScheduleRepository scheduleRepository) {
         this.categoryRepository = categoryRepository;
         this.boardRepository = boardRepository;
         this.userRepository = userRepository;
@@ -45,6 +48,7 @@ public class BoardService {
         this.boardFileRepository = boardFileRepository;
         this.boardLikeRepository = boardLikeRepository;
         this.boardScrapRepository = boardScrapRepository;
+        this.scheduleRepository = scheduleRepository;
     }
 
     // 게시글 보기
@@ -127,7 +131,15 @@ public class BoardService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
 
-        Board board = boardRepository.save(boardRequestDto.toEntity(category, user));
+        Schedule schedule = null;
+
+        if (boardRequestDto.getScheduleNo() != null) {
+            // 실제 존재하는 스케줄 가져오기
+            schedule = scheduleRepository.findById(boardRequestDto.getScheduleNo())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "스케줄 정보를 찾을 수 없습니다"));
+        }
+
+        Board board = boardRepository.save(boardRequestDto.toEntity(category, user, schedule));
 
         try {
             boardFileService.saveFiles(board, files);
@@ -145,11 +157,19 @@ public class BoardService {
         Category category = categoryRepository.findById(boardRequestDto.getCategoryNo())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 카테고리가 존재하지 않습니다"));
 
+        Schedule schedule = null;
+
+        if (boardRequestDto.getScheduleNo() != null) {
+            // 실제 존재하는 스케줄 가져오기
+            schedule = scheduleRepository.findById(boardRequestDto.getScheduleNo())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "스케줄 정보를 찾을 수 없습니다"));
+        }
+
         // 수정하려는 게시글 가져오기(해당 게시글의 작성자여야만 함)
         Board board = boardRepository.findByBoardNoAndUser_UserId(boardNo, userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 게시글을 찾을 수 없거나 수정 권한이 없습니다"));
 
-        board.setBoardWithoutBoardNo(boardRequestDto, category);
+        board.setBoardWithoutBoardNo(boardRequestDto, category, schedule);
 
         // 기존 파일 삭제
         if (deleteFileNos != null && !deleteFileNos.isEmpty()) {

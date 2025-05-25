@@ -17,7 +17,6 @@
 | API 호출                                                 | 설명             |
 |--------------------------------------------------------|----------------|
 | [GET /schedules](#자신이-만든-스케줄-조회)                       | 자신이 만든 스케줄 조회  |
-| [GET /schedules/{scheduleNo}/details](#스케줄-상세-정보-조회)   | 스케줄 상세 정보 조회   |
 | [GET /schedules/{scheduleNo}/members](#스케줄에-참여한-회원-조회) | 스케줄에 참여한 회원 조회 |
 | [POST /schedule/create](#스케줄-생성)                       | 스케줄 생성         |
 | [POST /schedules](#스케줄-저장)                             | 스케줄 저장         |
@@ -32,12 +31,12 @@
 
 ### 자신이 만든 스케줄 조회
 
-#### Request 예시 1
+#### Request 예시
 ```javascript
 axios.get(`${API_BASE_URL}/schedules`, { withCredentials: true })
 ```
 
-#### Response 예시 1
+#### Response 예시
 ```json
 [
   {
@@ -45,42 +44,29 @@ axios.get(`${API_BASE_URL}/schedules`, { withCredentials: true })
     "scheduleName": "스터디 회의",
     "scheduleAbout": "다음 주 프로젝트 스터디 회의 진행",
     "scheduleCreatedDate": "2025-03-04T10:00:00",
-    "userId": "user1"
-  }
-]
-```
-
----
-
-### 스케줄 상세 정보 조회
-
-#### Request 예시 1
-```javascript
-axios.get(`${API_BASE_URL}/schedules/1/details`, { withCredentials: true })
-```
-
-#### Response 예시 1
-```json
-[
-  {
-    "scheduleDetailNo": 1,
-    "scheduleContent": "스터디 장소 도착",
-    "scheduleAddress": "서울특별시 마포구 와우산로 94",
-    "latitude": 37.550900,
-    "longitude": 126.925300,
-    "scheduleStartTime": "2025-03-04T13:00:00",
-    "scheduleEndTime": "2025-03-04T13:30:00",
-    "scheduleNo": 1
-  },
-  {
-    "scheduleDetailNo": 2,
-    "scheduleContent": "팀 회의 시작",
-    "scheduleAddress": "홍대입구역 근처 카페",
-    "latitude": 37.550400,
-    "longitude": 126.926000,
-    "scheduleStartTime": "2025-03-04T13:30:00",
-    "scheduleEndTime": "2025-03-04T15:00:00",
-    "scheduleNo": 1
+    "userId": "user1",
+    "details": [
+      {
+        "scheduleDetailNo": 1,
+        "scheduleContent": "스터디 장소 도착",
+        "scheduleAddress": "서울특별시 마포구 와우산로 94",
+        "latitude": 37.550900,
+        "longitude": 126.925300,
+        "scheduleStartTime": "2025-03-04T13:00:00",
+        "scheduleEndTime": "2025-03-04T13:30:00",
+        "scheduleNo": 1
+      },
+      {
+        "scheduleDetailNo": 2,
+        "scheduleContent": "팀 회의 시작",
+        "scheduleAddress": "홍대입구역 근처 카페",
+        "latitude": 37.550400,
+        "longitude": 126.926000,
+        "scheduleStartTime": "2025-03-04T13:30:00",
+        "scheduleEndTime": "2025-03-04T15:00:00",
+        "scheduleNo": 1
+      }
+    ]
   }
 ]
 ```
@@ -89,12 +75,12 @@ axios.get(`${API_BASE_URL}/schedules/1/details`, { withCredentials: true })
 
 ### 스케줄에 참여한 회원 조회
 
-#### Request 예시 1
+#### Request 예시
 ```javascript
 axios.get(`${API_BASE_URL}/api/schedules/1/members`)
 ```
 
-#### Response 예시 1
+#### Response 예시
 ```json
 [
   {

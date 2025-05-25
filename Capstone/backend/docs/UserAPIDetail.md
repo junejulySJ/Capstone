@@ -91,7 +91,10 @@ axios.get(`${API_BASE_URL}/user`, { withCredentials: true })
   "userNick": "홍길동",
   "userImg": "hong.png",
   "userAddress": "서울특별시 중구 세종대로 110",
-  "userType": 1
+  "userType": 1,
+  "onlyFriendsCanSeeActivity": false,
+  "emailNotificationAgree": false,
+  "pushNotificationAgree": false
 }
 ```
 
@@ -113,7 +116,10 @@ axios.get(`${API_BASE_URL}/user`, { withCredentials: true })
     "userNick": "홍길동",
     "userImg": "hong.png",
     "userAddress": "서울특별시 중구 세종대로 110",
-    "userType": 1
+    "userType": 1,
+    "onlyFriendsCanSeeActivity": false,
+    "emailNotificationAgree": false,
+    "pushNotificationAgree": false
   },
   {
     "userId": "exampleUser2",
@@ -121,7 +127,10 @@ axios.get(`${API_BASE_URL}/user`, { withCredentials: true })
     "userNick": "이순신",
     "userImg": "lee.png",
     "userAddress": "서울특별시 종로구 세종대로 172",
-    "userType": 0
+    "userType": 0,
+    "onlyFriendsCanSeeActivity": false,
+    "emailNotificationAgree": false,
+    "pushNotificationAgree": false
   }
 ]
 ```

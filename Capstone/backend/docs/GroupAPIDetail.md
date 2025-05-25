@@ -27,7 +27,6 @@
 | [POST /groups/invitations/{invitationNo}/{status}](#그룹-초대-수락거절)     | 그룹 초대 수락/거절        |
 | [POST /groups/{groupNo}/schedules](#그룹-내-스케줄-공유)                    | 그룹 내 스케줄 공유        |
 | [GET /groups/{groupNo}/schedules](#그룹-내-공유된-스케줄-조회)                 | 그룹 내 공유된 스케줄 조회    |
-| [GET /groups/{groupNo}/schedules/{scheduleNo}](#그룹-내-공유된-스케줄-상세-조회) | 그룹 내 공유된 스케줄 상세 조회 |
 | [DELETE /groups/{groupNo}/schedules/{scheduleNo}](#공유-스케줄-삭제)       | 공유 스케줄 삭제          |
 
 ---
@@ -242,53 +241,40 @@ axios.get(`${API_BASE_URL}/groups/2/schedules`, { withCredentials: true })
         "scheduleName": "test",
         "scheduleAbout": "testabout",
         "scheduleCreatedDate": "2025-05-10T22:25:11",
-        "userId": "user1"
+        "userId": "user1",
+        "details": [
+          {
+            "scheduleDetailNo": 20,
+            "scheduleContent": "일상비일상의틈 방문",
+            "scheduleAddress": "서울특별시 강남구 강남대로 426 (역삼동) ",
+            "latitude": 37.500641,
+            "longitude": 127.026785,
+            "scheduleStartTime": "2025-05-07T10:00:00",
+            "scheduleEndTime": "2025-05-07T11:00:00",
+            "scheduleNo": 7
+          },
+          {
+            "scheduleDetailNo": 21,
+            "scheduleContent": "메가박스 코엑스 방문",
+            "scheduleAddress": "대한민국 서울특별시 강남구 봉은사로 524",
+            "latitude": 37.512657,
+            "longitude": 127.058652,
+            "scheduleStartTime": "2025-05-07T11:47:00",
+            "scheduleEndTime": "2025-05-07T12:47:00",
+            "scheduleNo": 7
+          },
+          {
+            "scheduleDetailNo": 22,
+            "scheduleContent": "우텐더 방문",
+            "scheduleAddress": "서울특별시 강남구 압구정로42길 25-10 1~2층",
+            "latitude": 37.527049,
+            "longitude": 127.035809,
+            "scheduleStartTime": "2025-05-07T13:26:00",
+            "scheduleEndTime": "2025-05-07T14:26:00",
+            "scheduleNo": 7
+          }
+        ]
     }
-]
-```
-
----
-
-### 그룹 내 공유된 스케줄 상세 조회
-
-#### Request 예시
-```javascript
-axios.get(`${API_BASE_URL}/groups/2/schedules/7`, { withCredentials: true })
-```
-
-#### Response 예시
-```json
-[
-  {
-    "scheduleDetailNo": 20,
-    "scheduleContent": "일상비일상의틈 방문",
-    "scheduleAddress": "서울특별시 강남구 강남대로 426 (역삼동) ",
-    "latitude": 37.500641,
-    "longitude": 127.026785,
-    "scheduleStartTime": "2025-05-07T10:00:00",
-    "scheduleEndTime": "2025-05-07T11:00:00",
-    "scheduleNo": 7
-  },
-  {
-    "scheduleDetailNo": 21,
-    "scheduleContent": "메가박스 코엑스 방문",
-    "scheduleAddress": "대한민국 서울특별시 강남구 봉은사로 524",
-    "latitude": 37.512657,
-    "longitude": 127.058652,
-    "scheduleStartTime": "2025-05-07T11:47:00",
-    "scheduleEndTime": "2025-05-07T12:47:00",
-    "scheduleNo": 7
-  },
-  {
-    "scheduleDetailNo": 22,
-    "scheduleContent": "우텐더 방문",
-    "scheduleAddress": "서울특별시 강남구 압구정로42길 25-10 1~2층",
-    "latitude": 37.527049,
-    "longitude": 127.035809,
-    "scheduleStartTime": "2025-05-07T13:26:00",
-    "scheduleEndTime": "2025-05-07T14:26:00",
-    "scheduleNo": 7
-  }
 ]
 ```
 

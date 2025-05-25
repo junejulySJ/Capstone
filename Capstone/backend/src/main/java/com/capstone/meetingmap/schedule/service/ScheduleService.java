@@ -61,16 +61,6 @@ public class ScheduleService {
         return scheduleList.stream().map(ScheduleResponseDto::fromEntity).collect(Collectors.toList());
     }
 
-    // 스케줄 세부 정보 가져오기
-    public List<ScheduleDetailResponseDto> getScheduleDetails(Integer scheduleNo) {
-        List<ScheduleDetail> scheduleDetails = scheduleDetailRepository.findBySchedule_ScheduleNo(scheduleNo);
-        List<ScheduleDetailResponseDto> responseDtoList = new ArrayList<>();
-        for (ScheduleDetail scheduleDetail : scheduleDetails) {
-            responseDtoList.add(ScheduleDetailResponseDto.fromEntity(scheduleDetail));
-        }
-        return responseDtoList;
-    }
-
     // 세부 스케줄과 함께 스케줄 추가
     @Transactional
     public Integer saveScheduleWithDetails(String userId, ScheduleSaveRequestDto scheduleSaveRequestDto) {

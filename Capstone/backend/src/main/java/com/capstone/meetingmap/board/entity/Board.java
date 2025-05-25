@@ -1,6 +1,7 @@
 package com.capstone.meetingmap.board.entity;
 
 import com.capstone.meetingmap.board.dto.BoardRequestDto;
+import com.capstone.meetingmap.schedule.entity.Schedule;
 import com.capstone.meetingmap.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -35,6 +36,10 @@ public class Board extends BoardTime {
     @JoinColumn(name = "category_no", nullable = false) //카테고리 번호 외래키
     private Category category;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "schedule_no")
+    private Schedule schedule;
+
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BoardLike> likes;
 
@@ -45,12 +50,13 @@ public class Board extends BoardTime {
     private List<BoardFile> boardFiles = new ArrayList<>();
 
     @Builder
-    public Board(String boardTitle, String boardDescription, String boardContent, User user, Category category, List<BoardLike> likes, List<BoardHate> hates) {
+    public Board(String boardTitle, String boardDescription, String boardContent, User user, Category category, Schedule schedule, List<BoardLike> likes, List<BoardHate> hates) {
         this.boardTitle = boardTitle;
         this.boardDescription = boardDescription;
         this.boardContent = boardContent;
         this.user = user;
         this.category = category;
+        this.schedule = schedule;
         this.likes = likes;
         this.hates = hates;
     }
@@ -59,10 +65,11 @@ public class Board extends BoardTime {
         this.boardViewCount += 1;
     }
 
-    public void setBoardWithoutBoardNo(BoardRequestDto boardRequestDto, Category category) {
+    public void setBoardWithoutBoardNo(BoardRequestDto boardRequestDto, Category category, Schedule schedule) {
         this.boardTitle = boardRequestDto.getBoardTitle();
         this.boardDescription = boardRequestDto.getBoardDescription();
         this.boardContent = boardRequestDto.getBoardContent();
         this.category = category;
+        this.schedule = schedule;
     }
 }

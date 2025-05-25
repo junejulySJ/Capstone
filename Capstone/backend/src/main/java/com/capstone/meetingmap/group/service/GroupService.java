@@ -8,13 +8,11 @@ import com.capstone.meetingmap.group.repository.GroupInvitationRepository;
 import com.capstone.meetingmap.group.repository.GroupMemberRepository;
 import com.capstone.meetingmap.group.repository.GroupRepository;
 import com.capstone.meetingmap.group.repository.GroupScheduleRepository;
-import com.capstone.meetingmap.schedule.dto.ScheduleDetailResponseDto;
 import com.capstone.meetingmap.schedule.dto.ScheduleResponseDto;
 import com.capstone.meetingmap.schedule.dto.ScheduleShareRequestDto;
 import com.capstone.meetingmap.schedule.entity.Schedule;
-import com.capstone.meetingmap.schedule.entity.ScheduleDetail;
 import com.capstone.meetingmap.schedule.repository.ScheduleRepository;
-import com.capstone.meetingmap.user.dto.UserResponseDto;
+import com.capstone.meetingmap.user.dto.UserMemberResponseDto;
 import com.capstone.meetingmap.user.entity.User;
 import com.capstone.meetingmap.user.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -66,7 +64,7 @@ public class GroupService {
     }
 
     // 그룹 멤버 조회
-    public List<UserResponseDto> getGroupMembers(Integer groupNo, String userId) {
+    public List<UserMemberResponseDto> getGroupMembers(Integer groupNo, String userId) {
         // 자신이 속한 group만 조회 가능
         if (!groupMemberRepository.existsByGroup_GroupNoAndUser_UserId(groupNo, userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "자신이 속한 그룹만 조회 가능합니다");
@@ -75,7 +73,7 @@ public class GroupService {
         List<GroupMember> groupMemberList = groupMemberRepository.findByGroup_GroupNo(groupNo);
 
         return groupMemberList.stream()
-                .map(groupMember -> UserResponseDto.fromEntity(groupMember.getUser()))
+                .map(groupMember -> UserMemberResponseDto.fromEntity(groupMember.getUser()))
                 .collect(Collectors.toList());
     }
 
@@ -239,16 +237,6 @@ public class GroupService {
         List<Schedule> scheduleList = groupScheduleRepository.findSchedulesByGroup_GroupNo(groupNo);
 
         return scheduleList.stream().map(ScheduleResponseDto::fromEntity).collect(Collectors.toList());
-    }
-
-    // 그룹 내 공유된 스케줄 상세 조회
-    public List<ScheduleDetailResponseDto> getSharedScheduleDetail(Integer groupNo, Integer scheduleNo, String userId) {
-        if (!groupMemberRepository.existsByGroup_GroupNoAndUser_UserId(groupNo, userId))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "자신이 속한 그룹만 스케줄 조회가 가능합니다");
-
-        List<ScheduleDetail> scheduleDetailList = groupScheduleRepository.findScheduleDetailsByGroup_GroupNoAndSchedule_ScheduleNo(groupNo, scheduleNo);
-
-        return scheduleDetailList.stream().map(ScheduleDetailResponseDto::fromEntity).collect(Collectors.toList());
     }
 
     // 그룹 내 스케줄 삭제

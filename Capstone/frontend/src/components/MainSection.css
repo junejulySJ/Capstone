@@ -60,7 +60,6 @@
   border-radius: 16px;
   text-align: center;
   z-index: 2; /* 배경보다 위 */
-  color: white; /* 배경 대비 텍스트 가독성 확보 */
 }
 
 .subtitle {

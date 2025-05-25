@@ -18,11 +18,12 @@ public interface BoardScrapRepository extends JpaRepository<BoardScrap, Integer>
     @Query("""
         SELECT new com.capstone.meetingmap.board.dto.BoardScrapView(
             bs.scrapNo, b.boardNo, b.user.userId, b.user.userNick, b.user.userRole.userType, b.user.userRole.userTypeName,
-                b.boardTitle, b.boardDescription, b.boardViewCount, b.boardWriteDate, b.boardUpdateDate,
-                    (SELECT COUNT(l) + 0L FROM BoardLike l WHERE l.board.boardNo = b.boardNo),
-                        (SELECT COUNT(h) + 0L FROM BoardHate h WHERE h.board.boardNo = b.boardNo), b.category.categoryNo, b.category.categoryName,
-                           (SELECT COUNT(c) + 0L FROM Comment c WHERE c.board.boardNo = b.boardNo),
-                               b.user.userImg
+            b.boardTitle, b.boardDescription, b.boardViewCount, b.boardWriteDate, b.boardUpdateDate,
+            (SELECT COUNT(l) + 0L FROM BoardLike l WHERE l.board.boardNo = b.boardNo),
+            (SELECT COUNT(h) + 0L FROM BoardHate h WHERE h.board.boardNo = b.boardNo),
+            b.category.categoryNo, b.category.categoryName,
+            (SELECT COUNT(c) + 0L FROM Comment c WHERE c.board.boardNo = b.boardNo),
+            b.user.userImg
         )
         FROM BoardScrap bs
         JOIN bs.board b

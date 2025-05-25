@@ -219,7 +219,8 @@ axios.get(`${API_BASE_URL}/user/boards`, { withCredentials: true })
         "categoryNo": 2,
         "categoryName": "자유",
         "commentCount": 0,
-        "userImg": "https://capstone-meetingmap.s3.eu-north-1.amazonaws.com/8c0405c9-6369-4dec-ae70-4e197217fbb4_ai-generated-9510467_640.jpg"
+        "userImg": "https://capstone-meetingmap.s3.eu-north-1.amazonaws.com/8c0405c9-6369-4dec-ae70-4e197217fbb4_ai-generated-9510467_640.jpg",
+        "thumbnailUrl": null
     },
     {
         "boardNo": 6,
@@ -237,7 +238,8 @@ axios.get(`${API_BASE_URL}/user/boards`, { withCredentials: true })
         "categoryNo": 1,
         "categoryName": "Q&A",
         "commentCount": 0,
-        "userImg": "https://capstone-meetingmap.s3.eu-north-1.amazonaws.com/8c0405c9-6369-4dec-ae70-4e197217fbb4_ai-generated-9510467_640.jpg"
+        "userImg": "https://capstone-meetingmap.s3.eu-north-1.amazonaws.com/8c0405c9-6369-4dec-ae70-4e197217fbb4_ai-generated-9510467_640.jpg", 
+        "thumbnailUrl": null
     }
 ]
 ```
@@ -270,7 +272,8 @@ axios.get(`${API_BASE_URL}/user/boards/liked`, { withCredentials: true })
         "categoryNo": 1,
         "categoryName": "Q&A",
         "commentCount": 2,
-        "userImg": null
+        "userImg": "https://capstone-meetingmap.s3.eu-north-1.amazonaws.com/8c0405c9-6369-4dec-ae70-4e197217fbb4_ai-generated-9510467_640.jpg", 
+        "thumbnailUrl": "https://capstone-meetingmap.s3.eu-north-1.amazonaws.com/8cfed205-448c-49a0-baf2-486a0bc008ae_Seoul_Forest_서울숲.jpg"
     }
 ]
 ```
@@ -304,7 +307,8 @@ axios.get(`${API_BASE_URL}/user/boards/scraped`, { withCredentials: true })
     "categoryNo": 1,
     "categoryName": "Q&A",
     "commentCount": 2,
-    "userImg": "https://capstone-meetingmap.s3.eu-north-1.amazonaws.com/8c0405c9-6369-4dec-ae70-4e197217fbb4_ai-generated-9510467_640.jpg"
+    "userImg": "https://capstone-meetingmap.s3.eu-north-1.amazonaws.com/8c0405c9-6369-4dec-ae70-4e197217fbb4_ai-generated-9510467_640.jpg",
+    "thumbnailUrl": "https://capstone-meetingmap.s3.eu-north-1.amazonaws.com/8cfed205-448c-49a0-baf2-486a0bc008ae_Seoul_Forest_서울숲.jpg"
   }
 ]
 ```

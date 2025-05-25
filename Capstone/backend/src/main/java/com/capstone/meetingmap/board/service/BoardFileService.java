@@ -1,5 +1,6 @@
 package com.capstone.meetingmap.board.service;
 
+import com.capstone.meetingmap.api.amazon.service.S3Service;
 import com.capstone.meetingmap.board.entity.Board;
 import com.capstone.meetingmap.board.entity.BoardFile;
 import com.capstone.meetingmap.board.repository.BoardFileRepository;
@@ -8,19 +9,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class BoardFileService {
     private final BoardFileRepository boardFileRepository;
+    private final S3Service s3Service;
 
-    public BoardFileService(BoardFileRepository boardFileRepository) {
+    public BoardFileService(BoardFileRepository boardFileRepository, S3Service s3Service) {
         this.boardFileRepository = boardFileRepository;
+        this.s3Service = s3Service;
     }
 
     @Transactional
@@ -28,11 +27,7 @@ public class BoardFileService {
         List<BoardFile> savedFiles = new ArrayList<>();
         for (MultipartFile file : files) {
             // 파일 저장 로직
-            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            String fileUrl = "/uploads/" + fileName; // 서버 로컬 디스크에 업로드
-            Path path = Paths.get("uploads/" + fileName);
-            Files.createDirectories(path.getParent());
-            Files.write(path, file.getBytes());
+            String fileUrl = s3Service.upload(file);
 
             BoardFile boardFile = BoardFile.builder()
                     .fileName(file.getOriginalFilename())
@@ -48,6 +43,7 @@ public class BoardFileService {
     @Transactional
     public void deleteFiles(Integer boardNo) {
         List<BoardFile> files = boardFileRepository.findAllByBoard_BoardNo(boardNo);
+        //s3Service.deleteFile(file.getFileUrl()); // S3에서 실제 삭제
         boardFileRepository.deleteAll(files);
     }
 }

@@ -57,7 +57,8 @@ axios.get(`${API_BASE_URL}/boards`)
             "categoryNo": 2,
             "categoryName": "자유",
             "commentCount": 0,
-            "userImg": null
+            "userImg": null,
+            "thumbnailUrl": null
         },
         {
             "boardNo": 15,
@@ -75,7 +76,8 @@ axios.get(`${API_BASE_URL}/boards`)
             "categoryNo": 2,
             "categoryName": "자유",
             "commentCount": 0,
-            "userImg": null
+            "userImg": null,
+            "thumbnailUrl": null
         },
         {
             "boardNo": 14,
@@ -93,7 +95,8 @@ axios.get(`${API_BASE_URL}/boards`)
             "categoryNo": 2,
             "categoryName": "자유",
             "commentCount": 0,
-            "userImg": null
+            "userImg": null,
+            "thumbnailUrl": null
         },
         {
             "boardNo": 13,
@@ -111,7 +114,8 @@ axios.get(`${API_BASE_URL}/boards`)
             "categoryNo": 1,
             "categoryName": "Q&A",
             "commentCount": 0,
-            "userImg": null
+            "userImg": null,
+            "thumbnailUrl": null
         },
         {
             "boardNo": 12,
@@ -129,7 +133,8 @@ axios.get(`${API_BASE_URL}/boards`)
             "categoryNo": 1,
             "categoryName": "Q&A",
             "commentCount": 0,
-            "userImg": null
+            "userImg": null,
+            "thumbnailUrl": null
         },
         {
             "boardNo": 11,
@@ -147,12 +152,13 @@ axios.get(`${API_BASE_URL}/boards`)
             "categoryNo": 1,
             "categoryName": "Q&A",
             "commentCount": 0,
-            "userImg": null
+            "userImg": null,
+            "thumbnailUrl": null
         }
     ],
     "pageable": {
         "pageNumber": 0,
-        "pageSize": 10,
+        "pageSize": 100,
         "sort": {
             "empty": false,
             "sorted": true,
@@ -165,7 +171,7 @@ axios.get(`${API_BASE_URL}/boards`)
     "last": false,
     "totalPages": 1,
     "totalElements": 6,
-    "size": 10,
+    "size": 100,
     "number": 0,
     "sort": {
         "empty": false,
@@ -173,7 +179,7 @@ axios.get(`${API_BASE_URL}/boards`)
         "unsorted": false
     },
     "first": true,
-    "numberOfElements": 10,
+    "numberOfElements": 100,
     "empty": false
 }
 ```
@@ -203,7 +209,8 @@ axios.get(`${API_BASE_URL}/boards?category=1&keyword=질문&page=0&size=10&sortB
             "categoryNo": 1,
             "categoryName": "Q&A",
             "commentCount": 0,
-            "userImg": null
+            "userImg": null,
+            "thumbnailUrl": null
         },
         {
             "boardNo": 12,
@@ -221,7 +228,8 @@ axios.get(`${API_BASE_URL}/boards?category=1&keyword=질문&page=0&size=10&sortB
             "categoryNo": 1,
             "categoryName": "Q&A",
             "commentCount": 0,
-            "userImg": null
+            "userImg": null,
+            "thumbnailUrl": null
         },
         {
             "boardNo": 11,
@@ -239,7 +247,8 @@ axios.get(`${API_BASE_URL}/boards?category=1&keyword=질문&page=0&size=10&sortB
             "categoryNo": 1,
             "categoryName": "Q&A",
             "commentCount": 0,
-            "userImg": null
+            "userImg": null,
+            "thumbnailUrl": null
         }
     ],
     "pageable": {

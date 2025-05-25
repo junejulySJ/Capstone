@@ -1,15 +1,11 @@
 package com.capstone.meetingmap.comment.controller;
 
-import com.capstone.meetingmap.comment.dto.CommentResponseDto;
 import com.capstone.meetingmap.comment.dto.CommentRequestDto;
+import com.capstone.meetingmap.comment.dto.CommentResponseDto;
 import com.capstone.meetingmap.comment.service.CommentService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;

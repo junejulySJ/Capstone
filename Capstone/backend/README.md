@@ -278,11 +278,46 @@ SELECT
     B.`CATEGORY_NO`,
     C.`CATEGORY_NAME`,
     IFNULL((SELECT COUNT(*) FROM `COMMENT` CM WHERE CM.`BOARD_NO` = B.`BOARD_NO`), 0) AS `COMMENT_COUNT`,
-    U.`USER_IMG`
+    U.`USER_IMG`,
+    -- 썸네일 (대표 이미지 1개만)
+    (SELECT BF.`FILE_URL`
+     FROM `BOARD_FILE` BF
+     WHERE BF.`BOARD_NO` = B.`BOARD_NO`
+     ORDER BY BF.`FILE_NO`
+     LIMIT 1
+    ) AS `THUMBNAIL_URL`
 FROM `BOARD` B
 JOIN `USER` U ON B.`USER_ID` = U.`USER_ID`
 JOIN `USER_ROLE` UR ON U.`USER_TYPE` = UR.`USER_TYPE`
 JOIN `CATEGORY` C ON B.`CATEGORY_NO` = C.`CATEGORY_NO`;
+
+INSERT INTO `PLACE_CATEGORY` (`PLACE_CATEGORY_CODE`, `PLACE_CATEGORY_NAME`) VALUES
+      ('tour', '관광지'),
+      ('food', '음식점'),
+      ('cafe', '카페'),
+      ('convenience-store', '편의점'),
+      ('shopping', '쇼핑'),
+      ('culture', '문화시설'),
+      ('event', '공연/행사'),
+      ('other', '기타');
+
+INSERT INTO `PLACE_CATEGORY_DETAIL` (`PLACE_CATEGORY_DETAIL_CODE`, `PLACE_CATEGORY_DETAIL_NAME`, `PARENT_NO`, `CONTENT_TYPE_ID`, `CAT1`, `CAT2`, `CAT3`, `ADDITIONAL_SEARCH`, `SEARCH_TYPE`) VALUES
+     ('tour-nature', '자연', 1, '12', 'A01', null, null, false, null),
+     ('tour-tradition', '역사', 1, '12', 'A02', 'A0201', null, false, null),
+     ('tour-park', '공원', 1, '12', 'A02', 'A0202', 'A02020700', false, null),
+     ('tour-theme-park', '테마파크', 1, '12', 'A02', 'A0202', 'A02020600', false, null),
+     ('food-korean', '한식', 2, '39', 'A05', 'A0502', 'A05020100', false, null),
+     ('food-western', '양식', 2, '39', 'A05', 'A0502', 'A05020200', false, null),
+     ('food-japanese', '일식', 2, '39', 'A05', 'A0502', 'A05020300', false, null),
+     ('food-chinese', '중식', 2, '39', 'A05', 'A0502', 'A05020400', false, null),
+     ('food-other', '기타', 2, '39', 'A05', 'A0502', 'A05020700', false, null),
+     ('cafe', '카페', 3, '39', 'A05', 'A0502', 'A05020900', true, 'cafe'),
+     ('convenience-store', '편의점', 4, null, null, null, null, true, 'convenience_store'),
+     ('shopping-permanent-market', '상설시장', 5, '38', 'A04', 'A0401', 'A04010200', false, null),
+     ('shopping-department-store', '백화점', 5, null, null, null, null, true, 'department_store'),
+     ('culture', '문화시설', 6, '14', 'A02', 'A0206', null, true, 'movie_theater'),
+     ('event', '공연/행사', 7, '15', 'A02', null, null, false, null),
+     ('other', '기타', 8, null, null, null, null, false, null);
 ```
 2. 프로필 사진 변경을 사용해보려면 `Apidog->외부 API->S3 API->Headers`의 키를 `resources->cloud.aws.credentials.access-key`와 `cloud.aws.credentials.secret-key`에 붙여넣습니다.
 ---
@@ -471,6 +506,38 @@ CREATE TABLE `BOARD_SCRAP` (
 ALTER TABLE `BOARD_SCRAP` ADD CONSTRAINT `FK_USER_TO_BOARD_SCRAP_1` FOREIGN KEY (`USER_ID`) REFERENCES `USER`(`USER_ID`);
 ALTER TABLE `BOARD_SCRAP` ADD CONSTRAINT `FK_BOARD_TO_BOARD_SCRAP_1` FOREIGN KEY (`BOARD_NO`) REFERENCES `BOARD`(`BOARD_NO`);
 ALTER TABLE `BOARD_SCRAP` ADD CONSTRAINT `UQ_BOARD_SCRAP` UNIQUE (`USER_ID`, `BOARD_NO`);
+
+DROP VIEW `BOARD_VIEW`;
+
+CREATE VIEW `BOARD_VIEW` AS
+SELECT
+    B.`BOARD_NO`,
+    B.`USER_ID`,
+    U.`USER_NICK`,
+    U.`USER_TYPE`,
+    UR.`USER_TYPE_NAME`,
+    B.`BOARD_TITLE`,
+    B.`BOARD_DESCRIPTION`,
+    B.`BOARD_VIEW_COUNT`,
+    B.`BOARD_WRITE_DATE`,
+    B.`BOARD_UPDATE_DATE`,
+    IFNULL((SELECT COUNT(*) FROM `BOARD_LIKE` BL WHERE BL.`BOARD_NO` = B.`BOARD_NO`), 0) AS `BOARD_LIKE`,
+    IFNULL((SELECT COUNT(*) FROM `BOARD_HATE` BH WHERE BH.`BOARD_NO` = B.`BOARD_NO`), 0) AS `BOARD_HATE`,
+    B.`CATEGORY_NO`,
+    C.`CATEGORY_NAME`,
+    IFNULL((SELECT COUNT(*) FROM `COMMENT` CM WHERE CM.`BOARD_NO` = B.`BOARD_NO`), 0) AS `COMMENT_COUNT`,
+    U.`USER_IMG`,
+    -- 썸네일 (대표 이미지 1개만)
+    (SELECT BF.`FILE_URL`
+     FROM `BOARD_FILE` BF
+     WHERE BF.`BOARD_NO` = B.`BOARD_NO`
+     ORDER BY BF.`FILE_NO`
+     LIMIT 1
+    ) AS `THUMBNAIL_URL`
+FROM `BOARD` B
+         JOIN `USER` U ON B.`USER_ID` = U.`USER_ID`
+         JOIN `USER_ROLE` UR ON U.`USER_TYPE` = UR.`USER_TYPE`
+         JOIN `CATEGORY` C ON B.`CATEGORY_NO` = C.`CATEGORY_NO`;
 ```
 ---
 6. 앞으로 테이블이 추가나 변경될 상황이 생기면 여기에 추가할 예정입니다...

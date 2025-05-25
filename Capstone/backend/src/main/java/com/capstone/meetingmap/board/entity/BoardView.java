@@ -31,4 +31,5 @@ public class BoardView {
     private String categoryName;
     private Long commentCount;
     private String userImg;
+    private String thumbnailUrl;
 }

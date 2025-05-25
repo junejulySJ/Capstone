@@ -26,6 +26,7 @@ public class BoardScrapView {
     private String categoryName;
     private Long commentCount;
     private String userImg;
+    private String thumbnailUrl;
 
     @Builder
     public BoardScrapView(Integer scrapNo, Integer boardNo, String userId, String userNick, Integer userType,
@@ -49,5 +50,9 @@ public class BoardScrapView {
         this.categoryName = categoryName;
         this.commentCount = commentCount;
         this.userImg = userImg;
+    }
+
+    public void addThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
     }
 }

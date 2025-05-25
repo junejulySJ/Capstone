@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
@@ -42,6 +43,20 @@ public class S3Service {
 
     public String getFileUrl(String fileName) {
         return "https://" + bucket + ".s3." + region + ".amazonaws.com/" + fileName;
+    }
+
+    public String extractKeyFromUrl(String fileUrl) {
+        // fileUrl에서 마지막 '/' 이후의 값을 잘라냄
+        return fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+    }
+
+    public void delete(String fileName) {
+        DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                .bucket(bucket)
+                .key(fileName)
+                .build();
+
+        s3Client.deleteObject(deleteObjectRequest);
     }
 }
 

@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(uniqueConstraints = { @UniqueConstraint(columnNames = {"user_id", "group_no"}) })
 public class BoardScrap extends BoardScrapTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

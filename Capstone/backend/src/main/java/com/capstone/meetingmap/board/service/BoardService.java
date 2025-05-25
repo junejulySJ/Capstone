@@ -97,7 +97,12 @@ public class BoardService {
         if (scrapedBoardNos.isEmpty()) {
             return Collections.emptyList();
         }
-        return boardScrapRepository.findScrapedBoardViewsByUserIdOrderByBoardUpdateDateDesc(userId);
+        List<BoardScrapView> viewList = boardScrapRepository.findScrapedBoardViewsByUserIdOrderByBoardUpdateDateDesc(userId);
+        for (BoardScrapView scrapView : viewList) {
+            Optional<BoardFile> thumbnail = boardFileRepository.findFirstByBoardBoardNoOrderByFileNoAsc(scrapView.getBoardNo());
+            thumbnail.ifPresent(file -> scrapView.addThumbnailUrl(file.getFileUrl()));
+        }
+        return viewList;
     }
 
     // 게시글 상세보기
@@ -153,7 +158,6 @@ public class BoardService {
                 if (!file.getBoard().getBoardNo().equals(boardNo)) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "파일이 해당 게시글에 속하지 않습니다");
                 }
-                //fileStorageService.deleteFile(file.getFileUrl()); // S3나 로컬에서 실제 삭제
                 boardFileRepository.delete(file);
             }
         }
@@ -185,7 +189,6 @@ public class BoardService {
         }
 
         // 게시글의 파일 먼저 삭제
-        //fileStorageService.deleteFile(file.getFileUrl()); // S3나 로컬에서 실제 삭제
         boardFileService.deleteFiles(boardNo);
 
         // 게시글에 달린 댓글 삭제

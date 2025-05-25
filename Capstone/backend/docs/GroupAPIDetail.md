@@ -77,6 +77,51 @@ axios.get(`${API_BASE_URL}/groups/3/members`, { withCredentials: true })
 
 ---
 
+### 소속되어있는 전체 그룹 멤버 조회
+
+#### Request 예시
+```javascript
+axios.get(`${API_BASE_URL}/groups/members`, { withCredentials: true })
+```
+
+#### Response 예시
+```json
+[
+    {
+        "userId": "user1",
+        "userEmail": "user1@example.com",
+        "userNick": "사용자1",
+        "userImg": "https://capstone-meetingmap.s3.eu-north-1.amazonaws.com/8c0405c9-6369-4dec-ae70-4e197217fbb4_ai-generated-9510467_640.jpg",
+        "userAddress": "서울 종로구 사직로 161",
+        "userType": 1,
+        "groupNo": 2,
+        "groupTitle": "testgroup"
+    },
+    {
+        "userId": "user1",
+        "userEmail": "user1@example.com",
+        "userNick": "사용자1",
+        "userImg": "https://capstone-meetingmap.s3.eu-north-1.amazonaws.com/8c0405c9-6369-4dec-ae70-4e197217fbb4_ai-generated-9510467_640.jpg",
+        "userAddress": "서울 종로구 사직로 161",
+        "userType": 1,
+        "groupNo": 3,
+        "groupTitle": "testgroup"
+    },
+    {
+        "userId": "user2",
+        "userEmail": "user2@example.com",
+        "userNick": "사용자2",
+        "userImg": null,
+        "userAddress": null,
+        "userType": 1,
+        "groupNo": 3,
+        "groupTitle": "testgroup"
+    }
+]
+```
+
+---
+
 ### 그룹 생성
 
 #### Request 예시
@@ -123,8 +168,10 @@ axios.delete(`${API_BASE_URL}/groups/1/members/user2`, { withCredentials: true }
 
 #### Request 예시
 ```javascript
-axios.post(`${API_BASE_URL}/groups/1/invitations`, {
-    "userId": "user2"
+axios.post(`${API_BASE_URL}/groups/invitations`, {
+    "userNick": "회원2",
+    "userEmail": "user2@example.com",
+    "groupTitle": "헬스 커뮤니티"
 }, { withCredentials: true })
 ```
 

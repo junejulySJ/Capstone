@@ -1,9 +1,6 @@
 package com.capstone.meetingmap.group.controller;
 
-import com.capstone.meetingmap.group.dto.GroupInvitationResponseDto;
-import com.capstone.meetingmap.group.dto.GroupInvitationRequestDto;
-import com.capstone.meetingmap.group.dto.GroupRequestDto;
-import com.capstone.meetingmap.group.dto.GroupResponseDto;
+import com.capstone.meetingmap.group.dto.*;
 import com.capstone.meetingmap.group.service.GroupService;
 import com.capstone.meetingmap.schedule.dto.ScheduleDetailResponseDto;
 import com.capstone.meetingmap.schedule.dto.ScheduleResponseDto;
@@ -51,6 +48,16 @@ public class GroupController {
         return ResponseEntity.ok(userResponseDtoList);
     }
 
+    // 소속되어있는 전체 그룹 멤버 조회
+    @GetMapping("/members")
+    public ResponseEntity<?> getAllMembers() {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        List<UserGroupResponseDto> userResponseDtoList = groupService.getAllGroupMembers(userId);
+
+        return ResponseEntity.ok(userResponseDtoList);
+    }
+
     // 그룹 생성
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody GroupRequestDto groupRequestDto) {
@@ -94,11 +101,11 @@ public class GroupController {
     }
 
     // 그룹 초대
-    @PostMapping("/{groupNo}/invitations")
-    public ResponseEntity<?> invite(@PathVariable Integer groupNo, @Valid @RequestBody GroupInvitationRequestDto groupInvitationRequestDto) {
+    @PostMapping("/invitations")
+    public ResponseEntity<?> invite(@Valid @RequestBody GroupInvitationRequestDto groupInvitationRequestDto) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        groupService.inviteGroup(groupNo, groupInvitationRequestDto, userId);
+        groupService.inviteGroup(groupInvitationRequestDto, userId);
 
         return ResponseEntity.noContent().build();
     }

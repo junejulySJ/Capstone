@@ -2,10 +2,7 @@ package com.capstone.meetingmap.group.service;
 
 import com.capstone.meetingmap.friendship.entity.FriendshipStatus;
 import com.capstone.meetingmap.friendship.repository.FriendshipRepository;
-import com.capstone.meetingmap.group.dto.GroupInvitationRequestDto;
-import com.capstone.meetingmap.group.dto.GroupInvitationResponseDto;
-import com.capstone.meetingmap.group.dto.GroupRequestDto;
-import com.capstone.meetingmap.group.dto.GroupResponseDto;
+import com.capstone.meetingmap.group.dto.*;
 import com.capstone.meetingmap.group.entity.*;
 import com.capstone.meetingmap.group.repository.GroupInvitationRepository;
 import com.capstone.meetingmap.group.repository.GroupMemberRepository;
@@ -82,6 +79,15 @@ public class GroupService {
                 .collect(Collectors.toList());
     }
 
+    // 소속되어있는 전체 그룹 멤버 조회
+    public List<UserGroupResponseDto> getAllGroupMembers(String userId) {
+        List<GroupMember> groupMemberList = groupMemberRepository.findAll();
+
+        return groupMemberList.stream()
+                .map(groupMember -> UserGroupResponseDto.fromEntity(groupMember.getUser(), groupMember.getGroup()))
+                .collect(Collectors.toList());
+    }
+
     // 그룹 생성
     @Transactional
     public Integer createGroup(GroupRequestDto groupRequestDto, String userId) {
@@ -131,25 +137,26 @@ public class GroupService {
 
     // 그룹 초대
     @Transactional
-    public void inviteGroup(Integer groupNo, GroupInvitationRequestDto groupInvitationRequestDto, String userId) {
-        if (!groupMemberRepository.existsByGroup_GroupNoAndUser_UserId(groupNo, userId))
+    public void inviteGroup(GroupInvitationRequestDto groupInvitationRequestDto, String userId) {
+
+        Group group = groupRepository.findByGroupTitle(groupInvitationRequestDto.getGroupTitle())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "그룹 정보를 찾을 수 없습니다"));
+
+        if (!groupMemberRepository.existsByGroup_GroupNoAndUser_UserId(group.getGroupNo(), userId))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "자신이 속한 그룹만 다른 회원을 초대할 수 있습니다");
 
-        if (!friendshipRepository.existsByUser_UserIdAndOpponent_UserIdAndStatus(userId, groupInvitationRequestDto.getUserId(), FriendshipStatus.ACCEPTED)) {
+        User receiver = userRepository.findByUserNickAndUserEmail(groupInvitationRequestDto.getUserNick(), groupInvitationRequestDto.getUserEmail())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
+
+        if (!friendshipRepository.existsByUser_UserIdAndOpponent_UserIdAndStatus(userId, receiver.getUserId(), FriendshipStatus.ACCEPTED)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "친구인 회원만 초대할 수 있습니다");
         }
 
-        if (groupInvitationRepository.existsByGroup_GroupNoAndSender_UserIdAndReceiver_UserIdAndStatusNot(groupNo, userId, groupInvitationRequestDto.getUserId(), InvitationStatus.REJECTED)) {
+        if (groupInvitationRepository.existsByGroup_GroupNoAndSender_UserIdAndReceiver_UserIdAndStatusNot(group.getGroupNo(), userId, receiver.getUserId(), InvitationStatus.REJECTED)) {
             throw new IllegalStateException("이미 초대가 이루어진 회원입니다");
         }
 
-        Group group = groupRepository.findById(groupNo)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "그룹 정보를 찾을 수 없습니다"));
-
         User sender = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
-
-        User receiver = userRepository.findById(groupInvitationRequestDto.getUserId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
 
         GroupInvitation groupInvitation = GroupInvitation.builder()

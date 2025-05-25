@@ -14,21 +14,22 @@
 
 # Group API
 ## API 바로가기
-| API 호출                                                              | 설명                 |
-|---------------------------------------------------------------------|--------------------|
-| [GET /groups/{groupNo}](#그룹-조회)                                     | 그룹 조회              |
-| [GET /groups/{groupNo}/members](#그룹-멤버-조회)                          | 그룹 멤버 조회           |
-| [POST /groups](#그룹-생성)                                              | 그룹 생성              |
-| [PUT /groups/{groupNo}](#그룹-수정)                                     | 그룹 수정              |
-| [DELETE /groups/{groupNo}](#그룹-삭제)                                  | 그룹 삭제              |
-| [DELETE /groups/{groupNo}/members/{deleteUserId}](#그룹-멤버-강제-탈퇴)     | 그룹 멤버 강제 탈퇴        |
-| [POST /groups/{groupNo}/invitations](#그룹-초대)                        | 그룹 초대              |
-| [GET /groups/invitations](#그룹-초대-목록-조회)                             | 그룹 초대 목록 조회        |
-| [POST /groups/invitations/{invitationNo}/{status}](#그룹-초대-수락거절)     | 그룹 초대 수락/거절        |
-| [POST /groups/{groupNo}/schedules](#그룹-내-스케줄-공유)                    | 그룹 내 스케줄 공유        |
-| [GET /groups/{groupNo}/schedules](#그룹-내-공유된-스케줄-조회)                 | 그룹 내 공유된 스케줄 조회    |
-| [GET /groups/{groupNo}/schedules/{scheduleNo}](#그룹-내-공유된-스케줄-상세-조회) | 그룹 내 공유된 스케줄 상세 조회 |
-| [DELETE /groups/{groupNo}/schedules/{scheduleNo}](#공유-스케줄-삭제)       | 공유 스케줄 삭제          |
+| API 호출                                                              | 설명                    |
+|---------------------------------------------------------------------|-----------------------|
+| [GET /groups/{groupNo}](#그룹-조회)                                     | 그룹 조회                 |
+| [GET /groups/{groupNo}/members](#그룹-멤버-조회)                          | 그룹 멤버 조회              |
+| [GET /groups/members](#소속되어있는-전체-그룹-멤버-조회)                          | 소속되어있는 전체 그룹 멤버 조회 ✏️ |
+| [POST /groups](#그룹-생성)                                              | 그룹 생성                 |
+| [PUT /groups/{groupNo}](#그룹-수정)                                     | 그룹 수정                 |
+| [DELETE /groups/{groupNo}](#그룹-삭제)                                  | 그룹 삭제                 |
+| [DELETE /groups/{groupNo}/members/{deleteUserId}](#그룹-멤버-강제-탈퇴)     | 그룹 멤버 강제 탈퇴           |
+| [POST /groups/invitations](#그룹-초대)                                  | 그룹 초대 ✏️              |
+| [GET /groups/invitations](#그룹-초대-목록-조회)                             | 그룹 초대 목록 조회           |
+| [POST /groups/invitations/{invitationNo}/{status}](#그룹-초대-수락거절)     | 그룹 초대 수락/거절           |
+| [POST /groups/{groupNo}/schedules](#그룹-내-스케줄-공유)                    | 그룹 내 스케줄 공유           |
+| [GET /groups/{groupNo}/schedules](#그룹-내-공유된-스케줄-조회)                 | 그룹 내 공유된 스케줄 조회       |
+| [GET /groups/{groupNo}/schedules/{scheduleNo}](#그룹-내-공유된-스케줄-상세-조회) | 그룹 내 공유된 스케줄 상세 조회    |
+| [DELETE /groups/{groupNo}/schedules/{scheduleNo}](#공유-스케줄-삭제)       | 공유 스케줄 삭제             |
 
 ---
 
@@ -94,6 +95,34 @@
 | userImg     | 회원 프로필 사진 | "hong.png"          |
 | userAddress | 회원 주소     | "서울특별시 중구 세종대로 110" |
 | userType    | 회원 유형     | 1(일반 사용자)           |
+
+---
+
+### 소속되어있는 전체 그룹 멤버 조회
+
+**GET** `/groups/members`
+
+> 회원이 소속되어있는 전체 그룹의 멤버를 조회합니다.
+
+## [Example](GroupAPIDetail.md#소속되어있는-전체-그룹-멤버-조회)
+
+#### 요청 쿠키
+| 쿠키          | 설명  | 값 예시            |
+|-------------|-----|-----------------|
+| accessToken | jwt | eyJhbGciOiJI... |
+- 로그인을 진행하면 자동으로 쿠키가 등록되어 보내집니다.
+
+#### 응답 바디 파라미터
+| 파라미터        | 설명        | 값 예시                |
+|-------------|-----------|---------------------|
+| userId      | 회원 ID     | "exampleUser"       |
+| userEmail   | 회원 이메일    | "hong@example.com"  |
+| userNick    | 회원 닉네임    | "홍길동"               |
+| userImg     | 회원 프로필 사진 | "hong.png"          |
+| userAddress | 회원 주소     | "서울특별시 중구 세종대로 110" |
+| userType    | 회원 유형     | 1(일반 사용자)           |
+| groupNo     | 그룹 번호     | 1                   |
+| groupTitle  | 그룹명       | "헬스 커뮤니티"           |
 
 ---
 
@@ -196,7 +225,7 @@
 
 ### 그룹 초대
 
-**POST** `/groups/{groupNo}/invitations`
+**POST** `/groups/invitations`
 > 특정 회원을 그룹에 초대합니다.
 
 ## [Example](GroupAPIDetail.md#그룹-초대)
@@ -208,9 +237,11 @@
 - 로그인을 진행하면 자동으로 쿠키가 등록되어 보내집니다.
 
 #### 요청 바디 파라미터
-| 파라미터   | 설명    | 값 예시    |
-|--------|-------|---------|
-| userId | 회원 ID | "user2" |
+| 파라미터       | 설명     | 값 예시      |
+|------------|--------|-----------|
+| userNick   | 회원 닉네임 | "회원2"     |
+| userEmail  | 회원 이메일 | "회원 이메일"  |
+| groupTitle | 그룹명    | "헬스 커뮤니티" |
 
 ---
 

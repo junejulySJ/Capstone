@@ -34,7 +34,7 @@ public class BoardController {
             @RequestParam(value = "category", required = false) Integer categoryNo,
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(defaultValue = "100") Integer size,
             @RequestParam(defaultValue = "boardWriteDate") String sortBy,
             @RequestParam(defaultValue = "desc") String direction
     ) {

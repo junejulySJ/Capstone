@@ -32,11 +32,7 @@
 - **API**: Kakao Map API, Tmap API, Tour API  
 - **DB**: MySQL  
 - **언어**: Java, JavaScript  
-- **IDE**: IntelliJ, VSCode
-
----
-
-## 🖼 스크린샷
+- **IDE**: IntelliJ, VSCode  
 <p align="center">
   <img src="https://github.com/user-attachments/assets/38090353-a309-43e5-90cf-3b228ef27cd7" width="500"/>
 </p>

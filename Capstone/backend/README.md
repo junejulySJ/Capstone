@@ -28,7 +28,7 @@
 ## ※기존 테이블을 그대로 사용하면서 변경사항을 추가하려면 [방법2](#방법2)를 따라가세요
 
 # 방법1
-1. 다음 sql문을 적용합니다.**(기존 테이블 내용은 전부 사라지니 백업 필수)**
+1. 다음 sql문을 적용합니다. RDS에는 해당 쿼리로 적용되어있습니다. **(기존 테이블 내용은 전부 사라지니 백업 필수)**
 ```mysql
 -- 데이터베이스 생성
 DROP DATABASE IF EXISTS capstone_db;
@@ -40,270 +40,267 @@ USE capstone_db;
 -- GRANT SELECT, INSERT, UPDATE, DELETE ON capstone_db.* TO 'scott'@'localhost';
 
 -- 테이블 생성
-CREATE TABLE `USER_ROLE` (
-    `USER_TYPE` INT NOT NULL,
-    `USER_TYPE_NAME` VARCHAR(50) NULL,
-    PRIMARY KEY (`USER_TYPE`)
+create table `user_role` (
+    `user_type` int not null,
+    `user_type_name` varchar(50) null,
+    primary key (`user_type`)
 );
 
-CREATE TABLE `CATEGORY` (
-    `CATEGORY_NO` INT NOT NULL,
-    `CATEGORY_NAME` VARCHAR(50) NULL,
-    PRIMARY KEY (`CATEGORY_NO`)
+create table `category` (
+    `category_no` int not null,
+    `category_name` varchar(50) null,
+    primary key (`category_no`)
 );
 
-CREATE TABLE `USER` (
-    `USER_ID` VARCHAR(50) NOT NULL,
-    `USER_EMAIL` VARCHAR(255) NULL,
-    `USER_PASSWD` VARCHAR(128) NULL,
-    `USER_NICK` VARCHAR(50) NULL,
-    `USER_IMG` VARCHAR(255) NULL,
-    `USER_ADDRESS` VARCHAR(255) NULL,
-    `USER_TYPE` INT NOT NULL,
-    `ONLY_FRIENDS_CAN_SEE_ACTIVITY` TINYINT NULL,
-    `EMAIL_NOTIFICATION_AGREE` TINYINT NULL,
-    `PUSH_NOTIFICATION_AGREE` TINYINT NULL,
-    PRIMARY KEY (`USER_ID`)
+create table `user` (
+    `user_id` varchar(50) not null,
+    `user_email` varchar(255) null,
+    `user_passwd` varchar(128) null,
+    `user_nick` varchar(50) null,
+    `user_img` varchar(255) null,
+    `user_address` varchar(255) null,
+    `user_type` int not null,
+    `only_friends_can_see_activity` tinyint null,
+    `email_notification_agree` tinyint null,
+    `push_notification_agree` tinyint null,
+    primary key (`user_id`)
 );
-ALTER TABLE `USER` ADD CONSTRAINT `FK_USER_ROLE_TO_USER_1` FOREIGN KEY (`USER_TYPE`) REFERENCES `USER_ROLE` (`USER_TYPE`);
+alter table `user` add constraint `fk_user_role_to_user_1` foreign key (`user_type`) references `user_role` (`user_type`);
 
-CREATE TABLE `BOARD` (
-    `BOARD_NO` INT NOT NULL AUTO_INCREMENT,
-    `BOARD_TITLE` VARCHAR(255) NULL,
-    `BOARD_DESCRIPTION` VARCHAR(255) NULL,
-    `BOARD_CONTENT` TEXT NULL,
-    `BOARD_VIEW_COUNT` INT NULL,
-    `BOARD_WRITE_DATE` DATETIME NULL,
-    `BOARD_UPDATE_DATE` DATETIME NULL,
-    `USER_ID` VARCHAR(50) NOT NULL,
-    `CATEGORY_NO` INT NOT NULL,
-    `SCHEDULE_NO` INT NULL,
-    PRIMARY KEY (`BOARD_NO`)
+create table `board` (
+    `board_no` int not null auto_increment,
+    `board_title` varchar(255) null,
+    `board_description` varchar(255) null,
+    `board_content` text null,
+    `board_view_count` int null,
+    `board_write_date` datetime null,
+    `board_update_date` datetime null,
+    `user_id` varchar(50) not null,
+    `category_no` int not null,
+    `schedule_no` int null,
+    primary key (`board_no`)
 );
-ALTER TABLE `BOARD` ADD CONSTRAINT `FK_USER_TO_BOARD_1` FOREIGN KEY (`USER_ID`) REFERENCES `USER` (`USER_ID`);
-ALTER TABLE `BOARD` ADD CONSTRAINT `FK_CATEGORY_TO_BOARD_1` FOREIGN KEY (`CATEGORY_NO`) REFERENCES `CATEGORY` (`CATEGORY_NO`);
-ALTER TABLE `BOARD` ADD CONSTRAINT `FK_SCHEDULE_TO_BOARD_1` FOREIGN KEY (`SCHEDULE_NO`) REFERENCES `SCHEDULE` (`SCHEDULE_NO`);
+alter table `board` add constraint `fk_user_to_board_1` foreign key (`user_id`) references `user` (`user_id`);
+alter table `board` add constraint `fk_category_to_board_1` foreign key (`category_no`) references `category` (`category_no`);
+alter table `board` add constraint `fk_schedule_to_board_1` foreign key (`schedule_no`) references `schedule` (`schedule_no`);
 
-CREATE TABLE `BOARD_FILE` (
-    `FILE_NO`   INT NOT NULL AUTO_INCREMENT,
-    `FILE_NAME` VARCHAR(50) NULL,
-    `FILE_URL`  VARCHAR(255) NULL,
-    `BOARD_NO`  INT NOT NULL,
-    PRIMARY KEY (`FILE_NO`)
+create table `board_file` (
+    `file_no` int not null auto_increment,
+    `file_name` varchar(50) null,
+    `file_url` varchar(255) null,
+    `board_no` int not null,
+    primary key (`file_no`)
 );
-ALTER TABLE `BOARD_FILE` ADD CONSTRAINT `FK_BOARD_TO_BOARD_FILE_1` FOREIGN KEY (`BOARD_NO`) REFERENCES `BOARD` (`BOARD_NO`);
+alter table `board_file` add constraint `fk_board_to_board_file_1` foreign key (`board_no`) references `board` (`board_no`);
 
-CREATE TABLE `SCHEDULE` (
-    `SCHEDULE_NO`   INT NOT NULL AUTO_INCREMENT,
-    `SCHEDULE_NAME` VARCHAR(50) NULL,
-    `SCHEDULE_ABOUT` TEXT NULL,
-    `SCHEDULE_CREATED_DATE` DATETIME NULL,
-    `USER_ID` VARCHAR(50) NOT NULL,
-    PRIMARY KEY (`SCHEDULE_NO`)
+create table `schedule` (
+    `schedule_no` int not null auto_increment,
+    `schedule_name` varchar(50) null,
+    `schedule_about` text null,
+    `schedule_created_date` datetime null,
+    `user_id` varchar(50) not null,
+    primary key (`schedule_no`)
 );
-ALTER TABLE `SCHEDULE` ADD CONSTRAINT `FK_USER_TO_SCHEDULE_1` FOREIGN KEY (`USER_ID`) REFERENCES `USER` (`USER_ID`);
+alter table `schedule` add constraint `fk_user_to_schedule_1` foreign key (`user_id`) references `user` (`user_id`);
 
-CREATE TABLE `SCHEDULE_DETAIL` (
-    `SCHEDULE_DETAIL_NO` INT NOT NULL AUTO_INCREMENT,
-    `SCHEDULE_CONTENT` TEXT NULL,
-    `SCHEDULE_ADDRESS` VARCHAR(255) NULL,
-    `LATITUDE` DECIMAL(9, 6) NULL,
-    `LONGITUDE` DECIMAL(9, 6) NULL,
-    `SCHEDULE_START_TIME` DATETIME NULL,
-    `SCHEDULE_END_TIME` DATETIME NULL,
-    `SCHEDULE_NO` INT NOT NULL,
-    PRIMARY KEY (`SCHEDULE_DETAIL_NO`)
+create table `schedule_detail` (
+    `schedule_detail_no` int not null auto_increment,
+    `schedule_content` text null,
+    `schedule_address` varchar(255) null,
+    `latitude` decimal(9, 6) null,
+    `longitude` decimal(9, 6) null,
+    `schedule_start_time` datetime null,
+    `schedule_end_time` datetime null,
+    `schedule_no` int not null,
+    primary key (`schedule_detail_no`)
 );
-ALTER TABLE `SCHEDULE_DETAIL` ADD CONSTRAINT `FK_SCHEDULE_TO_SCHEDULE_DETAIL_1` FOREIGN KEY (`SCHEDULE_NO`) REFERENCES `SCHEDULE` (`SCHEDULE_NO`);
+alter table `schedule_detail` add constraint `fk_schedule_to_schedule_detail_1` foreign key (`schedule_no`) references `schedule` (`schedule_no`);
 
-CREATE TABLE `BOARD_LIKE` (
-    `BOARD_NO` INT NOT NULL,
-    `USER_ID` VARCHAR(50) NOT NULL,
-    PRIMARY KEY (`BOARD_NO`, `USER_ID`) -- 복합 키
+create table `board_like` (
+    `board_no` int not null,
+    `user_id` varchar(50) not null,
+    primary key (`board_no`, `user_id`)
 );
-ALTER TABLE `BOARD_LIKE` ADD CONSTRAINT `FK_BOARD_TO_BOARD_LIKE_1` FOREIGN KEY (`BOARD_NO`) REFERENCES `BOARD` (`BOARD_NO`);
-ALTER TABLE `BOARD_LIKE` ADD CONSTRAINT `FK_USER_TO_BOARD_LIKE_1` FOREIGN KEY (`USER_ID`) REFERENCES `USER` (`USER_ID`);
+alter table `board_like` add constraint `fk_board_to_board_like_1` foreign key (`board_no`) references `board` (`board_no`);
+alter table `board_like` add constraint `fk_user_to_board_like_1` foreign key (`user_id`) references `user` (`user_id`);
 
-CREATE TABLE `COMMENT` (
-    `COMMENT_NO` INT NOT NULL AUTO_INCREMENT,
-    `COMMENT_CONTENT` TEXT NULL,
-    `COMMENT_WRITE_DATE` DATETIME NULL,
-    `USER_ID` VARCHAR(50) NOT NULL,
-    `BOARD_NO` INT NOT NULL,
-    PRIMARY KEY (`COMMENT_NO`)
+create table `comment` (
+    `comment_no` int not null auto_increment,
+    `comment_content` text null,
+    `comment_write_date` datetime null,
+    `user_id` varchar(50) not null,
+    `board_no` int not null,
+    primary key (`comment_no`)
 );
-ALTER TABLE `COMMENT` ADD CONSTRAINT `FK_USER_TO_COMMENT_1` FOREIGN KEY (`USER_ID`) REFERENCES `USER` (`USER_ID`);
-ALTER TABLE `COMMENT` ADD CONSTRAINT `FK_BOARD_TO_COMMENT_1` FOREIGN KEY (`BOARD_NO`) REFERENCES `BOARD` (`BOARD_NO`);
+alter table `comment` add constraint `fk_user_to_comment_1` foreign key (`user_id`) references `user` (`user_id`);
+alter table `comment` add constraint `fk_board_to_comment_1` foreign key (`board_no`) references `board` (`board_no`);
 
-CREATE TABLE `BOARD_HATE` (
-    `BOARD_NO` INT NOT NULL,
-    `USER_ID` VARCHAR(50) NOT NULL,
-    PRIMARY KEY (`BOARD_NO`, `USER_ID`) -- 복합 키
+create table `board_hate` (
+    `board_no` int not null,
+    `user_id` varchar(50) not null,
+    primary key (`board_no`, `user_id`)
 );
-ALTER TABLE `BOARD_HATE` ADD CONSTRAINT `FK_BOARD_TO_BOARD_HATE_1` FOREIGN KEY (`BOARD_NO`) REFERENCES `BOARD` (`BOARD_NO`);
-ALTER TABLE `BOARD_HATE` ADD CONSTRAINT `FK_USER_TO_BOARD_HATE_1` FOREIGN KEY (`USER_ID`) REFERENCES `USER` (`USER_ID`);
+alter table `board_hate` add constraint `fk_board_to_board_hate_1` foreign key (`board_no`) references `board` (`board_no`);
+alter table `board_hate` add constraint `fk_user_to_board_hate_1` foreign key (`user_id`) references `user` (`user_id`);
 
-CREATE TABLE `GROUP_USER` (
-    `SCHEDULE_NO` INT NOT NULL,
-    `USER_ID` VARCHAR(50) NOT NULL,
-    PRIMARY KEY (`SCHEDULE_NO`, `USER_ID`) -- 복합 키
+create table `friendship` (
+    `friendship_no` int not null auto_increment,
+    `user_id` varchar(50) not null,
+    `opponent_id` varchar(50) not null,
+    `status` enum('ACCEPTED', 'WAITING') not null,
+    `is_from` tinyint null,
+    `counterpart_friendship_no` int null,
+    primary key (`friendship_no`)
 );
-ALTER TABLE `GROUP_USER` ADD CONSTRAINT `FK_SCHEDULE_TO_GROUP_USER_1` FOREIGN KEY (`SCHEDULE_NO`) REFERENCES `SCHEDULE` (`SCHEDULE_NO`);
-ALTER TABLE `GROUP_USER` ADD CONSTRAINT `FK_USER_TO_GROUP_USER_1` FOREIGN KEY (`USER_ID`) REFERENCES `USER` (`USER_ID`);
+alter table `friendship` add constraint `fk_user_to_friendship_1` foreign key (`user_id`) references `user` (`user_id`);
+alter table `friendship` add constraint `fk_user_to_friendship_2` foreign key (`opponent_id`) references `user` (`user_id`);
 
-CREATE TABLE `FRIENDSHIP` (
-    `FRIENDSHIP_NO` INT NOT NULL AUTO_INCREMENT,
-    `USER_ID` VARCHAR(50) NOT NULL,
-    `OPPONENT_ID` VARCHAR(50) NOT NULL,
-    `STATUS` ENUM('ACCEPTED', 'WAITING') NOT NULL,
-    `IS_FROM` TINYINT NULL,
-    `COUNTERPART_FRIENDSHIP_NO` INT NULL,
-    PRIMARY KEY (`FRIENDSHIP_NO`)
-);
-ALTER TABLE `FRIENDSHIP` ADD CONSTRAINT `FK_USER_TO_FRIENDSHIP_1` FOREIGN KEY (`USER_ID`) REFERENCES `USER` (`USER_ID`);
-ALTER TABLE `FRIENDSHIP` ADD CONSTRAINT `FK_USER_TO_FRIENDSHIP_2` FOREIGN KEY (`OPPONENT_ID`) REFERENCES `USER` (`USER_ID`);
-
-CREATE TABLE `PLACE_CATEGORY` (
-    `PLACE_CATEGORY_NO` INT AUTO_INCREMENT NOT NULL,
-    `PLACE_CATEGORY_CODE` VARCHAR(20) NULL,
-    `PLACE_CATEGORY_NAME` VARCHAR(20) NULL,
-    PRIMARY KEY (PLACE_CATEGORY_NO)
+create table `place_category` (
+    `place_category_no` int auto_increment not null,
+    `place_category_code` varchar(20) null,
+    `place_category_name` varchar(20) null,
+    primary key (`place_category_no`)
 );
 
-CREATE TABLE `PLACE_CATEGORY_DETAIL` (
-   `PLACE_CATEGORY_DETAIL_NO` INT AUTO_INCREMENT NOT NULL,
-   `PLACE_CATEGORY_DETAIL_CODE` VARCHAR(30) NULL,
-   `PLACE_CATEGORY_DETAIL_NAME` VARCHAR(20) NULL,
-   `PARENT_NO` INT NOT NULL,
-   `CONTENT_TYPE_ID` VARCHAR(2) NULL,
-   `CAT1` VARCHAR(3) NULL,
-   `CAT2` VARCHAR(5) NULL,
-   `CAT3` VARCHAR(9) NULL,
-   `ADDITIONAL_SEARCH` TINYINT NULL,
-   `SEARCH_TYPE` VARCHAR(30) NULL,
-   PRIMARY KEY (PLACE_CATEGORY_DETAIL_NO)
+create table `place_category_detail` (
+    `place_category_detail_no` int auto_increment not null,
+    `place_category_detail_code` varchar(30) null,
+    `place_category_detail_name` varchar(20) null,
+    `parent_no` int not null,
+    `content_type_id` varchar(2) null,
+    `cat1` varchar(3) null,
+    `cat2` varchar(5) null,
+    `cat3` varchar(9) null,
+    `additional_search` tinyint null,
+    `search_type` varchar(30) null,
+    primary key (`place_category_detail_no`)
 );
-ALTER TABLE `PLACE_CATEGORY_DETAIL` ADD CONSTRAINT `FK_PLACE_CATEGORY_TO_PLACE_CATEGORY_DETAIL_1` FOREIGN KEY (`PARENT_NO`) REFERENCES `PLACE_CATEGORY` (`PLACE_CATEGORY_NO`);
+alter table `place_category_detail` add constraint `fk_place_category_to_place_category_detail_1` foreign key (`parent_no`) references `place_category` (`place_category_no`);
 
-CREATE TABLE `GROUP` (
-    `GROUP_NO` INT AUTO_INCREMENT NOT NULL,
-    `GROUP_TITLE` VARCHAR(30) NULL,
-    `GROUP_DESCRIPTION` VARCHAR(50) NULL,
-    `GROUP_CREATED_DATE` DATETIME NULL,
-    `GROUP_CREATED_USER_ID` VARCHAR(50) NOT NULL,
-    PRIMARY KEY (`GROUP_NO`)
+create table `group` (
+    `group_no` int auto_increment not null,
+    `group_title` varchar(30) null,
+    `group_description` varchar(50) null,
+    `group_created_date` datetime null,
+    `group_created_user_id` varchar(50) not null,
+    primary key (`group_no`)
 );
-ALTER TABLE `GROUP` ADD CONSTRAINT `FK_USER_TO_GROUP_1` FOREIGN KEY (`GROUP_CREATED_USER_ID`) REFERENCES `USER` (`USER_ID`);
+alter table `group` add constraint `fk_user_to_group_1` foreign key (`group_created_user_id`) references `user` (`user_id`);
 
-CREATE TABLE `GROUP_MEMBER` (
-    `GROUP_MEMBER_NO` INT AUTO_INCREMENT NOT NULL,
-    `GROUP_NO` INT NOT NULL,
-    `USER_ID` VARCHAR(50) NOT NULL,
-    PRIMARY KEY (`GROUP_MEMBER_NO`)
+create table `group_member` (
+    `group_member_no` int auto_increment not null,
+    `group_no` int not null,
+    `user_id` varchar(50) not null,
+    primary key (`group_member_no`)
 );
-ALTER TABLE `GROUP_MEMBER` ADD CONSTRAINT `FK_GROUP_TO_GROUP_MEMBER_1` FOREIGN KEY (`GROUP_NO`) REFERENCES `GROUP` (`GROUP_NO`);
-ALTER TABLE `GROUP_MEMBER` ADD CONSTRAINT `FK_USER_TO_GROUP_MEMBER_1` FOREIGN KEY (`USER_ID`) REFERENCES `USER` (`USER_ID`);
-ALTER TABLE `GROUP_MEMBER` ADD CONSTRAINT `UQ_GROUP_USER` UNIQUE (`GROUP_NO`, `USER_ID`);
+alter table `group_member` add constraint `fk_group_to_group_member_1` foreign key (`group_no`) references `group` (`group_no`);
+alter table `group_member` add constraint `fk_user_to_group_member_1` foreign key (`user_id`) references `user` (`user_id`);
+alter table `group_member` add constraint `uq_group_user` unique (`group_no`, `user_id`);
 
-CREATE TABLE `GROUP_INVITATION` (
-    `INVITATION_NO` INT AUTO_INCREMENT NOT NULL,
-    `GROUP_NO` INT NOT NULL,
-    `SENDER_ID` VARCHAR(50) NOT NULL,
-    `RECEIVER_ID` VARCHAR(50) NOT NULL,
-    `STATUS` ENUM('WAITING', 'ACCEPTED', 'REJECTED') NOT NULL,
-    `INVITED_DATE` DATETIME NULL,
-    PRIMARY KEY (`INVITATION_NO`)
+create table `group_invitation` (
+    `invitation_no` int auto_increment not null,
+    `group_no` int not null,
+    `sender_id` varchar(50) not null,
+    `receiver_id` varchar(50) not null,
+    `status` enum('WAITING', 'ACCEPTED', 'REJECTED') not null,
+    `invited_date` datetime null,
+    primary key (`invitation_no`)
 );
-ALTER TABLE `GROUP_INVITATION` ADD CONSTRAINT `FK_GROUP_TO_GROUP_INVITATION_1` FOREIGN KEY (`GROUP_NO`) REFERENCES `GROUP` (`GROUP_NO`);
-ALTER TABLE `GROUP_INVITATION` ADD CONSTRAINT `FK_USER_TO_GROUP_INVITATION_1` FOREIGN KEY (`SENDER_ID`) REFERENCES `USER` (`USER_ID`);
-ALTER TABLE `GROUP_INVITATION` ADD CONSTRAINT `FK_USER_TO_GROUP_INVITATION_2` FOREIGN KEY (`RECEIVER_ID`) REFERENCES `USER` (`USER_ID`);
-ALTER TABLE `GROUP_INVITATION` ADD CONSTRAINT `UQ_GROUP_RECEIVER` UNIQUE (`GROUP_NO`, `RECEIVER_ID`);
+alter table `group_invitation` add constraint `fk_group_to_group_invitation_1` foreign key (`group_no`) references `group` (`group_no`);
+alter table `group_invitation` add constraint `fk_user_to_group_invitation_1` foreign key (`sender_id`) references `user` (`user_id`);
+alter table `group_invitation` add constraint `fk_user_to_group_invitation_2` foreign key (`receiver_id`) references `user` (`user_id`);
+alter table `group_invitation` add constraint `uq_group_receiver` unique (`group_no`, `receiver_id`);
 
-CREATE TABLE `GROUP_BOARD` (
-	`GROUP_BOARD_NO` INT AUTO_INCREMENT NOT NULL,
-    `GROUP_BOARD_TITLE` VARCHAR(255) NULL,
-    `GROUP_BOARD_CONTENT` TEXT NULL,
-    `GROUP_BOARD_WRITE_DATE` DATETIME NULL,
-    `GROUP_BOARD_UPDATE_DATE` DATETIME NULL,
-    `USER_ID` VARCHAR(50) NOT NULL,
-    `GROUP_NO` INT NOT NULL,
-    PRIMARY KEY (`GROUP_BOARD_NO`)
+create table `group_board` (
+    `group_board_no` int auto_increment not null,
+    `group_board_title` varchar(255) null,
+    `group_board_content` text null,
+    `group_board_write_date` datetime null,
+    `group_board_update_date` datetime null,
+    `user_id` varchar(50) not null,
+    `group_no` int not null,
+    primary key (`group_board_no`)
 );
-ALTER TABLE `GROUP_BOARD` ADD CONSTRAINT `FK_USER_TO_GROUP_BOARD_1` FOREIGN KEY (`USER_ID`) REFERENCES `USER` (`USER_ID`);
-ALTER TABLE `GROUP_BOARD` ADD CONSTRAINT `FK_GROUP_TO_GROUP_BOARD_1` FOREIGN KEY (`GROUP_NO`) REFERENCES `GROUP` (`GROUP_NO`);
+alter table `group_board` add constraint `fk_user_to_group_board_1` foreign key (`user_id`) references `user` (`user_id`);
+alter table `group_board` add constraint `fk_group_to_group_board_1` foreign key (`group_no`) references `group` (`group_no`);
 
-CREATE TABLE `GROUP_COMMENT` (
-	`GROUP_COMMENT_NO` INT AUTO_INCREMENT NOT NULL,
-    `GROUP_COMMENT_CONTENT` TEXT NULL,
-    `GROUP_COMMENT_WRITE_DATE` DATETIME NULL,
-    `USER_ID` VARCHAR(50) NOT NULL,
-    `GROUP_BOARD_NO` INT NOT NULL,
-    PRIMARY KEY (`GROUP_COMMENT_NO`)
+create table `group_comment` (
+    `group_comment_no` int auto_increment not null,
+    `group_comment_content` text null,
+    `group_comment_write_date` datetime null,
+    `user_id` varchar(50) not null,
+    `group_board_no` int not null,
+    primary key (`group_comment_no`)
 );
-ALTER TABLE `GROUP_COMMENT` ADD CONSTRAINT `FK_USER_TO_GROUP_COMMENT_1` FOREIGN KEY (`USER_ID`) REFERENCES `USER` (`USER_ID`);
-ALTER TABLE `GROUP_COMMENT` ADD CONSTRAINT `FK_GROUP_BOARD_TO_GROUP_COMMENT_1` FOREIGN KEY (`GROUP_BOARD_NO`) REFERENCES `GROUP_BOARD` (`GROUP_BOARD_NO`);
+alter table `group_comment` add constraint `fk_user_to_group_comment_1` foreign key (`user_id`) references `user` (`user_id`);
+alter table `group_comment` add constraint `fk_group_board_to_group_comment_1` foreign key (`group_board_no`) references `group_board` (`group_board_no`);
 
-CREATE TABLE `GROUP_SCHEDULE` (
-    `GROUP_NO` INT NOT NULL,
-    `SCHEDULE_NO` INT NOT NULL,
-    PRIMARY KEY (`GROUP_NO`, `SCHEDULE_NO`)
+create table `group_schedule` (
+    `group_no` int not null,
+    `schedule_no` int not null,
+    primary key (`group_no`, `schedule_no`)
 );
-ALTER TABLE `GROUP_SCHEDULE` ADD CONSTRAINT `FK_GROUP_TO_GROUP_SCHEDULE_1` FOREIGN KEY (`GROUP_NO`) REFERENCES `GROUP` (`GROUP_NO`);
-ALTER TABLE `GROUP_SCHEDULE` ADD CONSTRAINT `FK_SCHEDULE_TO_GROUP_SCHEDULE_1` FOREIGN KEY (`SCHEDULE_NO`) REFERENCES `SCHEDULE` (`SCHEDULE_NO`);
+alter table `group_schedule` add constraint `fk_group_to_group_schedule_1` foreign key (`group_no`) references `group` (`group_no`);
+alter table `group_schedule` add constraint `fk_schedule_to_group_schedule_1` foreign key (`schedule_no`) references `schedule` (`schedule_no`);
 
-CREATE TABLE `BOARD_SCRAP` (
-    `SCRAP_NO` INT AUTO_INCREMENT NOT NULL,
-    `USER_ID` VARCHAR(50) NOT NULL,
-    `BOARD_NO` INT NOT NULL,
-    `SCRAP_DATE` DATETIME NULL,
-    PRIMARY KEY (`SCRAP_NO`)
+create table `board_scrap` (
+    `scrap_no` int auto_increment not null,
+    `user_id` varchar(50) not null,
+    `board_no` int not null,
+    `scrap_date` datetime null,
+    primary key (`scrap_no`)
 );
-ALTER TABLE `BOARD_SCRAP` ADD CONSTRAINT `FK_USER_TO_BOARD_SCRAP_1` FOREIGN KEY (`USER_ID`) REFERENCES `USER`(`USER_ID`);
-ALTER TABLE `BOARD_SCRAP` ADD CONSTRAINT `FK_BOARD_TO_BOARD_SCRAP_1` FOREIGN KEY (`BOARD_NO`) REFERENCES `BOARD`(`BOARD_NO`);
-ALTER TABLE `BOARD_SCRAP` ADD CONSTRAINT `UQ_BOARD_SCRAP` UNIQUE (`USER_ID`, `BOARD_NO`);
+alter table `board_scrap` add constraint `fk_user_to_board_scrap_1` foreign key (`user_id`) references `user` (`user_id`);
+alter table `board_scrap` add constraint `fk_board_to_board_scrap_1` foreign key (`board_no`) references `board` (`board_no`);
+alter table `board_scrap` add constraint `uq_board_scrap` unique (`user_id`, `board_no`);
 
 -- 게시판 view 생성
-CREATE VIEW `BOARD_VIEW` AS
-SELECT
-    B.`BOARD_NO`,
-    B.`USER_ID`,
-    U.`USER_NICK`,
-    U.`USER_TYPE`,
-    UR.`USER_TYPE_NAME`,
-    B.`BOARD_TITLE`,
-    B.`BOARD_DESCRIPTION`,
-    B.`BOARD_VIEW_COUNT`,
-    B.`BOARD_WRITE_DATE`,
-    B.`BOARD_UPDATE_DATE`,
-    IFNULL((SELECT COUNT(*) FROM `BOARD_LIKE` BL WHERE BL.`BOARD_NO` = B.`BOARD_NO`), 0) AS `BOARD_LIKE`,
-    IFNULL((SELECT COUNT(*) FROM `BOARD_HATE` BH WHERE BH.`BOARD_NO` = B.`BOARD_NO`), 0) AS `BOARD_HATE`,
-    B.`CATEGORY_NO`,
-    C.`CATEGORY_NAME`,
-    IFNULL((SELECT COUNT(*) FROM `COMMENT` CM WHERE CM.`BOARD_NO` = B.`BOARD_NO`), 0) AS `COMMENT_COUNT`,
-    U.`USER_IMG`,
+create view `board_view` as
+select
+    b.`board_no`,
+    b.`user_id`,
+    u.`user_nick`,
+    u.`user_type`,
+    ur.`user_type_name`,
+    b.`board_title`,
+    b.`board_description`,
+    b.`board_view_count`,
+    b.`board_write_date`,
+    b.`board_update_date`,
+    ifnull((select count(*) from `board_like` bl where bl.`board_no` = b.`board_no`), 0) as `board_like`,
+    ifnull((select count(*) from `board_hate` bh where bh.`board_no` = b.`board_no`), 0) as `board_hate`,
+    b.`category_no`,
+    c.`category_name`,
+    ifnull((select count(*) from `comment` cm where cm.`board_no` = b.`board_no`), 0) as `comment_count`,
+    u.`user_img`,
     -- 썸네일 (대표 이미지 1개만)
-    (SELECT BF.`FILE_URL`
-     FROM `BOARD_FILE` BF
-     WHERE BF.`BOARD_NO` = B.`BOARD_NO`
-     ORDER BY BF.`FILE_NO`
-     LIMIT 1
-    ) AS `THUMBNAIL_URL`
-FROM `BOARD` B
-JOIN `USER` U ON B.`USER_ID` = U.`USER_ID`
-JOIN `USER_ROLE` UR ON U.`USER_TYPE` = UR.`USER_TYPE`
-JOIN `CATEGORY` C ON B.`CATEGORY_NO` = C.`CATEGORY_NO`;
+    (select bf.`file_url`
+     from `board_file` bf
+     where bf.`board_no` = b.`board_no`
+     order by bf.`file_no`
+     limit 1
+    ) as `thumbnail_url`
+from `board` b
+    join `user` u on b.`user_id` = u.`user_id`
+    join `user_role` ur on u.`user_type` = ur.`user_type`
+    join `category` c on b.`category_no` = c.`category_no`;
 
-INSERT INTO `PLACE_CATEGORY` (`PLACE_CATEGORY_CODE`, `PLACE_CATEGORY_NAME`) VALUES
-      ('tour', '관광지'),
-      ('food', '음식점'),
-      ('cafe', '카페'),
-      ('convenience-store', '편의점'),
-      ('shopping', '쇼핑'),
-      ('culture', '문화시설'),
-      ('event', '공연/행사'),
-      ('other', '기타');
+insert into `user_role` (`user_type`, `user_type_name`)
+values
+    (0, 'Admin'),
+    (1, 'User');
 
-INSERT INTO `PLACE_CATEGORY_DETAIL` (`PLACE_CATEGORY_DETAIL_CODE`, `PLACE_CATEGORY_DETAIL_NAME`, `PARENT_NO`, `CONTENT_TYPE_ID`, `CAT1`, `CAT2`, `CAT3`, `ADDITIONAL_SEARCH`, `SEARCH_TYPE`) VALUES
+insert into `place_category` (`place_category_code`, `place_category_name`) values
+    ('tour', '관광지'),
+    ('food', '음식점'),
+    ('cafe', '카페'),
+    ('convenience-store', '편의점'),
+    ('shopping', '쇼핑'),
+    ('culture', '문화시설'),
+    ('event', '공연/행사'),
+    ('other', '기타');
+
+insert into `place_category_detail` (`place_category_detail_code`, `place_category_detail_name`, `parent_no`, `content_type_id`, `cat1`, `cat2`, `cat3`, `additional_search`, `search_type`) values
      ('tour-nature', '자연', 1, '12', 'A01', null, null, false, null),
      ('tour-tradition', '역사', 1, '12', 'A02', 'A0201', null, false, null),
      ('tour-park', '공원', 1, '12', 'A02', 'A0202', 'A02020700', false, null),

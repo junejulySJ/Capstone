@@ -53,12 +53,19 @@ const Map = () => {
   const [transferMarkers, setTransferMarkers] = useState();
 
   useEffect(() => {
-    const container = document.getElementById('map');
-    const map = new kakao.maps.Map(container, {
-      center: new kakao.maps.LatLng(37.554722, 126.970833),
-      level: 5,
-    });
-    setMapObj(map);
+    const interval = setInterval(() => {
+      if (window.kakao && window.kakao.maps) {
+        clearInterval(interval);
+        const container = document.getElementById('map');
+        const map = new window.kakao.maps.Map(container, {
+          center: new window.kakao.maps.LatLng(37.554722, 126.970833),
+          level: 5,
+        });
+        setMapObj(map);
+      }
+    }, 100);
+
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -77,6 +84,7 @@ const Map = () => {
   }, [location.search]);
 
   useEffect(() => {
+    if (!mapObj) return;
     const fetchData = async () => {
       const allPlaces = [];
       const markers = [];

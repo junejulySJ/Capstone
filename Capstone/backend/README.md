@@ -285,6 +285,10 @@ from `board` b
     join `user_role` ur on u.`user_type` = ur.`user_type`
     join `category` c on b.`category_no` = c.`category_no`;
 
+insert into `user` (`user_id`, `user_passwd`, `user_type`, `user_email`, `user_nick`, 'only_friends_can_see_activity', 'email_notification_agree', 'push_notification_agree')
+values
+    ('user1', '$2a$10$36vCUK5vsfQ6/HK2HGatdOJ3x3RoH.6da2WESPsQ8zVKHqMB96Mle', 1, 'user1@example.com', '사용자1', 0, 0, 0);
+
 insert into `user_role` (`user_type`, `user_type_name`)
 values
     (0, 'Admin'),
@@ -542,4 +546,5 @@ ALTER TABLE `BOARD` ADD COLUMN `SCHEDULE_NO` INT NULL;
 ALTER TABLE `BOARD` ADD CONSTRAINT `FK_SCHEDULE_TO_BOARD_1` FOREIGN KEY (`SCHEDULE_NO`) REFERENCES `SCHEDULE` (`SCHEDULE_NO`);
 ```
 ---
-6. 앞으로 테이블이 추가나 변경될 상황이 생기면 여기에 추가할 예정입니다...
+6. user 테이블의 모든 계정(레코드)들에 ONLY_FRIENDS_CAN_SEE_ACTIVITY, EMAIL_NOTIFICATION_AGREE, PUSH_NOTIFICATION_AGREE 값을 모두 0으로 채워주셔야 합니다.
+7. 앞으로 테이블이 추가나 변경될 상황이 생기면 여기에 추가할 예정입니다...

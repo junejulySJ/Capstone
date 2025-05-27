@@ -1,44 +1,35 @@
-/* 햄버거 버튼: 항상 고정됨 (App.js에서 제거하고 Header에 포함) */
-.fixed-hamburger {
-    position: fixed;
-    top: 16px;
-    left: 16px;
-    font-size: 24px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    z-index: 1001;
-  }
-  
-  /* 로그인/회원가입 버튼을 포함하는 바 (스크롤에 따라 사라짐) */
-  .header-bar {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    padding: 12px 0px 12px 0px; /* 좌측 여백을 줘서 약간 왼쪽으로 밀림 */
-    background: #fff;
-    border-bottom: 1px solid #ddd;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  }
-  
-  .login-buttons {
-    display: flex;
-    gap: 12px;
-  }
-  
-  .login-buttons button {
-    padding: 6px 12px;
-    font-size: 14px;
-    background-color: white;
-    border: 1px solid #888;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.2s ease;
-  }
-  
-  .login-buttons button:hover {
-    background-color: #f0f0f0;
-  }
-  
+
+.header-buttons {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  z-index: 1000;
+}
+
+.header-buttons button {
+  font-size: 0.85rem;
+  padding: 4px 8px;
+  background-color: white;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.header-buttons .nickname {
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.hamburger {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 1001;
+}

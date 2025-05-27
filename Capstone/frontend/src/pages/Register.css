@@ -71,3 +71,12 @@
   margin-bottom: 0.5rem;
 }
 
+/* 기존 스타일 아래에 추가 */
+input::-ms-reveal,
+input::-ms-clear,
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-textfield-decoration-container {
+  display: none !important;
+  pointer-events: none;
+  opacity: 0;
+}

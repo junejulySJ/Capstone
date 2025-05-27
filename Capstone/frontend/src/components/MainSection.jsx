@@ -7,8 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './MainSection.css';
 import dummyPosts from '../data/dummyPosts';
-
-const API_BASE_URL = 'http://localhost:8080';
+import { API_BASE_URL } from '../constants';
 
 const images = [
   '/images/bg1.jpg',
@@ -73,7 +72,7 @@ export default function MainSection() {
   const fetchSuggestions = async (query, index = null) => {
     if (!query.trim()) return;
     try {
-      const res = await axios.get(`${API_BASE_URL}/api/map/autocomplete?name=${query}`);
+      const res = await axios.get(`${API_BASE_URL}/map/autocomplete?name=${query}`);
       const key = index !== null ? index : 'single';
       const data = res.data.slice(0, 10); // 최대 10개 제한
       setSuggestions((prev) => ({ ...prev, [key]: data }));

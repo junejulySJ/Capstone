@@ -19,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
@@ -55,7 +56,10 @@ public class  SecurityConfig {
                             public CorsConfiguration getCorsConfiguration(@NonNull HttpServletRequest request) {
                                 CorsConfiguration config = new CorsConfiguration();
 
-                                config.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                                config.setAllowedOrigins(Arrays.asList(
+                                        "http://localhost:3000",             // 로컬 개발용
+                                        "https://meeting-map.kro.kr"        // 실제 배포 도메인
+                                ));
                                 config.setAllowedMethods(Collections.singletonList("*"));
                                 config.setAllowCredentials(true);
                                 config.setAllowedHeaders(Collections.singletonList("*"));

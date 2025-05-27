@@ -5,7 +5,7 @@ import { API_BASE_URL } from "./constants";
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(undefined);
 
   // 새로고침 시 로그인 정보 복구
   useEffect(() => {

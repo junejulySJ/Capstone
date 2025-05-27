@@ -50,7 +50,7 @@ const Schedule = () => {
   const [selectedCategoryPlaces, setSelectedCategoryPlaces] = useState();
 
   useEffect(() => {
-    if (!user) {
+    if (user === null) {
       navigate("/login"); // 로그인 페이지로 이동
     }
   }, [user, navigate]);

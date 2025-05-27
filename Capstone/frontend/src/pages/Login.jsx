@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
+import { useAppContext } from "../AppContext"; // ✅ context 불러오기
+import { API_BASE_URL } from '../constants';
 
 const predefinedUsers = ['user1','user2','user3','user4','user5','user6','user7','user8','user9','user10','admin1','admin2','admin3'];
 
@@ -11,6 +13,7 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
+  const { setUser } = useAppContext(); // ✅ context에 로그인 정보 저장할 함수
 
   const handleLogin = async () => {
     if (!userId || !userPasswd) {
@@ -21,14 +24,15 @@ function Login() {
     const finalPassword = predefinedUsers.includes(userId) ? '123456' : userPasswd;
 
     try {
-      await axios.post(
-        "http://localhost:8080/api/auth/login",
+      const response = await axios.post(
+        `${API_BASE_URL}/auth/login`,
         { userId, userPasswd: finalPassword },
         {
           withCredentials: true,
           headers: { "Content-Type": "application/json" }
         }
       );
+      setUser(response.data); // ✅ context에도 저장!
       alert("로그인 성공");
       navigate("/"); // 메인페이지 이동
     } catch (error) {

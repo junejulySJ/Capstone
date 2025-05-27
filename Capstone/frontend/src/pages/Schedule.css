@@ -181,7 +181,7 @@
 
 .schedule-category-panel {
   position: absolute;
-  top: 170px;             /* 지도 내부에서의 상대 위치 */
+  top: 230px;             /* 지도 내부에서의 상대 위치 */
   right: 6px;
   width: 400px;
   height: 44vh;

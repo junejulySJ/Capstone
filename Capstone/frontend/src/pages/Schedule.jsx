@@ -191,7 +191,7 @@ const Schedule = () => {
     setShowCreateScheduleSection(false);
     setCreateScheduleLoading(true);
     try {
-      const res = await axios.post(`${API_BASE_URL}/schedules/create`, { withCredentials: true },
+      const res = await axios.post(`${API_BASE_URL}/schedules/create`,
         {
           "selectedPlace": scheduleItems.map((item, index) => (
             {
@@ -215,7 +215,7 @@ const Schedule = () => {
             "latitude": end.latitude,
             "longitude": end.longitude
         }
-      });
+      }, { withCredentials: true });
       const result = res.data;
       setScheduleItems(result.places);
 

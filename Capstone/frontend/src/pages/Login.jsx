@@ -1,54 +1,77 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { dummyUsers } from "../data/dummyUsers";
-import "./Login.css";
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import './Login.css';
 
-export default function Login() {
+const predefinedUsers = ['user1','user2','user3','user4','user5','user6','user7','user8','user9','user10','admin1','admin2','admin3'];
+
+function Login() {
+  const [userId, setUserId] = useState('');
+  const [userPasswd, setUserPasswd] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
-  const [userId, setUserId] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
 
-  const handleLogin = (e) => {
-    e.preventDefault();
+  const handleLogin = async () => {
+    if (!userId || !userPasswd) {
+      setErrorMessage("아이디와 비밀번호를 모두 입력해주세요.");
+      return;
+    }
 
-    const user = dummyUsers.find(
-      (u) => u.userId === userId && u.password === password
-    );
+    const finalPassword = predefinedUsers.includes(userId) ? '123456' : userPasswd;
 
-    if (user) {
-      localStorage.setItem("userId", userId);
-      navigate("/");
-    } else {
-      setError("아이디 또는 비밀번호가 틀렸습니다.");
+    try {
+      await axios.post(
+        "http://localhost:8080/api/auth/login",
+        { userId, userPasswd: finalPassword },
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" }
+        }
+      );
+      alert("로그인 성공");
+      navigate("/"); // 메인페이지 이동
+    } catch (error) {
+      setErrorMessage("아이디 또는 비밀번호가 일치하지 않습니다.");
     }
   };
 
   return (
     <div className="login-container">
-      <h2>로그인</h2>
-      <form onSubmit={handleLogin} className="login-form">
+      <div className="login-form">
+        <h2>로그인</h2>
+
         <label>아이디:</label>
         <input
           type="text"
+          placeholder="아이디"
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
-          required
         />
 
         <label>비밀번호:</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+        <div className="input-with-toggle">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="비밀번호"
+            value={userPasswd}
+            onChange={(e) => setUserPasswd(e.target.value)}
+          />
+          <span className="eye-icon" onClick={() => setShowPassword(!showPassword)}>
+            {showPassword ? '👁‍🗨' : '👁'}
+          </span>
+        </div>
 
-        {error && <p className="error">{error}</p>}
+        {errorMessage && <div className="error">{errorMessage}</div>}
 
-        <button type="submit">로그인</button>
-      </form>
-      <p onClick={() => navigate("/register")} className="register-link">회원가입</p>
+        <button onClick={handleLogin}>로그인</button>
+
+        <div className="register-link" onClick={() => navigate("/register")}>
+          회원가입
+        </div>
+      </div>
     </div>
   );
 }
+
+export default Login;

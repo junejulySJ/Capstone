@@ -32,8 +32,11 @@
 
 .error {
   color: red;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  margin-top: -0.5rem;
+  margin-bottom: 0.5rem;
 }
+
 
 .register-link {
   margin-top: 1rem;
@@ -41,4 +44,18 @@
   color: #2c7a7b;
   cursor: pointer;
   font-weight: bold;
+}
+
+
+
+
+
+.eye-icon {
+  position: absolute;
+  right: 0.8rem;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: #444;
 }

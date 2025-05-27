@@ -143,9 +143,21 @@ const Map = () => {
     } else {
       const startPosition = new kakao.maps.LatLng(start.latitude, start.longitude);
       const endPosition = new kakao.maps.LatLng(end.latitude, end.longitude);
-
-      new kakao.maps.Marker({ map: mapObj, position: startPosition });
-      new kakao.maps.Marker({ map: mapObj, position: endPosition });
+      
+      // 출발지: 초록색, 도착지: 빨간색, 1.3배 크기
+      const startImage = new kakao.maps.MarkerImage(
+        'https://cdn-icons-png.flaticon.com/512/447/447031.png',
+        new kakao.maps.Size(33, 44)
+      );
+      
+      const endImage = new kakao.maps.MarkerImage(
+        'https://cdn-icons-png.flaticon.com/512/684/684908.png',
+        new kakao.maps.Size(33, 44)
+      );
+      
+      new kakao.maps.Marker({ map: mapObj, position: startPosition, title: start.name, image: startImage });
+      new kakao.maps.Marker({ map: mapObj, position: endPosition, title: end.name, image: endImage });
+      
 
       bounds.extend(startPosition);
       bounds.extend(endPosition);

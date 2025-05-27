@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Schedule.css';
 import CategorySidebar from '../components/CategorySidebar';
@@ -7,10 +7,13 @@ import RouteSummary from '../components/RouteSummary';
 import { drawPolyline, drawTransitPlan, clearPolylines } from '../components/RouteDrawer';
 import { categoryList, categoryDetailCodes } from './Map';
 import { API_BASE_URL} from '../constants.js'
+import { useAppContext } from '../AppContext'
 
 const { kakao } = window;
 
 const Schedule = () => {
+  const navigate = useNavigate();
+  const { user, setUser } = useAppContext();
   const location = useLocation();
   const [mapObj, setMapObj] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -46,6 +49,11 @@ const Schedule = () => {
   const [createScheduleError, setCreateScheduleError] = useState();
   const [selectedCategoryPlaces, setSelectedCategoryPlaces] = useState();
 
+  useEffect(() => {
+    if (!user) {
+      navigate("/login"); // 로그인 페이지로 이동
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     const container = document.getElementById('map');

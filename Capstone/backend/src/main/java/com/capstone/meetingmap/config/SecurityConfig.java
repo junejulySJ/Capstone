@@ -86,7 +86,7 @@ public class  SecurityConfig {
         //경로별 인가 작업
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/", "/api/auth/**", "/api/user/check-id", "/api/user/register", "/api/map/**", "/api/path/**", "/api/schedules/create").permitAll()
+                        .requestMatchers("/", "/api/auth/**", "/api/user/check-id", "/api/user/register", "/api/map/**", "/api/path/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/boards/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/boards").authenticated()
                         .requestMatchers("/api/user/list").hasAuthority("Admin")

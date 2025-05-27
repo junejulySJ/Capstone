@@ -2,6 +2,8 @@ package com.capstone.meetingmap.jwt;
 
 import com.capstone.meetingmap.user.dto.CustomUserDetails;
 import com.capstone.meetingmap.user.dto.LoginRequestDto;
+import com.capstone.meetingmap.user.dto.UserResponseDto;
+import com.capstone.meetingmap.user.entity.User;
 import com.capstone.meetingmap.util.JWTUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -71,6 +73,19 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         cookie.setMaxAge(60 * 60); // 1시간
 
         response.addCookie(cookie);
+
+        // User 엔티티 정보를 JSON으로 응답
+        User user = customUserDetails.getUser(); // CustomUserDetails에서 User 엔티티 가져오는 메서드가 있다고 가정
+        UserResponseDto userResponseDto = UserResponseDto.fromEntity(user);
+
+        // 응답 헤더 설정
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        // JSON 생성 및 응답에 쓰기
+        ObjectMapper objectMapper = new ObjectMapper();
+        String userJson = objectMapper.writeValueAsString(userResponseDto);
+        response.getWriter().write(userJson);
     }
 
     @Override

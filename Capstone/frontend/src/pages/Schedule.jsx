@@ -191,7 +191,7 @@ const Schedule = () => {
     setShowCreateScheduleSection(false);
     setCreateScheduleLoading(true);
     try {
-      const res = await axios.post(`${API_BASE_URL}/schedules/create`,
+      const res = await axios.post(`${API_BASE_URL}/schedules/create`, { withCredentials: true },
         {
           "selectedPlace": scheduleItems.map((item, index) => (
             {

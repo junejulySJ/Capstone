@@ -110,4 +110,22 @@ public class FriendshipService {
         friendship.acceptFriendshipRequest();
         counterFriendship.acceptFriendshipRequest();
     }
+
+    // 친구 삭제
+    @Transactional
+    public void deleteFriendship(String userId, Integer friendshipNo) {
+
+        if (!friendshipRepository.existsByFriendshipNoAndUser_UserIdAndStatus(friendshipNo, userId, FriendshipStatus.ACCEPTED))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "자신의 친구만 삭제 가능합니다");
+
+        // 나의 친구 관계와 매칭되는 상대방 친구 관계 둘다 가져옴
+        Friendship friendship = friendshipRepository.findById(friendshipNo)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "친구 요청을 찾을 수 없습니다"));
+        Friendship counterFriendship = friendshipRepository.findById(friendship.getCounterpartFriendshipNo())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "친구 요청을 찾을 수 없습니다"));
+
+        // 둘다 삭제
+        friendshipRepository.delete(friendship);
+        friendshipRepository.delete(counterFriendship);
+    }
 }

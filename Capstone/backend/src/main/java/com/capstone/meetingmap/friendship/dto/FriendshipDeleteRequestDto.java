@@ -1,6 +1,6 @@
 package com.capstone.meetingmap.friendship.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class FriendshipAddRequestDto {
-    @NotBlank(message = "추가할 친구 id는 반드시 입력해야 합니다.")
-    private String opponentId;
+public class FriendshipDeleteRequestDto {
+    @NotNull(message = "삭제할 친구 관계 번호는 반드시 필요합니다.")
+    private Integer friendshipNo;
 }

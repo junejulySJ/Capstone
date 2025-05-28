@@ -7,6 +7,8 @@ import com.capstone.meetingmap.group.dto.GroupResponseDto;
 import com.capstone.meetingmap.group.service.GroupService;
 import com.capstone.meetingmap.user.dto.*;
 import com.capstone.meetingmap.user.service.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -130,10 +132,18 @@ public class UserController {
 
     // 회원 탈퇴
     @DeleteMapping
-    public ResponseEntity<?> delete(@RequestBody UserDeleteRequestDto userDeleteRequestDto) {
+    public ResponseEntity<?> delete(@RequestBody UserDeleteRequestDto userDeleteRequestDto, HttpServletResponse response) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-
+        System.out.println(userId);
         userService.delete(userDeleteRequestDto, userId);
+
+        // "accessToken" 쿠키 삭제
+        Cookie cookie = new Cookie("accessToken", null);
+        cookie.setMaxAge(0); // 쿠키 만료
+        cookie.setPath("/"); // 쿠키 경로 설정 (서버에서 설정한 경로와 동일해야 함)
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie); // 응답에 쿠키 추가
 
         return ResponseEntity.noContent().build();
     }

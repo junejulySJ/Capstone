@@ -170,7 +170,7 @@ axios
 - 로그인을 진행해 JWT 쿠키가 있어야 함
 ```javascript
 axios
-    .post(`${API_BASE_URL}/user/friends/approve/{friendshipNo}`, {
+    .post(`${API_BASE_URL}/user/friends/approve`, {
         "friendshipNo": 8,
     }, {
         withCredentials: true,

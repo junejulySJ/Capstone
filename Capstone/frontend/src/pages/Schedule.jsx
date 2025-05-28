@@ -56,13 +56,28 @@ const Schedule = () => {
   }, [user, navigate]);
 
   useEffect(() => {
-    const container = document.getElementById('map');
-    const map = new kakao.maps.Map(container, {
-      center: new kakao.maps.LatLng(37.554722, 126.970833),
-      level: 5,
-    });
-    setMapObj(map);
-  }, []);
+  const container = document.getElementById('map');
+  const map = new kakao.maps.Map(container, {
+    center: new kakao.maps.LatLng(37.554722, 126.970833), // 서울역
+    level: 5,
+  });
+  setMapObj(map);
+}, []);
+
+useEffect(() => {
+  if (!mapObj || !scheduleItems || scheduleItems.length === 0) return;
+
+  const shouldUseRandomCenter = location.state?.fromRandomPlace === true;
+
+  if (shouldUseRandomCenter) {
+    const centerLatLng = new kakao.maps.LatLng(
+      parseFloat(scheduleItems[0].latitude),
+      parseFloat(scheduleItems[0].longitude)
+    );
+    mapObj.setCenter(centerLatLng);
+  }
+}, [mapObj, scheduleItems, location.state]);
+
 
   useEffect(() => {
     // 장소들 마커 출력

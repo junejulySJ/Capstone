@@ -155,6 +155,22 @@ export default function MainSection() {
     }
   };
 
+  const handleRandomPlaceClick = async () => {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/api/map/autocomplete?name=${randomPlace}`);
+    if (res.data && res.data.length > 0) {
+      const place = res.data[0];
+      navigate('/map?search=random-place&sort=rating_dsc&name=' + encodeURIComponent(place.placeName));
+    } else {
+      alert('장소 정보를 찾을 수 없습니다.');
+    }
+  } catch (err) {
+    console.error('장소 조회 실패:', err);
+    alert('장소 정보를 불러오는 데 실패했습니다.');
+  }
+};
+
+
   //const topPosts = [...dummyPosts].sort((a, b) => (b.views + b.likes * 2) - (a.views + a.likes * 2)).slice(0, 3);
 
   return (  
@@ -287,26 +303,37 @@ export default function MainSection() {
         </div>
 
         <div className="recommend-right">
-          <h2>#랜덤 장소 추천</h2>
-          <div className="card-grid">
-            <div
-              className="recommend-card big-card"
-              style={{
-                backgroundImage: `url(${placeBackgrounds[randomPlace] || ''})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                position: 'relative',
-                overflow: 'hidden'
-              }}
-            >
-              <div className="overlay"></div>
-              <div className="card-content">
-                <h3>{randomPlace}</h3>
-                <button className="action-btn" onClick={() => setRandomPlace(randomPlaces[Math.floor(Math.random() * randomPlaces.length)])}>다시 추천받기</button>
-              </div>
-            </div>
-          </div>
-        </div>
+  <h2>#랜덤 장소 추천</h2>
+  <div className="card-grid">
+    <div
+      className="recommend-card big-card"
+      onClick={handleRandomPlaceClick}  // ✅ 클릭 이벤트 연결
+      style={{
+        backgroundImage: `url(${placeBackgrounds[randomPlace] || ''})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        position: 'relative',
+        overflow: 'hidden',
+        cursor: 'pointer'  // UX 향상: 커서 포인터
+      }}
+    >
+      <div className="overlay"></div>
+      <div className="card-content">
+        <h3>{randomPlace}</h3>
+        <button
+          className="action-btn"
+          onClick={(e) => {
+            e.stopPropagation();  // ✅ 카드 클릭과 버튼 클릭 분리
+            setRandomPlace(randomPlaces[Math.floor(Math.random() * randomPlaces.length)]);
+          }}
+        >
+          다시 추천받기
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
       </section>
     </div>
   );

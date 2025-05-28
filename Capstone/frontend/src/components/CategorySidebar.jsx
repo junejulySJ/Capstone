@@ -4,7 +4,7 @@ import './CategorySidebar.css';
 const CategorySidebar = ({ places = [], onClose, onAddPlace, addedList = [] }) => {
   return (
     <div className="category-sidebar">
-      <div className="header">
+      <div className="category-header">
         <h3>카테고리</h3>
         <button className="close-button" onClick={onClose}>닫기</button>
       </div>

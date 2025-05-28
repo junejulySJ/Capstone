@@ -51,6 +51,9 @@ const Map = () => {
   const [end, setEnd] = useState();
   const [middlePoint, setMiddlePoint] = useState();
   const [transferMarkers, setTransferMarkers] = useState();
+  const [middleMarker, setMiddleMarker] = useState(null); // 중간지점 도착 마커 저장용
+
+  
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -140,14 +143,23 @@ const Map = () => {
 
     const bounds = new kakao.maps.LatLngBounds();
 
-    if (Array.isArray(start)) { //중간지점 조회면
+    if (Array.isArray(start)) { // 중간지점 기반 조회면
+      const startImage = new kakao.maps.MarkerImage(
+        'https://cdn-icons-png.flaticon.com/512/447/447031.png', // 초록색 마커
+        new kakao.maps.Size(33, 44)
+      );
+    
       start.forEach((s) => {
         const startPosition = new kakao.maps.LatLng(s.latitude, s.longitude);
-
-        new kakao.maps.Marker({ map: mapObj, position: startPosition });
-
+        new kakao.maps.Marker({
+          map: mapObj,
+          position: startPosition,
+          title: s.name,
+          image: startImage  // ✅ 이미지 적용
+        });
         bounds.extend(startPosition);
-      })
+      });
+    
     } else {
       const startPosition = new kakao.maps.LatLng(start.latitude, start.longitude);
       const endPosition = new kakao.maps.LatLng(end.latitude, end.longitude);
@@ -175,28 +187,60 @@ const Map = () => {
     loadRoutes();
   }, [mapObj, start, end, transportMode]);
 
+
   const loadRoutes = async () => {
     clearPolylines(polylines);
     setPolylines([]);
     setSelectedRouteIdx(null);
-    if (Array.isArray(start)) { //중간지점 조회면
+    
+    if (Array.isArray(start)) {
       try {
-        const pathType = transportMode === 'walk' ? 'pedestrian' : transportMode === 'transit' ? 'transit' : 'car';
-        const res = await axios.get(`${API_BASE_URL}/path/${pathType}?${start.map((d) => (`name=${d.name}`)).join('&')}`);
-        // 응답 데이터를 출발지별로 묶음
-        const result = res.data.map((routes, idx) => ({
-          from: start[idx].name,
-          routes: [routes],
-        }));
+        const pathType = transportMode === 'walk'
+        ? 'pedestrian'
+        : transportMode === 'transit'
+        ? 'transit'
+        : 'car';
+
+      const res = await axios.get(
+        `${API_BASE_URL}/path/${pathType}?${start.map((d) => `name=${d.name}`).join('&')}`
+      );
+
+      const result = res.data.map((routes, idx) => ({
+        from: start[idx].name,
+        routes: [routes],
+      }));
         setRouteList(result);
+    
         if (transportMode !== 'transit') {
-          const line = drawPolyline(mapObj, result[0].routes[0].coordinates, (pathType === 'pedestrian' ? '#4D524C' : '#007bff'));
+          const coordinates = result[0].routes[0].coordinates;
+    
+          // ✅ 1. 경로 라인 그리기
+          const line = drawPolyline(mapObj, coordinates,
+            pathType === 'pedestrian' ? '#4D524C' : '#007bff',
+            pathType === 'pedestrian' ? 'dashed' : 'solid'
+          );
           setPolylines([line]);
+    
+          // ✅ 2. 도착 마커 추가 (← 이 부분을 여기에 넣으세요)
+          const [lastLng, lastLat] = coordinates[coordinates.length - 1];
+          const finalPosition = new kakao.maps.LatLng(lastLat, lastLng);
+          const endImage = new kakao.maps.MarkerImage(
+            'https://cdn-icons-png.flaticon.com/512/684/684908.png',
+            new kakao.maps.Size(33, 44)
+          );
+          new kakao.maps.Marker({
+            map: mapObj,
+            position: finalPosition,
+            title: '도착지 (중간지점)',
+            image: endImage
+          });
         }
       } catch (err) {
         console.error('경로 API 오류:', err);
       }
-    } else {
+    }
+    
+    else {
       try {
         const pathType = transportMode === 'walk' ? 'pedestrian' : transportMode === 'transit' ? 'transit' : 'car';
         const res = await axios.get(`${API_BASE_URL}/path/${pathType}?start=${start.name}&end=${end.name}`);

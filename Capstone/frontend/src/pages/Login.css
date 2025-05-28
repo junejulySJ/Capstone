@@ -46,10 +46,6 @@
   font-weight: bold;
 }
 
-
-
-
-
 .eye-icon {
   position: absolute;
   right: 0.8rem;
@@ -58,4 +54,21 @@
   cursor: pointer;
   font-size: 1.1rem;
   color: #444;
+}
+
+.kakaoimg{
+  background-color: #fee500;
+  border: none;
+  color: #000000;
+  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  width: 100%;
+  max-width: 360px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }

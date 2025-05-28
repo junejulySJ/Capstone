@@ -3,18 +3,6 @@ body {
   font-family: 'Segoe UI', sans-serif;
 }
 
-.sidebar-toggle-button {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 9999;
-  font-size: 24px;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-
 .App {
   overflow-x: hidden;
 }

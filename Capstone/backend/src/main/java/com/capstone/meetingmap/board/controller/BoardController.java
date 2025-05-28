@@ -76,7 +76,7 @@ public class BoardController {
     @PutMapping(value = "/{boardNo}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> modify(
             @PathVariable Integer boardNo,
-            @RequestPart("json") @Valid BoardRequestDto boardRequestDto,
+            @RequestPart(value = "json", required = false) @Valid BoardRequestDto boardRequestDto,
             @RequestPart(value = "files", required = false) List<MultipartFile> files,
             @RequestParam(value = "deleteFileNos", required = false) List<Integer> deleteFileNos
     ) {

@@ -68,16 +68,16 @@ public class UserController {
     //회원 정보 수정
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateUser(
-            @RequestPart("user") UserUpdateRequestDto userUpdateRequestDto,
+            @RequestPart(value = "user", required = false) UserUpdateRequestDto userUpdateRequestDto,
             @RequestPart(value = "profileImage", required = false) MultipartFile profileImage
     ) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        userService.updateUser(userUpdateRequestDto, profileImage, userId);
+        UserResponseDto userResponseDto = userService.updateUser(userUpdateRequestDto, profileImage, userId);
 
         log.info("User Updated: {}", userId);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(userResponseDto);
     }
 
     // 작성한 글 조회

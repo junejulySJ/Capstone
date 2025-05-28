@@ -100,7 +100,7 @@ public class UserService {
 
     // 회원 정보 변경
     @Transactional
-    public void updateUser(UserUpdateRequestDto userUpdateRequestDto, MultipartFile profileImage, String userId) {
+    public UserResponseDto updateUser(UserUpdateRequestDto userUpdateRequestDto, MultipartFile profileImage, String userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
 
@@ -115,7 +115,11 @@ public class UserService {
             }
         }
 
-        user.updateInfo(userUpdateRequestDto);
+        if (userUpdateRequestDto != null) {
+            user.updateInfo(userUpdateRequestDto);
+        }
+
+        return UserResponseDto.fromEntity(user);
     }
 
     // 회원 비밀번호 변경

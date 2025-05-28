@@ -52,7 +52,7 @@ public class BoardDetailResponseDto {
                 .boardHate((long) board.getHates().size())
                 .categoryNo(board.getCategory().getCategoryNo())
                 .categoryName(board.getCategory().getCategoryName())
-                .schedule(ScheduleResponseDto.fromEntity(board.getSchedule()))
+                .schedule((board.getSchedule() == null ? null : ScheduleResponseDto.fromEntity(board.getSchedule())))
                 .boardFiles(board.getBoardFiles().stream().map(BoardFileResponseDto::fromEntity).collect(Collectors.toList()))
                 .build();
     }

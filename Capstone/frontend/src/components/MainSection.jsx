@@ -7,8 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './MainSection.css';
 import dummyPosts from '../data/dummyPosts';
-
-const API_BASE_URL = 'http://localhost:8080';
+import { API_BASE_URL } from '../constants';
 
 const images = [
   '/images/bg1.jpg',
@@ -73,7 +72,7 @@ export default function MainSection() {
   const fetchSuggestions = async (query, index = null) => {
     if (!query.trim()) return;
     try {
-      const res = await axios.get(`${API_BASE_URL}/api/map/autocomplete?name=${query}`);
+      const res = await axios.get(`${API_BASE_URL}/map/autocomplete?name=${query}`);
       const key = index !== null ? index : 'single';
       const data = res.data.slice(0, 10); // 최대 10개 제한
       setSuggestions((prev) => ({ ...prev, [key]: data }));
@@ -156,19 +155,34 @@ export default function MainSection() {
   };
 
   const handleRandomPlaceClick = async () => {
-  try {
-    const res = await axios.get(`${API_BASE_URL}/api/map/autocomplete?name=${randomPlace}`);
-    if (res.data && res.data.length > 0) {
+    try {
+      // 1) 자동완성 API 호출 ('/map/autocomplete' 경로 확인)
+      const res = await axios.get(
+        `${API_BASE_URL}/map/autocomplete?name=${encodeURIComponent(randomPlace)}`
+      );
+      if (!res.data || res.data.length === 0) {
+        return alert('장소 정보를 찾을 수 없습니다.');
+      }
+      // 2) 첫 번째 추천 결과를 선택
       const place = res.data[0];
-      navigate('/map?search=random-place&sort=rating_dsc&name=' + encodeURIComponent(place.placeName));
-    } else {
-      alert('장소 정보를 찾을 수 없습니다.');
+
+      // 3) Map 페이지로 이동하면서 state 에 전체 place 객체 전달
+      navigate('/map?search=random-place', {
+        state: {
+          fromRandomPlace: true,
+          selectedPlace: {
+            name: place.placeName,
+            address: place.address_name || place.road_address_name,
+            latitude: place.y,
+            longitude: place.x
+          }
+        }
+      });
+    } catch (err) {
+      console.error('장소 조회 실패:', err);
+      alert('장소 정보를 불러오는 데 실패했습니다.');
     }
-  } catch (err) {
-    console.error('장소 조회 실패:', err);
-    alert('장소 정보를 불러오는 데 실패했습니다.');
-  }
-};
+  };
 
 
   //const topPosts = [...dummyPosts].sort((a, b) => (b.views + b.likes * 2) - (a.views + a.likes * 2)).slice(0, 3);

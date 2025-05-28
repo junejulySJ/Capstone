@@ -5,7 +5,7 @@ import './Map.css';
 import CategorySidebar from '../components/CategorySidebar';
 import RouteSummary from '../components/RouteSummary';
 import { drawPolyline, drawTransitPlan, clearPolylines } from '../components/RouteDrawer';
-import { API_BASE_URL } from '../constants.js';
+import { API_BASE_URL} from '../constants.js'
 
 const { kakao } = window;
 
@@ -16,9 +16,10 @@ export const categoryList = [
   { code: 'convenience-store', name: '편의점' },
   { code: 'shopping', name: '쇼핑' },
   { code: 'culture', name: '문화시설' },
-  { code: 'event', name: '공연/행사' },
+  { code: 'event', name: '공연/행사' }
 ];
 
+// 정확한 분류코드 구조
 export const categoryDetailCodes = {
   tour: ['tour-nature', 'tour-tradition', 'tour-park', 'tour-theme-park'],
   food: ['food-korean', 'food-western', 'food-japanese', 'food-chinese', 'food-other'],
@@ -26,13 +27,11 @@ export const categoryDetailCodes = {
   'convenience-store': ['convenience-store'],
   shopping: ['shopping-permanent-market', 'shopping-department-store'],
   culture: ['culture'],
-  event: ['event'],
+  event: ['event']
 };
 
 const Map = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-
   const [mapObj, setMapObj] = useState(null);
   const [departure, setDeparture] = useState(null);
   const [destination, setDestination] = useState(null);
@@ -40,19 +39,18 @@ const Map = () => {
   const [routeList, setRouteList] = useState([]);
   const [selectedRouteIdx, setSelectedRouteIdx] = useState(null);
   const [polylines, setPolylines] = useState([]);
-  const [transferMarkers, setTransferMarkers] = useState();
-
   const [showSidebar, setShowSidebar] = useState(false);
   const [categoryMarkers, setCategoryMarkers] = useState([]);
   const [selectedPlaces, setSelectedPlaces] = useState([]);
   const [addedList, setAddedList] = useState([]);
-
+  const location = useLocation();
   const [sort, setSort] = useState();
   const [search, setSearch] = useState();
   const [departures, setDepartures] = useState([]);
   const [start, setStart] = useState();
   const [end, setEnd] = useState();
   const [middlePoint, setMiddlePoint] = useState();
+  const [transferMarkers, setTransferMarkers] = useState();
 
   useEffect(() => {
     const container = document.getElementById('map');
@@ -64,81 +62,91 @@ const Map = () => {
   }, []);
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    setSearch(searchParams.get("search") || "");
-    setSort(searchParams.get("sort") || "");
-    setDeparture(searchParams.get("start") || "");
-    setDestination(searchParams.get("end") || "");
-    setDepartures(searchParams.getAll("name") || []);
-  }, [location.search]);
+  const searchParams = new URLSearchParams(location.search);
+  const search = searchParams.get("search") || "";
+  const sort = searchParams.get("sort") || "";
+  const departure = searchParams.get("start") || "";
+  const destination = searchParams.get("end") || "";
+  const departures = searchParams.getAll("name") || "";
 
-  useEffect(() => {
-    if (
-      mapObj &&
-      location.state?.fromRandomPlace === true &&
-      location.state?.addedList?.[0]
-    ) {
-      const place = location.state.addedList[0];
-      const lat = parseFloat(place.latitude);
-      const lng = parseFloat(place.longitude);
+  setSearch(search);
+  setSort(sort);
+  setDeparture(departure);
+  setDestination(destination);
+  setDepartures(departures);
+}, [location.search]);
 
-      const marker = new kakao.maps.Marker({
-        map: mapObj,
-        position: new kakao.maps.LatLng(lat, lng),
-        title: place.name,
-      });
+   useEffect(() => {
+  if (
+    mapObj &&
+    location.state?.fromRandomPlace &&
+    location.state?.selectedPlace
+  ) {
+    const place = location.state.selectedPlace;
+    clearPolylines(polylines);
+    categoryMarkers.forEach(m => m.setMap(null));
 
-      mapObj.setCenter(new kakao.maps.LatLng(lat, lng));
-      setCategoryMarkers([marker]);
-      setSelectedPlaces([place]);
-      setShowSidebar(true);
-    }
-  }, [mapObj, location.state]);
+    const lat = parseFloat(place.latitude);
+    const lng = parseFloat(place.longitude);
+    const marker = new kakao.maps.Marker({
+      map: mapObj,
+      position: new kakao.maps.LatLng(lat, lng),
+      title: place.name
+    });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!search || !sort || search === 'random-place') return;
+    mapObj.setCenter(new kakao.maps.LatLng(lat, lng));
+    setCategoryMarkers([marker]);
+    setSelectedPlaces([place]);
+    setShowSidebar(true);
+  }
+ }, [mapObj, location.state]);
 
-      const allPlaces = [];
-      const markers = [];
 
-      try {
-        const res = await axios.get(
-          `${API_BASE_URL}/map?search=${search}&sort=${sort}${departure ? `&start=${departure}` : ''}${destination ? `&end=${destination}` : ''}${departures.length ? `&${departures.map((d) => `name=${d}`).join('&')}` : ''}`
-        );
+useEffect(() => {
+  const fetchData = async () => {
+    if (!search || !sort) return;
+    if (search === 'random-place') return; // ❌ 랜덤 추천일 땐 이 fetch 막기
 
-        const start = res.data?.start || null;
-        const end = res.data?.end || null;
-        const middlePoint = res.data?.middlePoint || null;
-        const items = res.data?.list || [];
+    const allPlaces = [];
+    const markers = [];
 
-        for (const place of items) {
-          if (!place.longitude || !place.latitude) continue;
+    try {
+      const res = await axios.get(
+        `${API_BASE_URL}/map?search=${search}&sort=${sort}${departure ? `&start=${departure}` : ''}${destination ? `&end=${destination}` : ''}${departures.length ? `&${departures.map((d) => `name=${d}`).join('&')}` : ''}`
+      );
 
-          const lat = parseFloat(place.latitude);
-          const lng = parseFloat(place.longitude);
-          const marker = new kakao.maps.Marker({
-            map: mapObj,
-            position: new kakao.maps.LatLng(lat, lng),
-            title: place.name,
-          });
-          markers.push(marker);
-        }
+      const start = res.data?.start || null;
+      const end = res.data?.end || null;
+      const middlePoint = res.data?.middlePoint || null;
+      const items = res.data?.list || [];
 
-        allPlaces.push(...items);
-        setStart(start);
-        setEnd(end);
-        setMiddlePoint(middlePoint);
-        setCategoryMarkers(markers);
-        setSelectedPlaces(allPlaces.slice(0, 50));
-        setShowSidebar(true);
-      } catch (err) {
-        console.error('❌ 전체 요청 실패:', err);
+      for (const place of items) {
+        if (!place.longitude || !place.latitude) continue;
+
+        const lat = parseFloat(place.latitude);
+        const lng = parseFloat(place.longitude);
+        const marker = new kakao.maps.Marker({
+          map: mapObj,
+          position: new kakao.maps.LatLng(lat, lng),
+          title: place.name,
+        });
+        markers.push(marker);
       }
-    };
 
-    fetchData();
-  }, [departure, destination, departures, sort, mapObj, search]);
+      allPlaces.push(...items);
+      setStart(start);
+      setEnd(end);
+      setMiddlePoint(middlePoint);
+      setCategoryMarkers(markers);
+      setSelectedPlaces(allPlaces.slice(0, 50));
+      setShowSidebar(true);
+    } catch (err) {
+      console.error('❌ 전체 요청 실패:', err);
+    }
+  };
+
+  fetchData();
+}, [departure, destination, departures, sort, mapObj, search]);
 
 
   useEffect(() => {

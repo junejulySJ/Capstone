@@ -69,11 +69,14 @@ function Login() {
         {errorMessage && <div className="error">{errorMessage}</div>}
 
         <button onClick={handleLogin}>로그인</button>
-
-        <div className="register-link" onClick={() => navigate("/register")}>
+        <div className="kakaoimg">
+        <a style={{textAlign: "center"}} href="https://kauth.kakao.com/oauth/authorize?client_id=d88db5d8494588ec7e3f5e9aa95b78d8&redirect_uri=http://localhost:3000/auth/kakao/callback&response_type=code"><img src="/images/kakao_login_medium_narrow.png" /></a>{/* 개발용 */}
+        {/*<a style={{textAlign: "center"}} href="https://kauth.kakao.com/oauth/authorize?client_id=d88db5d8494588ec7e3f5e9aa95b78d8&redirect_uri=https://meeting-map.kro.kr/auth/kakao/callback&response_type=code"><img src="/images/kakao_login_medium_narrow.png" /></a> 배포용*/}
+      </div>
+      </div>
+      <div className="register-link" onClick={() => navigate("/register")}>
           회원가입
         </div>
-      </div>
     </div>
   );
 }

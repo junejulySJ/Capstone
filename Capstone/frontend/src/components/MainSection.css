@@ -46,17 +46,10 @@
   z-index: 0;
 }
 
-.slider-content {
-  position: relative;
-  z-index: 2;
-  color: white;
-  font-size: 2rem;
-}
-
 .main-box {
   position: absolute;
   background-color: rgba(0, 0, 0, 0.4);
-  padding: 40px;
+  padding: 45px;
   border-radius: 16px;
   text-align: center;
   z-index: 2; /* 배경보다 위 */

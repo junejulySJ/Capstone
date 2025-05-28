@@ -13,6 +13,7 @@ import Register from './pages/Register';
 import Map from './pages/Map';
 import './App.css';
 import { AppProvider } from "./AppContext";
+import KakaoLogin from './pages/KakaoLogin';
 
 function AppContent() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -39,6 +40,7 @@ function AppContent() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/map" element={<Map />} />
+        <Route path="/auth/kakao/callback" element={<KakaoLogin />} />
       </Routes>
       </AppProvider>
     </div>

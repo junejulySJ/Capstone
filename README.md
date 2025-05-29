@@ -43,8 +43,14 @@
     <th>홈 (만보기 기록 확인)</th>
   </tr>
   <tr>
+  <table>
+  <tr>
     <td align="center">
-           <img src="./asset/Animation4.gif" width="250"/>
+      <img src="https://raw.githubusercontent.com/junejulySJ/Capstone/main/asset/Animation4.gif" width="250"/>
+    </td>
+  </tr>
+</table>
+
     </td>
     <td align="center">
       (추가 예정)

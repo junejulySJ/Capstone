@@ -44,7 +44,7 @@
   </tr>
   <tr>
     <td align="center">
-           <img src="./Capstone/asset/Animation4.gif" width="250"/>
+           <img src="./asset/Animation4.gif" width="100%"/>
     </td>
     <td align="center">
       (추가 예정)

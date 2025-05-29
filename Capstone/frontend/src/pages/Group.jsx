@@ -24,6 +24,9 @@ const Group = () => {
   const [postTexts, setPostTexts] = useState({});
   const [commentTexts, setCommentTexts] = useState({});
   const [openScheduleKey, setOpenScheduleKey] = useState(null);
+  const [groupTitle, setGroupTitle] = useState("");
+  const [groupDescription, setGroupDescription] = useState("");
+  const [showGroupForm, setShowGroupForm] = useState(false);
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState('member');
@@ -121,6 +124,10 @@ const Group = () => {
     m.userEmail.toLowerCase().includes(search.toLowerCase())
   );
 
+  const ToggleGroupForm = () => {
+    setShowGroupForm(!showGroupForm);
+  } 
+
   const toggleSchedule = (groupNo, scheduleNo) => {
     const key = `${groupNo}-${scheduleNo}`;
     setOpenScheduleKey(prev => (prev === key ? null : key));
@@ -128,6 +135,24 @@ const Group = () => {
 
   //const groupMembers = members.filter((m) => m.group === selectedGroup);
   //const uniqueGroups = [...new Set(members.map((m) => m.group))];
+
+  const handleAddGroup = async () => {
+    if (!groupTitle || !groupDescription) {
+      alert('그룹명, 그룹 설명을 입력해주세요.');
+      return;
+    }
+    try {
+      await axios.post(`${API_BASE_URL}/groups`, {
+        groupTitle,
+        groupDescription
+      }, { withCredentials: true });
+      setGroupTitle("");
+      setGroupDescription("");
+      fetchGroups();
+    } catch (err) {
+      handleError(err, "그룹 생성 실패");
+    }
+  };
 
   const handleAddMember = async () => {
     if (!newMember.name || !newMember.email || !newMember.group) {
@@ -293,6 +318,7 @@ const Group = () => {
             <table className="member-table">
               <thead>
                 <tr>
+                  <th>프로필 사진</th>
                   <th>이름</th>
                   <th>이메일</th>
                   <th>그룹</th>
@@ -302,6 +328,7 @@ const Group = () => {
               <tbody>
                 {filteredMembers.map((m, idx) => (
                   <tr key={idx}>
+                    <td><img src={m.userImg || "/images/default-pro.png"} alt="프로필" className="group-member-avatar" /></td>
                     <td>{m.userNick}</td>
                     <td>{m.userEmail}</td>
                     <td>{m.groupTitle}</td>
@@ -319,6 +346,36 @@ const Group = () => {
         {activeTab === 'group' && !selectedGroup && (
           <div className="group-list">
             <h3>그룹 목록</h3>
+            <button onClick={() => {
+                ToggleGroupForm();
+              }}>
+                {showGroupForm ? '작성 취소' : '그룹 생성'}
+              </button>
+              {showGroupForm && (
+                <div className="group-form">
+                  <input
+                    type="text"
+                    className="group-title-input"
+                    placeholder="그룹명을 입력하세요..."
+                    value={groupTitle}
+                    onChange={(e) =>
+                      setGroupTitle(e.target.value)
+                    }
+                  />
+                  <input
+                    type="text"
+                    className="group-description"
+                    placeholder="그룹 설명을 입력하세요..."
+                    value={groupDescription}
+                    onChange={(e) =>
+                      setGroupDescription(e.target.value)
+                    }
+                  />
+                  <button className="group-submit" onClick={handleAddGroup}>
+                    등록
+                  </button>
+                </div>
+              )}
             <ul>
               {groups.map((g, idx) => (
                 <li key={idx} onClick={() => setSelectedGroup(g)} style={{ cursor: 'pointer' }}>
@@ -341,7 +398,6 @@ const Group = () => {
 
             <div className="community-section">
               <h3>스케줄</h3>
-              <button>내 스케줄 등록</button>
               <p>{(groupDetails[selectedGroup.groupNo]?.schedules || []).map((item) => {
                 const key = `${selectedGroup.groupNo}-${item.scheduleNo}`;
                 const isOpen = openScheduleKey === key;
@@ -421,7 +477,7 @@ const Group = () => {
 
               <div className="post-list">
                 {(groupDetails[selectedGroup.groupNo]?.posts || []).map((post) => (
-                  <div key={post.groupBoardNo} className="post-item">
+                  <div key={post.groupBoardNo} className="post-item" style={{display: "block"}}>
                     <h2>{post.groupBoardTitle}</h2>
                     <p className="timestamp">{post.userNick} · {timeAgo(post.groupBoardUpdateDate)}</p>
                     {user && (user.userId === selectedGroup.groupCreatedUserId || user.userId === post.userId) && 
@@ -459,11 +515,23 @@ const Group = () => {
               </div>
             </div>
 
-            <div className="community-section">
+            <div className="community-section group-member-list">
               <h3>멤버 목록</h3>
-              <ul>
+              <ul className="group-member-items">
                 {(groupDetails[selectedGroup.groupNo]?.members || []).map((m) => (
-                  <li key={m.userId}>{m.userNick}</li>
+                  <li key={m.userId} className="group-member-item">
+                    <img
+                      src={m.userImg || "/images/default-pro.png"}
+                      alt="프로필"
+                      className="group-member-avatar"
+                    />
+                    <span className="group-member-nick">
+                      {m.userNick}
+                      {selectedGroup.groupCreatedUserId === m.userId && (
+                        <span className="group-member-badge">그룹장</span>
+                      )}
+                    </span>
+                  </li>
                 ))}
               </ul>
             </div>

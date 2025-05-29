@@ -296,12 +296,14 @@ useEffect(() => {
     <div className="schedule-wrapper">
       {sidebarVisible && (
         <div className="schedule-category-panel">
-        <CategorySidebar
-          category={selectedCategory}
-          places={selectedCategoryPlaces}
-          onClose={() => setSidebarVisible(false)}
-          onAddPlace={addToSchedule}
-        />
+       <CategorySidebar
+  category={selectedCategory}
+  places={selectedCategoryPlaces}
+  onClose={() => setSidebarVisible(false)}
+  onAddPlace={addToSchedule}
+  className="schedule-category-style" // ⭐ 추가
+/>
+
           </div>
       )}
 

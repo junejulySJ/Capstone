@@ -69,15 +69,38 @@ function Login() {
         {errorMessage && <div className="error">{errorMessage}</div>}
 
         <button onClick={handleLogin}>로그인</button>
-        <div className="kakaoimg">
-        <a style={{textAlign: "center"}} href="https://kauth.kakao.com/oauth/authorize?client_id=d88db5d8494588ec7e3f5e9aa95b78d8&redirect_uri=http://localhost:3000/auth/kakao/callback&response_type=code"><img src="/images/kakao_login_medium_narrow.png" /></a>{/* 개발용 */}
-        {/*<a style={{textAlign: "center"}} href="https://kauth.kakao.com/oauth/authorize?client_id=d88db5d8494588ec7e3f5e9aa95b78d8&redirect_uri=https://meeting-map.kro.kr/auth/kakao/callback&response_type=code"><img src="/images/kakao_login_medium_narrow.png" /></a> 배포용*/}
-      </div>
-      </div>
-      <div className="register-link" onClick={() => navigate("/register")}>
-          회원가입
-        </div>
-    </div>
+
+        <div style={{ width: '100%', marginBottom: '12px' }}>
+  <a
+    href="https://kauth.kakao.com/oauth/authorize?client_id=d88db5d8494588ec7e3f5e9aa95b78d8&redirect_uri=http://localhost:3000/auth/kakao/callback&response_type=code"
+    style={{
+      display: 'block',
+      width: '100%',
+      height: '44px',
+      backgroundColor: '#FEE500',
+      borderRadius: '6px',
+      overflow: 'hidden'
+    }}
+  >
+    <img
+      src="/images/kakao_login_medium_narrow.png"
+      alt="카카오 로그인"
+      style={{
+        width: '100%',
+        height: '100%',
+        objectFit: 'contain',
+        display: 'block'
+      }}
+    />
+  </a>
+</div>
+
+  {/* ⬇ 회원가입은 그 아래로 이동 */}
+  <div className="register-link" onClick={() => navigate("/register")}>
+    회원가입
+  </div>
+</div>
+</div>
   );
 }
 

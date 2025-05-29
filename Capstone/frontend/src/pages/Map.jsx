@@ -53,6 +53,10 @@ const Map = () => {
   const [middlePoint, setMiddlePoint] = useState();
   const [transferMarkers, setTransferMarkers] = useState();
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const handleRemovePlace = (indexToRemove) => {
+    setAddedList(prev => prev.filter((_, i) => i !== indexToRemove));
+  };
+  
 
   // 카카오 맵 객체 초기화
   useEffect(() => {
@@ -334,8 +338,8 @@ useEffect(() => {
   };
 
   return (
-    <div className="map-page">
-      <header className="map-header">
+<div className="map-page map-page-scroll-fix">
+<header className="map-header">
         <h1 className="map-header-text" onClick={handleHeaderClick}>MeetingMap</h1>
       </header>
 
@@ -427,8 +431,24 @@ useEffect(() => {
           ) : (
             <ul>
               {addedList.map((place, index) => (
-                <li key={index}>{place.name} ({place.address})</li>
-              ))}
+  <li key={index}>
+    {place.name} ({place.address})
+    <button
+      onClick={() => handleRemovePlace(index)}
+      style={{
+        marginLeft: '8px',
+        background: 'transparent',
+        border: 'none',
+        color: 'red',
+        cursor: 'pointer',
+        fontSize: '16px'
+      }}
+    >
+      ❌
+    </button>
+  </li>
+))}
+
             </ul>
           )}
         </div>

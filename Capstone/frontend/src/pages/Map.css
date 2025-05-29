@@ -38,7 +38,7 @@
   top: 10px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.9);
   padding: 5px 7px;
   border-radius: 12px;
   border: 1px solid #8b8b8b;
@@ -107,7 +107,7 @@
   right: 18px;
   width: 250px;
   /* 적당한 크기 설정 */
-  background-color: rgba(255, 248, 220, 0.5);
+  background-color: rgba(255, 248, 220, 1.0);
   /* 배경색과 투명도 설정 (배경색 #fff8dc, 80% opacity) */
   border-radius: 10px;
   padding: 15px;
@@ -150,7 +150,9 @@
 }
 
 .transport-select {
-  margin-bottom: 15px;
+  display: flex;
+  gap: 20px; /* 버튼 간격 */
+  margin-bottom: 10px; /* 아래 여백 (선택) */
 }
 
 .transport-select button {
@@ -195,7 +197,7 @@
   /* 적당한 너비 설정 */
   height: 200px;
   /* 최대 높이 설정 */
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.9);
   /* 배경을 흰색으로 하고 80% 투명도 */
   border-radius: 10px;
   padding: 15px;
@@ -226,4 +228,9 @@
   font-weight: bold;
   color: #333;
   margin-bottom: 10px;
+}
+
+.map-page-scroll-fix {
+  overflow: hidden;
+  height: 100vh; /* 또는 필요 시 auto 조정 */
 }

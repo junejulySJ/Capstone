@@ -1,9 +1,9 @@
 import React from 'react';
 import './CategorySidebar.css';
 
-const CategorySidebar = ({ places = [], onClose, onAddPlace, addedList = [] }) => {
+const CategorySidebar = ({ places = [], onClose, onAddPlace, addedList = [], className }) => {
   return (
-    <div className="category-sidebar">
+<div className={`category-sidebar ${className || ''}`}>
       <div className="category-header">
         <h3>카테고리</h3>
         <button className="close-button" onClick={onClose}>닫기</button>

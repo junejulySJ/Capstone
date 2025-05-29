@@ -52,7 +52,7 @@
   /* spacing for each item */
   /* padding: 15px; */
   border-radius: 10px;
-  background-color: rgba(249, 249, 249, 0.3); /* 더 투명하게 조정 */
+  background-color: rgba(249, 249, 249, 0.9); /* 더 투명하게 조정 */
   border: 1px solid #ddd;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;

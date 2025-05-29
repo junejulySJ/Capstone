@@ -32,7 +32,30 @@
 - **API**: Kakao Map API, Tmap API, Tour API  
 - **DB**: MySQL  
 - **언어**: Java, JavaScript  
-- **IDE**: IntelliJ, VSCode  
+- **IDE**: IntelliJ, VSCode
+
+## 🎥 시연 영상
+
+<table>
+  <tr>
+    <th>회원가입</th>
+    <th>홈 (하이킹 기록 확인)</th>
+    <th>홈 (만보기 기록 확인)</th>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/junejulySJ/Capstone/assets/20504896/Animation1-ezgif.com-optimize.gif" width="250"/>
+    </td>
+    <td align="center">
+      (추가 예정)
+    </td>
+    <td align="center">
+      (추가 예정)
+    </td>
+  </tr>
+</table>
+
+
 <p align="center">
   <img src="https://github.com/user-attachments/assets/38090353-a309-43e5-90cf-3b228ef27cd7" width="500"/>
 </p>

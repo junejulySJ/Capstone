@@ -22,9 +22,10 @@ const CategorySidebar = ({ places = [], onClose, onAddPlace, addedList = [], cla
             places.map((place, index) => (
               <div key={index} className="place-item">
                 <div className="place-thumbnail-container">
-                  {place.thumbnail ? (
+                  {/* ✅ imageUrl 우선 사용, 없으면 thumbnail 사용 */}
+                  {place.imageUrl || place.thumbnail ? (
                     <img
-                      src={place.thumbnail}
+                      src={place.imageUrl || place.thumbnail}
                       alt={place.name}
                       className="place-thumbnail"
                     />

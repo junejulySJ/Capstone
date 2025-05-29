@@ -82,12 +82,15 @@ const Map = () => {
     location.state?.fromRandomPlace &&
     location.state?.selectedPlace
   ) {
-    const place = location.state.selectedPlace;
+    const { name, address, latitude, longitude, imageUrl } = location.state.selectedPlace;
+    const place = { name, address, latitude, longitude, imageUrl };
+
     clearPolylines(polylines);
     categoryMarkers.forEach(m => m.setMap(null));
 
     const lat = parseFloat(place.latitude);
     const lng = parseFloat(place.longitude);
+    
     const marker = new kakao.maps.Marker({
       map: mapObj,
       position: new kakao.maps.LatLng(lat, lng),
@@ -105,43 +108,50 @@ const Map = () => {
 useEffect(() => {
   const fetchData = async () => {
     if (!search || !sort) return;
-    if (search === 'random-place') return; // ❌ 랜덤 추천일 땐 이 fetch 막기
+    if (search === 'random-place') return; // 랜덤일 땐 건너뜀
 
     const allPlaces = [];
     const markers = [];
 
+    // ——— 여기서 2번 마커를 추가하고 싶다면 ———
+    // (1) 하드코딩 좌표를 쓸 수도 있고…
+    const secondLat = 37.5665;
+    const secondLng = 126.9780;
+    const marker2 = new kakao.maps.Marker({
+      map: mapObj,
+      position: new kakao.maps.LatLng(secondLat, secondLng),
+      title: '두 번째 마커'
+    });
+    markers.push(marker2);
+    // ————————————————————————————————
+
     try {
       const res = await axios.get(
-        `${API_BASE_URL}/map?search=${search}&sort=${sort}${departure ? `&start=${departure}` : ''}${destination ? `&end=${destination}` : ''}${departures.length ? `&${departures.map((d) => `name=${d}`).join('&')}` : ''}`
+        `${API_BASE_URL}/map?search=${search}&sort=${sort}` +
+        `${departure ? `&start=${departure}` : ''}` +
+        `${destination ? `&end=${destination}` : ''}` +
+        `${departures.length ? `&${departures.map(d=>`name=${d}`).join('&')}` : ''}`
       );
-
-      const start = res.data?.start || null;
-      const end = res.data?.end || null;
-      const middlePoint = res.data?.middlePoint || null;
-      const items = res.data?.list || [];
+      const items = res.data.list || [];
 
       for (const place of items) {
         if (!place.longitude || !place.latitude) continue;
-
         const lat = parseFloat(place.latitude);
         const lng = parseFloat(place.longitude);
         const marker = new kakao.maps.Marker({
           map: mapObj,
           position: new kakao.maps.LatLng(lat, lng),
-          title: place.name,
+          title: place.name
         });
         markers.push(marker);
+        allPlaces.push(place);
       }
 
-      allPlaces.push(...items);
-      setStart(start);
-      setEnd(end);
-      setMiddlePoint(middlePoint);
       setCategoryMarkers(markers);
       setSelectedPlaces(allPlaces.slice(0, 50));
       setShowSidebar(true);
     } catch (err) {
-      console.error('❌ 전체 요청 실패:', err);
+      console.error('전체 요청 실패:', err);
     }
   };
 

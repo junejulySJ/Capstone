@@ -166,6 +166,8 @@ export default function MainSection() {
       // 2) 첫 번째 추천 결과를 선택
       const place = res.data[0];
 
+      const imageUrl = placeBackgrounds[randomPlace];
+
       // 3) Map 페이지로 이동하면서 state 에 전체 place 객체 전달
       navigate('/map?search=random-place', {
         state: {
@@ -174,7 +176,8 @@ export default function MainSection() {
             name: place.placeName,
             address: place.address_name || place.road_address_name,
             latitude: place.y,
-            longitude: place.x
+            longitude: place.x,
+            imageUrl
           }
         }
       });

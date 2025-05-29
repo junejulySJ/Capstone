@@ -44,7 +44,7 @@
   </tr>
   <tr>
     <td align="center">
-      <img src="https://github.com/junejulySJ/Capstone/assets/20504896/Animation1-ezgif.com-optimize.gif" width="250"/>
+           <img src="./asset/Animation4.gif" width="250"/>
     </td>
     <td align="center">
       (추가 예정)

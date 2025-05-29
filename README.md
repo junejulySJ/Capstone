@@ -42,32 +42,32 @@
     <th>메인페이지</th>
   </tr>
   <tr>
-    <td><img src="./Capstone/asset/Animation5.gif" width="100%" height="600px"/></td>
-    <td><img src="./Capstone/asset/Animation4.gif" width="100%" height="600px"/></td>
+    <td><img src="./Capstone/asset/Animation5.gif" width="100%" height="300px"/></td>
+    <td><img src="./Capstone/asset/Animation4.gif" width="100%" height="300px"/></td>
   </tr>
   <tr>
     <th>3</th>
     <th>4</th>
   </tr>
   <tr>
-    <td><img src="./asset/img3.gif" width="100%" height="600px"/></td>
-    <td><img src="./asset/img4.gif" width="100%" height="600px"/></td>
+    <td><img src="./asset/img3.gif" width="100%" height="300px"/></td>
+    <td><img src="./asset/img4.gif" width="100%" height="300px"/></td>
   </tr>
   <tr>
     <th>5</th>
     <th>6</th>
   </tr>
   <tr>
-    <td><img src="./asset/img5.gif" width="100%" height="600px"/></td>
-    <td><img src="./asset/img6.gif" width="100%" height="600px"/></td>
+    <td><img src="./asset/img5.gif" width="100%" height="300px"/></td>
+    <td><img src="./asset/img6.gif" width="100%" height="300px"/></td>
   </tr>
   <tr>
     <th>7</th>
     <th>8</th>
   </tr>
   <tr>
-    <td><img src="./asset/img7.gif" width="100%" height="600px"/></td>
-    <td><img src="./asset/img8.gif" width="100%" height="600px"/></td>
+    <td><img src="./asset/img7.gif" width="100%" height="300px"/></td>
+    <td><img src="./asset/img8.gif" width="100%" height="300px"/></td>
   </tr>
   <tr>
     <th>9</th>

@@ -8,33 +8,6 @@ import { useAppContext } from '../AppContext'; // AppContext import
 const API_BASE = 'http://localhost:8080/api';
 
 
-export function timeAgo(dateString) {
-    const now = new Date();
-    const date = new Date(dateString);
-    const diffInSeconds = Math.floor((now - date) / 1000);
-
-    const seconds = diffInSeconds;
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-    const months = Math.floor(days / 30);  // 평균적인 계산
-    const years = Math.floor(days / 365);
-
-    if (seconds < 60) {
-        return `${seconds}초 전`;
-    } else if (minutes < 60) {
-        return `${minutes}분 전`;
-    } else if (hours < 24) {
-        return `${hours}시간 전`;
-    } else if (days < 30) {
-        return `${days}일 전`;
-    } else if (months < 12) {
-        return `${months}달 전`;
-    } else {
-        return `${years}년 전`;
-    }
-}
-
 const PostDetail = () => {
     const [selectedPost, setSelectedPost] = useState(null);
     const [comments, setComments] = useState([]);
@@ -54,12 +27,44 @@ const PostDetail = () => {
 
             // 댓글 조회
             const commentRes = await axios.get(`${API_BASE}/boards/${boardNo}/comments`);
-            setComments(commentRes.data || []);
+            // 댓글에 대해 '시간 차이'만 계산해서 저장
+            const commentsWithTimeAgo = commentRes.data.map((comment) => ({
+                ...comment,
+                timeAgo: timeAgo(comment.commentWriteDate)
+            }));
+            setComments(commentsWithTimeAgo || []);
         } catch (err) {
             console.error('게시글 또는 댓글 조회 실패:', err);
         }
     };
 
+    // 시간 계산 함수 (timeAgo)
+    const timeAgo = (dateString) => {
+        const now = new Date();
+        const date = new Date(dateString);
+        const diffInSeconds = Math.ceil((now - date) / 1000); // ceil을 사용하여 항상 1초 이상 차이로 처리
+
+        const seconds = diffInSeconds;
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+        const months = Math.floor(days / 30);  // 평균적인 계산
+        const years = Math.floor(days / 365);
+
+        if (seconds < 60) {
+            return `${seconds}초 전`;
+        } else if (minutes < 60) {
+            return `${minutes}분 전`;
+        } else if (hours < 24) {
+            return `${hours}시간 전`;
+        } else if (days < 30) {
+            return `${days}일 전`;
+        } else if (months < 12) {
+            return `${months}달 전`;
+        } else {
+            return `${years}년 전`;
+        }
+    };
     // 좋아요 버튼 클릭
     const toggleLike = async () => {
         if (!user) {
@@ -220,7 +225,7 @@ const PostDetail = () => {
                         <div key={comment.commentNo} className="comment-item">
                             <p><strong>{comment.userNick}</strong> · {comment.commentContent}</p>
                             <p className="comment-date">
-                                {timeAgo(comment.commentWriteDate)}
+                                {comment.timeAgo} {/* 이미 계산된 timeAgo 사용 */}
                             </p>
                             {editingCommentId === comment.commentNo ? (
                                 <>

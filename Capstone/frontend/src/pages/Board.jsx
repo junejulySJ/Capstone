@@ -105,78 +105,7 @@ const Board = () => {
     }
   };
 
-  // 댓글 작성
-  const postComment = async () => {
-    if (!user) {
-      alert('댓글을 작성하려면 로그인해야 합니다.');
-      return;
-    }
-    if (!newComment.trim()) return;
-    try {
-      await axios.post(`${API_BASE_URL}/boards/${selectedPost.boardNo}/comments`, {
-        commentContent: newComment
-      }, { withCredentials: true });
-      setNewComment('');
-      fetchComments(selectedPost.boardNo);
-    } catch (err) {
-      console.error('댓글 작성 실패:', err);
-    }
-  };
 
-  // 댓글 수정
-  const updateComment = async (commentNo) => {
-    try {
-      await axios.put(`${API_BASE_URL}/comments/${commentNo}`, {
-        commentContent: editingContent
-      }, { withCredentials: true });
-      setEditingCommentId(null);
-      setEditingContent('');
-      fetchComments(selectedPost.boardNo);
-    } catch (err) {
-      console.error('댓글 수정 실패:', err);
-    }
-  };
-
-  // 댓글 삭제
-  const deleteComment = async (commentNo) => {
-    const confirmed = window.confirm('정말로 이 댓글을 삭제하시겠습니까?');
-    if (!confirmed) return;
-
-    try {
-      await axios.delete(`${API_BASE_URL}/comments/${commentNo}`, { withCredentials: true });
-      fetchComments(selectedPost.boardNo);
-    } catch (err) {
-      console.error('댓글 삭제 실패:', err);
-    }
-  };
-
-  // 게시글 좋아요
-  const toggleLike = async () => {
-    if (!user) {
-      alert('좋아요를 누르려면 로그인해야 합니다.');
-      return;
-    }
-    try {
-      await axios.post(`${API_BASE_URL}/boards/${selectedPost.boardNo}/like`, {}, { withCredentials: true });
-      fetchPostDetail(selectedPost.boardNo);
-    } catch (err) {
-      console.error('좋아요 실패:', err);
-    }
-  };
-
-  // 게시글 싫어요
-  const toggleHate = async () => {
-    if (!user) {
-      alert('좋아요를 누르려면 로그인해야 합니다.');
-      return;
-    }
-    try {
-      await axios.post(`${API_BASE_URL}/boards/${selectedPost.boardNo}/hate`, {}, { withCredentials: true });
-      fetchPostDetail(selectedPost.boardNo);
-    } catch (err) {
-      console.error('싫어요 실패:', err);
-    }
-  };
 
 
 
@@ -213,15 +142,29 @@ const Board = () => {
               className="post-item"
               onClick={() => navigate(`/boards/${post.boardNo}`)} // 상세 페이지로 이동
             >
-              <h2 className="board-title">{post.boardTitle}</h2>
-
-              <div className='board-title-bottom'>
-                <p className="description">{post.boardDescription}</p>
-                <p className="timestamp">
-                  {post.userNick} · {new Date(post.boardWriteDate).toLocaleDateString()}
-                </p>
+              {/* 썸네일 이미지 추가 */}
+              <div className="thumbnail-container">
+                {post.thumbnailUrl ? (
+                  <img
+                    src={post.thumbnailUrl}
+                    alt={post.boardTitle}
+                    className="thumbnail-image"
+                  />
+                ) : (
+                  <span className="no-thumbnail">이미지 없음</span> // 이미지 없을 경우 대체 텍스트
+                )}
               </div>
 
+              <div className="post-content">
+                <h2 className="board-title">{post.boardTitle}</h2>
+
+                <div className="board-title-bottom">
+                  <p className="description">{post.boardDescription}</p>
+                  <p className="timestamp">
+                    {post.userNick} · {new Date(post.boardWriteDate).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
             </div>
           ))}
         </div>

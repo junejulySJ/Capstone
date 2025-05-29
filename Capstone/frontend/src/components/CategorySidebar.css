@@ -1,4 +1,4 @@
-/* CategorySidebar.module.css - Kakao 스타일 사이드바 UI */
+/* CategorySidebar.module.css - Refined Kakao-style Sidebar UI */
 .category-sidebar {
   position: absolute;
   top: 10px;
@@ -6,7 +6,7 @@
   z-index: 10;
   background-color: rgba(255, 255, 255, 0.3); /* 투명도를 0.6으로 변경 */
   width: 370px;
-  height: 570px;
+  max-height: 570px;
   /* Optional: limit the height */
   overflow-y: auto;
   /* Make sidebar scrollable if content overflows */
@@ -15,7 +15,7 @@
 }
 
 .category-header {
-  padding: 10px 15px;
+  padding: 0px 15px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -23,7 +23,7 @@
   font-weight: bold;
 }
 
-.category-header h3 {
+.header h3 {
   margin: 0;
 }
 
@@ -45,7 +45,6 @@
   padding: 0px;
   flex-grow: 1;
 }
-
 
 .place-item {
   /* margin: 15px 20px; */
@@ -79,6 +78,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  
 }
 
 .no-image-text {
@@ -144,4 +144,104 @@
 
 .matched-route-box:hover {
   background-color: #d9e7ff;
+}
+
+
+/* 모바일 화면에 적용할 스타일 */
+@media (max-width: 768px) {
+  /* 화면 하단에 사이드바 고정 */
+  .category-sidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    width: 100%;
+    height: 60%;  
+    background-color: rgba(255, 255, 255, 0.9);  /* 더 선명한 배경 */
+    border-radius: 8px 8px 0 0;  /* 상단에만 둥글게 처리 */
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
+    transform: translateY(100%);  /* 기본적으로 하단에 숨겨둠 */
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .category-sidebar.open {
+    transform: translateY(0);  /* open 클래스를 추가하면 위로 슬라이드 */
+  }
+
+  /* 카테고리 헤더 크기 조정 */
+  .category-header {
+    padding: 8px 15px;  /* 헤더 높이 줄이기 */
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  /* 콘텐츠 부분의 스타일 */
+  .place-list {
+    padding: 5px 0;
+    max-height: 450px;  /* 목록의 최대 높이를 줄여서 공간 절약 */
+    overflow-y: auto;
+  }
+
+  .place-item {
+    margin: 5px 8px;  /* 아이템 간 간격 줄이기 */
+    padding: 6px 8px;  /* 아이템 패딩 줄이기 */
+    border-radius: 8px;
+    background-color: rgba(249, 249, 249, 0.7);
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    gap: 8px;  /* 간격을 더 줄여서 아이템 크기 줄이기 */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .place-item:hover {
+    background-color: rgba(233, 236, 239, 0.8);
+  }
+
+  /* 이미지 크기 축소 */
+  .place-thumbnail-container {
+    width: 70px;  /* 이미지 크기 더 줄이기 */
+    height: 70px;
+  }
+
+  .place-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* 텍스트 크기 축소 */
+  .place-title {
+    font-size: 13px;  /* 제목 글자 크기 줄이기 */
+    font-weight: bold;
+    margin-bottom: 3px;  /* 제목과 설명 간 간격 축소 */
+  }
+
+  .place-desc {
+    font-size: 11px;  /* 설명 글자 크기 축소 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    width: 140px;  /* 텍스트가 넘어갈 수 있는 일정한 너비 설정 */
+  }
+
+  /* 버튼 크기 축소 */
+  .place-item button {
+    font-size: 11px;  /* 버튼 글자 크기 축소 */
+    padding: 4px 6px;  /* 버튼 크기 줄이기 */
+  }
+
+  .place-item button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+  }
+
+  .place-item button:hover {
+    background-color: #218838;
+  }
+}
+
+@media (max-width: 480px) {
+
 }

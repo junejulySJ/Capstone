@@ -3,12 +3,13 @@
   padding: 20px;
   max-width: 900px;
   margin: 0 auto;
-  margin-top: 100px;
-  border: 1px solid black;
+  margin-top: 50px;
+  border: 1px solid rgb(170, 170, 170);
   border-radius: 10px;
   /* height: 700px; */
-  background-color: #eefff1;
+  background-color: #fafafa;
   margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 추가 */
 }
 
 
@@ -28,7 +29,7 @@
   border-radius: 10px;
   min-height: 500px;
   border: 1px solid rgb(160, 160, 160);
-  padding: 10px 10px
+  padding: 10px 10px;
 }
 
 .post-detail-page .content {
@@ -49,19 +50,20 @@
   border-radius: 5px;
   font-size: 1rem;
   
-  background-color: white;
+  /* background-color: white; */
   border: 1px solid rgb(160, 160, 160);
 }
 
 .post-detail-page .like-hate-buttons button:hover {
   opacity: 0.8;
 }
-/* .board-like-button{
-  color: blue;
+
+.board-like-button{
+  background-color: #eefff1;
 }
 .board-hate-button{
-  color: red;
-} */
+  background-color: #eefff1;
+}
 
 .post-detail-page .comment-section {
   margin-top: 30px;
@@ -106,26 +108,7 @@
   font-weight: bold;
 }
 
-.comment-item button {
-  padding: 5px 10px;
-  margin-left: 10px;
-  background-color: #ffc107;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
 
-.comment-item button:hover {
-  background-color: #e0a800;
-}
-
-.comment-item button:nth-child(2) {
-  background-color: #dc3545;
-}
-
-.comment-item button:nth-child(2):hover {
-  background-color: #c82333;
-}
 
 .board-detail-title {
   border-radius: 10px;

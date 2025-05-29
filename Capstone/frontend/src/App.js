@@ -13,6 +13,7 @@ import Register from './pages/Register';
 import Map from './pages/Map';
 import PostWrite from './pages/PostWrite';
 import PostDetail from './pages/PostDetail';
+import PostUpdate from './pages/PostUpdate';
 import './App.css';
 import { AppProvider } from "./AppContext";
 import KakaoLogin from './pages/KakaoLogin';
@@ -47,6 +48,7 @@ function AppContent() {
         <Route path="/auth/kakao/callback" element={<KakaoLogin />} />
         <Route path="/write" element={<PostWrite />} /> {/* 게시글 작성 페이지 */}
         <Route path="/boards/:boardNo" element={<PostDetail />} /> {/* 라우트 설정 */}
+        <Route path="/edit/:boardNo" element={<PostUpdate />} />
       </Routes>
       {isMobile && <MobileBottomNav />} {/* ✅ 모바일에서만 표시 */}
       </AppProvider>

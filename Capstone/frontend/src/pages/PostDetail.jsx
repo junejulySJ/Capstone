@@ -143,6 +143,29 @@ const PostDetail = () => {
         return <div>로딩 중...</div>;  // 데이터가 없을 경우 로딩 화면
     }
 
+    // 게시글 삭제
+    const deletePost = async (boardNo) => {
+        if (window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
+            try {
+                const res = await axios.delete(`${API_BASE}/boards/${boardNo}`, { withCredentials: true });
+                alert('게시글이 삭제되었습니다.');
+                navigate('/board'); // 게시판 목록으로 이동
+            } catch (err) {
+                console.error('게시글 삭제 실패:', err);
+                alert('삭제 실패');
+            }
+        }
+    };
+
+    // 게시글 수정
+    const handleEditClick = () => {
+        if (selectedPost.userId === user.userId) {
+            navigate(`/edit/${selectedPost.boardNo}`);
+        } else {
+            alert('본인 게시글만 수정할 수 있습니다.');
+        }
+    };
+
     return (
         <div className="post-detail-page">
             <button onClick={() => navigate('/board')} className='board-content-back-button'><FaArrowLeft /> 뒤로가기</button>
@@ -153,15 +176,15 @@ const PostDetail = () => {
                 {/* 이미지 출력 영역 */}
                 {selectedPost.boardFiles && selectedPost.boardFiles.length > 0 && (
                     <div className="board-images">
-                    {selectedPost.boardFiles.map((file, index) => (
-                        <img
-                        key={index}
-                        src={file.fileUrl}
-                        alt={`첨부 이미지 ${index + 1}`}
-                        className="board-image"
-                        />
-                    ))}
-                </div>)}
+                        {selectedPost.boardFiles.map((file, index) => (
+                            <img
+                                key={index}
+                                src={file.fileUrl}
+                                alt={`첨부 이미지 ${index + 1}`}
+                                className="board-image"
+                            />
+                        ))}
+                    </div>)}
 
                 {selectedPost.boardContent}
             </div>
@@ -176,6 +199,13 @@ const PostDetail = () => {
                 <button onClick={toggleLike} className='board-like-button'><FaThumbsUp /> 좋아요 ({selectedPost.boardLike})</button>
                 <button onClick={toggleHate} className='board-hate-button'><FaThumbsDown /> 싫어요 ({selectedPost.boardHate})</button>
             </div>
+
+            {user?.userId === selectedPost.userId && ( // 로그인한 사용자와 게시글 작성자 일치
+                <div className="edit-delete-buttons">
+                    <button onClick={() => navigate(`/edit/${selectedPost.boardNo}`)} className="edit-button">수정</button>
+                    <button onClick={() => deletePost(selectedPost.boardNo)} className="delete-button">삭제</button>
+                </div>
+            )}
 
             <div className="comment-section">
                 <textarea
@@ -195,7 +225,7 @@ const PostDetail = () => {
                             {editingCommentId === comment.commentNo ? (
                                 <>
                                     <textarea
-                                    className='board-content-textarea'
+                                        className='board-content-textarea'
                                         value={editingContent}
                                         onChange={(e) => setEditingContent(e.target.value)}
                                     />

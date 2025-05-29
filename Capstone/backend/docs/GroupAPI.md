@@ -1,33 +1,20 @@
-## 📚 목차
-- [Home](../README.md)
-- [User API](UserAPI.md) [(Example)](UserAPIDetail.md)
-- [Auth API](AuthAPI.md)
-- [Friendship API](FriendshipAPI.md)
-- [Map API](MapAPI.md) [(Example)](MapAPIDetail.md)
-- [Schedule API](ScheduleAPI.md) [(Example)](ScheduleAPIDetail.md)
-- [Path API](PathAPI.md) [(Example)](PathAPIDetail.md)
-- [Board API](BoardAPI.md) [(Example)](BoardAPIDetail.md)
-- [Comment API](CommentAPI.md) [(Example)](CommentAPIDetail.md)
-- **Group API** [(Example)](GroupAPIDetail.md)
-- [GroupBoard API](GroupBoardAPI.md) [(Example)](GroupBoardAPIDetail.md)
-
 # Group API
 ## API 바로가기
-| API 호출                                                          | 설명                    |
-|-----------------------------------------------------------------|-----------------------|
-| [GET /groups/{groupNo}](#그룹-조회)                                 | 그룹 조회                 |
-| [GET /groups/{groupNo}/members](#그룹-멤버-조회)                      | 그룹 멤버 조회              |
-| [GET /groups/members](#소속되어있는-전체-그룹-멤버-조회)                      | 소속되어있는 전체 그룹 멤버 조회 ✏️ |
-| [POST /groups](#그룹-생성)                                          | 그룹 생성                 |
-| [PUT /groups/{groupNo}](#그룹-수정)                                 | 그룹 수정                 |
-| [DELETE /groups/{groupNo}](#그룹-삭제)                              | 그룹 삭제                 |
-| [DELETE /groups/{groupNo}/members/{deleteUserId}](#그룹-멤버-강제-탈퇴) | 그룹 멤버 강제 탈퇴           |
-| [POST /groups/invitations](#그룹-초대)                              | 그룹 초대 ✏️              |
-| [GET /groups/invitations](#그룹-초대-목록-조회)                         | 그룹 초대 목록 조회           |
-| [POST /groups/invitations/{invitationNo}/{status}](#그룹-초대-수락거절) | 그룹 초대 수락/거절           |
-| [POST /groups/{groupNo}/schedules](#그룹-내-스케줄-공유)                | 그룹 내 스케줄 공유           |
-| [GET /groups/{groupNo}/schedules](#그룹-내-공유된-스케줄-조회)             | 그룹 내 공유된 스케줄 조회 ✏️    |
-| [DELETE /groups/{groupNo}/schedules/{scheduleNo}](#공유-스케줄-삭제)   | 공유 스케줄 삭제             |
+| API 호출                                                          | 설명                 |
+|-----------------------------------------------------------------|--------------------|
+| [GET /groups/{groupNo}](#그룹-조회)                                 | 그룹 조회              |
+| [GET /groups/{groupNo}/members](#그룹-멤버-조회)                      | 그룹 멤버 조회           |
+| [GET /groups/members](#소속되어있는-전체-그룹-멤버-조회)                      | 소속되어있는 전체 그룹 멤버 조회 |
+| [POST /groups](#그룹-생성)                                          | 그룹 생성              |
+| [PUT /groups/{groupNo}](#그룹-수정)                                 | 그룹 수정              |
+| [DELETE /groups/{groupNo}](#그룹-삭제)                              | 그룹 삭제              |
+| [DELETE /groups/{groupNo}/members/{deleteUserId}](#그룹-멤버-강제-탈퇴) | 그룹 멤버 강제 탈퇴        |
+| [POST /groups/invitations](#그룹-초대)                              | 그룹 초대              |
+| [GET /groups/invitations](#그룹-초대-목록-조회)                         | 그룹 초대 목록 조회        |
+| [POST /groups/invitations/{invitationNo}/{status}](#그룹-초대-수락거절) | 그룹 초대 수락/거절        |
+| [POST /groups/{groupNo}/schedules](#그룹-내-스케줄-공유)                | 그룹 내 스케줄 공유        |
+| [GET /groups/{groupNo}/schedules](#그룹-내-공유된-스케줄-조회)             | 그룹 내 공유된 스케줄 조회    |
+| [DELETE /groups/{groupNo}/schedules/{scheduleNo}](#공유-스케줄-삭제)   | 공유 스케줄 삭제          |
 
 ---
 

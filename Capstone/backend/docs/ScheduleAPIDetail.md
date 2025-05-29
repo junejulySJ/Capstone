@@ -1,27 +1,10 @@
-## 📚 목차
-- [Home](../README.md)
-- [User API](UserAPI.md) [(Example)](UserAPIDetail.md)
-- [Auth API](AuthAPI.md)
-- [Friendship API](FriendshipAPI.md)
-- [Map API](AuthAPI.md) [(Example)](MapAPIDetail.md)
-- [Schedule API](ScheduleAPI.md) **(Example)**
-- [Path API](PathAPI.md) [(Example)](PathAPIDetail.md)
-- [Board API](BoardAPI.md) [(Example)](BoardAPIDetail.md)
-- [Comment API](CommentAPI.md) [(Example)](CommentAPIDetail.md)
-- [Group API](GroupAPI.md) [(Example)](GroupAPIDetail.md)
-- [GroupBoard API](GroupBoardAPI.md) [(Example)](GroupBoardAPIDetail.md)
-- [GroupComment API](GroupCommentAPI.md) [(Example)](GroupCommentAPIDetail.md)
-
 # Schedule API 예시
 ## API 바로가기
 | API 호출                                                 | 설명             |
 |--------------------------------------------------------|----------------|
 | [GET /schedules](#자신이-만든-스케줄-조회)                       | 자신이 만든 스케줄 조회  |
-| [GET /schedules/{scheduleNo}/members](#스케줄에-참여한-회원-조회) | 스케줄에 참여한 회원 조회 |
 | [POST /schedule/create](#스케줄-생성)                       | 스케줄 생성         |
 | [POST /schedules](#스케줄-저장)                             | 스케줄 저장         |
-| [POST /schedules/share](#스케줄-공유)                       | 스케줄 공유         |
-| [POST /schedules/unshare](#스케줄-공유-취소)                  | 스케줄 공유 취소      |
 | [PUT /schedules](#스케줄-수정)                              | 스케줄 수정         |
 | [DELETE /schedules{scheduleNo}](#스케줄-삭제)               | 스케줄 삭제         |
 
@@ -223,7 +206,7 @@ axios.post(`${API_BASE_URL}/api/schedules/create`,
 }
 ```
 
-#### Request 예시 2 (AI 추천 O) ✏️
+#### Request 예시 2 (AI 추천 O)
 ```javascript
 axios.post(`${API_BASE_URL}/api/schedules/create`,
     {
@@ -254,7 +237,7 @@ axios.post(`${API_BASE_URL}/api/schedules/create`,
 )
 ```
 
-#### Response 예시 2 (AI 추천 O) ✏️
+#### Response 예시 2 (AI 추천 O)
 ```json
 {
   "places": [
@@ -375,38 +358,6 @@ axios.post(`${API_BASE_URL}/schedules`, { withCredentials: true },
                 "scheduleStartTime": "2025-06-01T14:30:00",
                 "scheduleEndTime": "2025-06-01T15:30:00"
             }
-        ]
-    }
-)
-```
-
----
-
-### 스케줄 공유
-
-#### Request 예시 1
-```javascript
-axios.post(`${API_BASE_URL}/schedules/share`, { withCredentials: true },
-    {
-        "scheduleNo": 1,
-        "userIds": [
-            "user2"
-        ]
-    }
-)
-```
-
----
-
-### 스케줄 공유 취소
-
-#### Request 예시 1
-```javascript
-axios.post(`${API_BASE_URL}/schedules/unshare`, { withCredentials: true },
-    {
-        "scheduleNo": 1,
-        "userIds": [
-            "user2"
         ]
     }
 )

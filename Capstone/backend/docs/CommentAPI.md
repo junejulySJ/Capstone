@@ -1,24 +1,11 @@
-## 📚 목차
-- [Home](../README.md)
-- [User API](UserAPI.md) [(Example)](UserAPIDetail.md)
-- [Auth API](AuthAPI.md)
-- [Friendship API](FriendshipAPI.md)
-- [Map API](MapAPI.md) [(Example)](MapAPIDetail.md)
-- [Schedule API](ScheduleAPI.md) [(Example)](ScheduleAPIDetail.md)
-- [Path API](PathAPI.md) [(Example)](PathAPIDetail.md)
-- [Board API](BoardAPI.md) [(Example)](BoardAPIDetail.md)
-- **Comment API** [(Example)](CommentAPIDetail.md)
-- [Group API](GroupAPI.md) [(Example)](GroupAPIDetail.md)
-- [GroupBoard API](GroupBoardAPI.md) [(Example)](GroupBoardAPIDetail.md)
-
 # Comment API
 ## API 바로가기
-| API 호출                                          | 설명              |
-|-------------------------------------------------|-----------------|
-| [GET /boards/{boardNo}/comments](#특정-게시글-댓글-조회) | 특정 게시글 댓글 조회 ✏️ |
-| [POST /boards/{boardNo}/comments](#댓글-등록)       | 댓글 등록           |
-| [PUT /comments/{commentNo}](#댓글-수정)             | 댓글 수정           |
-| [DELETE /comments/{commentNo}](#댓글-삭제)          | 댓글 삭제           |
+| API 호출                                          | 설명           |
+|-------------------------------------------------|--------------|
+| [GET /boards/{boardNo}/comments](#특정-게시글-댓글-조회) | 특정 게시글 댓글 조회 |
+| [POST /boards/{boardNo}/comments](#댓글-등록)       | 댓글 등록        |
+| [PUT /comments/{commentNo}](#댓글-수정)             | 댓글 수정        |
+| [DELETE /comments/{commentNo}](#댓글-삭제)          | 댓글 삭제        |
 
 ---
 

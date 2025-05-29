@@ -1,17 +1,3 @@
-## 📚 목차
-- [Home](../README.md)
-- [User API](UserAPI.md) [(Example)](UserAPIDetail.md)
-- [Auth API](AuthAPI.md)
-- [Friendship API](FriendshipAPI.md)
-- [Map API](MapAPI.md) [(Example)](MapAPIDetail.md)
-- [Schedule API](ScheduleAPI.md) [(Example)](ScheduleAPIDetail.md)
-- [Path API](PathAPI.md) [(Example)](PathAPIDetail.md)
-- [Board API](BoardAPI.md) [(Example)](BoardAPIDetail.md)
-- [Comment API](CommentAPI.md) [(Example)](CommentAPIDetail.md)
-- [Group API](GroupAPI.md) **(Example)**
-- [GroupBoard API](GroupBoardAPI.md) [(Example)](GroupBoardAPIDetail.md)
-- [GroupComment API](GroupCommentAPI.md) [(Example)](GroupCommentAPIDetail.md)
-
 # Group API 상세
 ## API 바로가기
 | API 호출                                                              | 설명                 |

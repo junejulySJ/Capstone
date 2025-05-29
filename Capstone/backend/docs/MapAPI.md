@@ -1,25 +1,11 @@
-## 📚 목차
-- [Home](../README.md)
-- [User API](UserAPI.md) [(Example)](UserAPIDetail.md)
-- [Auth API](AuthAPI.md)
-- [Friendship API](FriendshipAPI.md)
-- **Map API** [(Example)](MapAPIDetail.md)
-- [Schedule API](ScheduleAPI.md) [(Example)](ScheduleAPIDetail.md)
-- [Path API](PathAPI.md) [(Example)](PathAPIDetail.md)
-- [Board API](BoardAPI.md) [(Example)](BoardAPIDetail.md)
-- [Comment API](CommentAPI.md) [(Example)](CommentAPIDetail.md)
-- [Group API](GroupAPI.md) [(Example)](GroupAPIDetail.md)
-- [GroupBoard API](GroupBoardAPI.md) [(Example)](GroupBoardAPIDetail.md)
-- [GroupComment API](GroupCommentAPI.md) [(Example)](GroupCommentAPIDetail.md)
-
 # MAP API
 ## API 바로가기
-| API 호출                             | 설명             |
-|------------------------------------|----------------|
-| [GET /map/category](#카테고리-조회)      | 카테고리 조회        |
-| [GET /map](#지도-출력)                 | 지도 출력          |
-| [GET /map/detail](#장소-세부-정보-출력)    | 장소 세부 정보 출력 ✏️ |
-| [GET /map/autocomplete](#장소명-자동완성) | 장소명 자동완성       |
+| API 호출                             | 설명          |
+|------------------------------------|-------------|
+| [GET /map/category](#카테고리-조회)      | 카테고리 조회     |
+| [GET /map](#지도-출력)                 | 지도 출력       |
+| [GET /map/detail](#장소-세부-정보-출력)    | 장소 세부 정보 출력 |
+| [GET /map/autocomplete](#장소명-자동완성) | 장소명 자동완성    |
 
 ---
 

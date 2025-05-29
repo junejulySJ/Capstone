@@ -1,17 +1,10 @@
-## 📚 목차
-- [Home](../README.md)
-- [User API](UserAPI.md) [(Example)](UserAPIDetail.md)
-- **Auth API**
-- [Friendship API](FriendshipAPI.md)
-- [Map API](MapAPI.md) [(Example)](MapAPIDetail.md)
-- [Schedule API](ScheduleAPI.md) [(Example)](ScheduleAPIDetail.md)
-- [Path API](PathAPI.md) [(Example)](PathAPIDetail.md)
-- [Board API](BoardAPI.md) [(Example)](BoardAPIDetail.md)
-- [Comment API](CommentAPI.md) [(Example)](CommentAPIDetail.md)
-- [Group API](GroupAPI.md) [(Example)](GroupAPIDetail.md)
-- [GroupBoard API](GroupBoardAPI.md) [(Example)](GroupBoardAPIDetail.md)
-
 # Auth API
+## API 바로가기
+| API 호출                       | 설명      |
+|------------------------------|---------|
+| [POST /auth/login](#로그인)     | 로그인     |
+| [POST /auth/kakao](#카카오-로그인) | 카카오 로그인 |
+| [POST /auth/logout](#로그아웃)   | 로그아웃    |
 
 ## API 목록
 
@@ -19,7 +12,13 @@
 
 **POST** `/auth/login`
 
-# 구현 완료
+> 로그인을 진행합니다.
+
+#### 요청 바디 파라미터
+| 파라미터       | 설명      | 값 예시              |
+|------------|---------|-------------------|
+| userId     | 회원 ID   | "exampleUser"     |
+| userPasswd | 회원 비밀번호 | "examplePassword" |
 
 **※ 로그인 이후 로그인이 필요한 api로 axios 요청시 `withCredentials: true`만 추가로 넣어주면 됩니다.**
 
@@ -29,7 +28,7 @@
 
 **POST** `/auth/kakao`
 
-# 구현 완료
+> 카카오 로그인을 진행합니다.
 
 **로그인 이후 로그인이 필요한 api로 axios 요청시 `withCredentials: true`만 추가로 넣어주면 됩니다.**
 
@@ -39,4 +38,4 @@
 
 **POST** `/auth/logout`
 
-# 구현 완료
+> 로그아웃을 진행합니다.

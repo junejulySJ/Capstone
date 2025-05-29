@@ -1,26 +1,12 @@
-## 📚 목차
-- [Home](../README.md)
-- [User API](UserAPI.md) [(Example)](UserAPIDetail.md)
-- [Auth API](AuthAPI.md)
-- [Friendship API](FriendshipAPI.md)
-- [Map API](MapAPI.md) [(Example)](MapAPIDetail.md)
-- **Schedule API** [(Example)](ScheduleAPIDetail.md)
-- [Path API](PathAPI.md) [(Example)](PathAPIDetail.md)
-- [Board API](BoardAPI.md) [(Example)](BoardAPIDetail.md)
-- [Comment API](CommentAPI.md) [(Example)](CommentAPIDetail.md)
-- [Group API](GroupAPI.md) [(Example)](GroupAPIDetail.md)
-- [GroupBoard API](GroupBoardAPI.md) [(Example)](GroupBoardAPIDetail.md)
-- [GroupComment API](GroupCommentAPI.md) [(Example)](GroupCommentAPIDetail.md)
-
 # Schedule API
 ## API 바로가기
-| API 호출                                    | 설명               |
-|-------------------------------------------|------------------|
-| [GET /schedules](#자신이-만든-스케줄-조회)          | 자신이 만든 스케줄 조회 ✏️ |
-| [POST /schedules/create](#스케줄-생성)         | 스케줄 생성           |
-| [POST /schedules](#스케줄-저장)                | 스케줄 저장 ✏️        |
-| [PUT /schedules](#스케줄-수정)                 | 스케줄 수정           |
-| [DELETE /schedules/{scheduleNo}](#스케줄-삭제) | 스케줄 삭제           |
+| API 호출                                                 | 설명            |
+|--------------------------------------------------------|---------------|
+| [GET /schedules](#자신이-만든-스케줄-조회)                       | 자신이 만든 스케줄 조회 |
+| [POST /schedules/create](#스케줄-생성)                      | 스케줄 생성        |
+| [POST /schedules](#스케줄-저장)                             | 스케줄 저장        |
+| [PUT /schedules](#스케줄-수정)                              | 스케줄 수정        |
+| [DELETE /schedules/{scheduleNo}](#스케줄-삭제)              | 스케줄 삭제        |
 
 ---
 

@@ -60,20 +60,22 @@ const Map = () => {
 
   // 카카오 맵 객체 초기화
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (window.kakao && window.kakao.maps) {
-        clearInterval(interval);
-        const container = document.getElementById('map');
-        const map = new window.kakao.maps.Map(container, {
-          center: new window.kakao.maps.LatLng(37.554722, 126.970833),
-          level: 5,
-        });
-        setMapObj(map);
-      }
-    }, 100);
+  const timeout = setTimeout(() => {
+    if (window.kakao && window.kakao.maps) {
+      const container = document.getElementById('map');
+      if (!container) return;
 
-    return () => clearInterval(interval);
-  }, []);
+      const map = new window.kakao.maps.Map(container, {
+        center: new window.kakao.maps.LatLng(37.554722, 126.970833),
+        level: 5,
+      });
+      setMapObj(map);
+    }
+  }, 200); // ✅ DOM 렌더 완료 후 약간의 지연
+
+  return () => clearTimeout(timeout);
+}, []);
+
 
   useEffect(() => {
   const searchParams = new URLSearchParams(location.search);

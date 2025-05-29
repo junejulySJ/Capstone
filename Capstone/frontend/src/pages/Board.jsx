@@ -156,7 +156,10 @@ const Board = () => {
               </div>
 
               <div className="post-content">
+                <div className='board-title-comment-count'>
                 <h2 className="board-title">{post.boardTitle}</h2>
+                <p className='board-title-comment-count-count'>({post.commentCount})</p>
+                </div>
 
                 <div className="board-title-bottom">
                   <p className="description">{post.boardDescription}</p>

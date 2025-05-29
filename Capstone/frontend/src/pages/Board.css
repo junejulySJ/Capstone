@@ -325,6 +325,19 @@
   flex-flow: row;
   justify-content: space-between;
 }
+.board-title{
+  padding-bottom: 15px;
+}
+.board-title-comment-count{
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+}
+.board-title-comment-count-count{
+  padding-top: 3px;
+  padding-left: 5px;
+  margin: 0;
+}
 /* ========================== 반응형 웹 ========================== */
 @media (max-width: 768px) {
   /* 화면 크기가 768px 이하일 때 */

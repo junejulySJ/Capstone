@@ -36,28 +36,48 @@
 
 ## 🎥 시연 영상
 
-<table>
+<table width="100%">
   <tr>
-    <th>회원가입</th>
-    <th>홈 (하이킹 기록 확인)</th>
-    <th>홈 (만보기 기록 확인)</th>
+    <th>회원가입/로그인</th>
+    <th>메인페이지</th>
   </tr>
   <tr>
-    <td align="center">
-           <img src="./Capstone/asset/Animation4.gif" width="250"/>
-    </td>
-    <td align="center">
-<img src="./Capstone/asset/Animation5.gif" width="250"/>    </td>
-    <td align="center">
-      (추가 예정)
-    </td>
+    <td><img src="./Capstone/asset/Animation5.gif" width="100%" height="600px"/></td>
+    <td><img src="./Capstone/asset/Animation4.gif" width="100%" height="600px"/></td>
+  </tr>
+  <tr>
+    <th>3</th>
+    <th>4</th>
+  </tr>
+  <tr>
+    <td><img src="./asset/img3.gif" width="100%" height="600px"/></td>
+    <td><img src="./asset/img4.gif" width="100%" height="600px"/></td>
+  </tr>
+  <tr>
+    <th>5</th>
+    <th>6</th>
+  </tr>
+  <tr>
+    <td><img src="./asset/img5.gif" width="100%" height="600px"/></td>
+    <td><img src="./asset/img6.gif" width="100%" height="600px"/></td>
+  </tr>
+  <tr>
+    <th>7</th>
+    <th>8</th>
+  </tr>
+  <tr>
+    <td><img src="./asset/img7.gif" width="100%" height="600px"/></td>
+    <td><img src="./asset/img8.gif" width="100%" height="600px"/></td>
+  </tr>
+  <tr>
+    <th>9</th>
+    <th>10</th>
+  </tr>
+  <tr>
+    <td><img src="./asset/img9.gif" width="100%" height="600px"/></td>
+    <td><img src="./asset/img10.gif" width="100%" height="600px"/></td>
   </tr>
 </table>
-
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/38090353-a309-43e5-90cf-3b228ef27cd7" width="500"/>
-</p>
 
 ---
 

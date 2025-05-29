@@ -93,11 +93,11 @@
 
 .map-area {
   width: 100%;
-  height: 571px;
+  height: 760px;
   border-radius: 10px;
   background-color: #e5e5e5;
   /* 지도 배경색 */
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
 }
 
 .location-box {
@@ -107,7 +107,7 @@
   right: 18px;
   width: 250px;
   /* 적당한 크기 설정 */
-  background-color: rgba(255, 248, 220, 1.0);
+  background-color: rgba(255, 248, 220, 0.7);
   /* 배경색과 투명도 설정 (배경색 #fff8dc, 80% opacity) */
   border-radius: 10px;
   padding: 15px;
@@ -141,12 +141,20 @@
 
 /* ========================================================== */
 .route-box {
-  width: 100%;
+  position: absolute;  /* 지도 위에 고정되도록 */
+  top: 520px;          /* 위치 조정 */
+  left: 50%;           /* 가운데 정렬 */
+  transform: translateX(-50%);
   padding: 20px;
-  background: #eef5ff;
+  width: 600px;        /* 고정된 너비 */
+  height: 200px;       /* 고정된 높이 */
+  background-color: rgba(255, 255, 255, 0.5);  /* 투명한 배경 */
   border-radius: 10px;
   font-size: 14px;
   border: 1px solid #ccc;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* 그림자 추가 */
+  z-index: 1000;       /* 다른 요소들보다 위에 표시 */
+  overflow-y: auto;    /* 세로 스크롤 추가 */
 }
 
 .transport-select {
@@ -161,15 +169,16 @@
   padding: 8px 14px;
   border: none;
   border-radius: 5px;
-  background-color: #007bff;
-  color: white;
+  background-color: #e8ffdb;
+  /* color: white; */
+  border: 1px solid rgb(155, 155, 155);
   font-size: 14px;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
 .transport-select button:hover {
-  background-color: #0056b3;
+  background-color: #6969695b;
 }
 
 /* ========================================================== */
@@ -191,7 +200,7 @@
 .section-b-wrapper {
   position: absolute;
   /* 절대 위치 지정 */
-  top: 370px;
+  top: 560px;
   /* 아래에서 20px 떨어지게 */
   right: 17px;
   /* 오른쪽에서 20px 떨어지게 */
@@ -199,7 +208,7 @@
   /* 적당한 너비 설정 */
   height: 200px;
   /* 최대 높이 설정 */
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(255, 255, 255, 0.6);
   /* 배경을 흰색으로 하고 80% 투명도 */
   border-radius: 10px;
   padding: 15px;
@@ -265,7 +274,7 @@
     top: 440px;
     width: 180px;
     /* 적당한 크기 설정 */
-    background-color: rgba(255, 248, 220, 1.0);
+    background-color: rgba(255, 248, 220, 0.5);
     /* 배경색과 투명도 설정 (배경색 #fff8dc, 80% opacity) */
     border-radius: 10px;
     padding: 0 5px;

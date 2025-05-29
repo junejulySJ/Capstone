@@ -50,3 +50,9 @@
   color: #a88fbf;
   font-weight: bold;
 }
+
+@media (max-width: 768px) {
+  .hamburger {
+    display: none !important;
+  }
+}

@@ -11,16 +11,20 @@ import Mypage from './pages/Mypage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Map from './pages/Map';
+import PostWrite from './pages/PostWrite';
+import PostDetail from './pages/PostDetail';
 import './App.css';
 import { AppProvider } from "./AppContext";
 import KakaoLogin from './pages/KakaoLogin';
+import MobileBottomNav from './components/MobileBottomNav';
+import useIsMobile from './utils/useIsMobile';
 
 function AppContent() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
+  const isMobile = useIsMobile();
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-
   // 로그인/회원가입 페이지가 아닐 때만 Header 표시
   const showHeader = location.pathname !== '/login' && location.pathname !== '/register';
 
@@ -29,7 +33,7 @@ function AppContent() {
       <AppProvider>
 
       {showHeader && <Header toggleSidebar={toggleSidebar} />}
-      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+      {!isMobile && <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />} {/* ✅ PC만 */}
 
       <Routes>
         <Route path="/" element={<Home />} />
@@ -41,7 +45,10 @@ function AppContent() {
         <Route path="/register" element={<Register />} />
         <Route path="/map" element={<Map />} />
         <Route path="/auth/kakao/callback" element={<KakaoLogin />} />
+        <Route path="/write" element={<PostWrite />} /> {/* 게시글 작성 페이지 */}
+        <Route path="/boards/:boardNo" element={<PostDetail />} /> {/* 라우트 설정 */}
       </Routes>
+      {isMobile && <MobileBottomNav />} {/* ✅ 모바일에서만 표시 */}
       </AppProvider>
     </div>
   );

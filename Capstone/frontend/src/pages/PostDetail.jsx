@@ -149,7 +149,22 @@ const PostDetail = () => {
 
             <h2 className='board-detail-title'>{selectedPost.boardTitle}</h2>
 
-            <div className='board-content'>{selectedPost.boardContent}</div>
+            <div className='board-content'>
+                {/* 이미지 출력 영역 */}
+                {selectedPost.boardFiles && selectedPost.boardFiles.length > 0 && (
+                    <div className="board-images">
+                    {selectedPost.boardFiles.map((file, index) => (
+                        <img
+                        key={index}
+                        src={file.fileUrl}
+                        alt={`첨부 이미지 ${index + 1}`}
+                        className="board-image"
+                        />
+                    ))}
+                </div>)}
+
+                {selectedPost.boardContent}
+            </div>
             <p>설명 : {selectedPost.boardDescription}</p>
             <div className='board-content-bottom'>
                 <p className='board-content-writer'>글쓴이 : {selectedPost.userNick}</p>

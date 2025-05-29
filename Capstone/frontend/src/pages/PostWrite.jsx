@@ -14,7 +14,8 @@ const PostWrite = () => {
   const [boardDescription, setBoardDescription] = useState('');
   const [boardContent, setBoardContent] = useState('');
   const [categoryNo, setCategoryNo] = useState(0);  // 카테고리 기본값을 설정
-  const [file, setFile] = useState(null);  // 파일 상태 추가
+  const [files, setFiles] = useState([]);  // 파일 상태 추가
+  const [selectedImages, setSelectedImages] = useState([]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,17 +38,20 @@ const PostWrite = () => {
 
     
 
-    // JSON 형식으로 postData를 stringify 해서 추가
-    formData.append("json", JSON.stringify(postData));
+    // JSON 데이터를 Blob으로 만들어서 추가
+    formData.append(
+        "json",
+        new Blob([JSON.stringify(postData)], { type: "application/json" })
+    );
 
-    // 파일이 있다면 파일도 추가
-    if (file) {
-      formData.append("files", file);
-    }
+    // 여러 파일 모두 formData에 추가
+    files.forEach((file) => {
+        formData.append("files", file);
+    });
 
     // 폼 데이터를 서버로 보내기
     try {
-      const res = await axios.post(`${API_BASE}/boards`, formData, {
+      await axios.post(`${API_BASE}/boards`, formData, {
         headers: {
           "Content-Type": "multipart/form-data", // 반드시 multipart/form-data로 설정
         },
@@ -62,7 +66,15 @@ const PostWrite = () => {
     }
   };
 
-
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    const imagePreviews = files.map((file) => ({
+      file,
+      preview: URL.createObjectURL(file),
+    }));
+    setSelectedImages(imagePreviews);
+    setFiles(files);
+  };
 
 
 
@@ -98,6 +110,31 @@ const PostWrite = () => {
                         onChange={(e) => setBoardContent(e.target.value)}
                         required
                     />
+                </div>
+
+                <div className="form-group">
+                    <label>이미지</label>
+                    <label htmlFor="image-upload" className="custom-file-upload" style={{color: "white"}}>
+                      이미지 선택(파일명은 50자 이내여야 합니다.)
+                    </label>
+                    <input
+                        id="image-upload"
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleFileChange}
+                        style={{ display: "none" }}
+                    />
+                    <div className="image-preview-container">
+                      {selectedImages.map((img, index) => (
+                        <img
+                          key={index}
+                          src={img.preview}
+                          alt={`preview-${index}`}
+                          className="image-preview"
+                        />
+                      ))}
+                    </div>
                 </div>
 
                 <div className="form-group">

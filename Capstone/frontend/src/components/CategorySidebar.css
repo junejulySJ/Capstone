@@ -158,7 +158,7 @@
     z-index: 10;
     width: 100%;
     height: 60%;  
-    background-color: rgba(255, 255, 255, 0.9);  /* 더 선명한 배경 */
+    background-color: rgba(255, 255, 255, 0.3);  
     border-radius: 8px 8px 0 0;  /* 상단에만 둥글게 처리 */
     box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
     transform: translateY(100%);  /* 기본적으로 하단에 숨겨둠 */
@@ -172,7 +172,7 @@
   /* 카테고리 헤더 크기 조정 */
   .category-header {
     padding: 8px 15px;  /* 헤더 높이 줄이기 */
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.3);
   }
 
   /* 콘텐츠 부분의 스타일 */

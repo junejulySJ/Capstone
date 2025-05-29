@@ -46,7 +46,7 @@
   display: flex;
 }
 
-.category-top-bar button {
+.category-top-bar-button {
   flex: 1;
   min-width: 80px;
   padding: 7px 0;
@@ -60,16 +60,16 @@
   transition: background 0.2s;
 }
 
-.category-top-bar button:not(:last-child) {
+.category-top-bar-button:not(:last-child) {
   border-right: none;
 }
 
-.category-top-bar button:hover {
+.category-top-bar-button:hover {
   background: rgba(0, 0, 0, 0.05);
 }
 
 /* ✅ 선택된 버튼 스타일 */
-.category-top-bar button.active {
+.category-top-bar-button:active {
   background: #8b8b8b;
   color: white;
   /* border-color: #007bff; */
@@ -151,8 +151,10 @@
 
 .transport-select {
   display: flex;
-  gap: 20px; /* 버튼 간격 */
-  margin-bottom: 10px; /* 아래 여백 (선택) */
+  gap: 20px;
+  /* 버튼 간격 */
+  margin-bottom: 10px;
+  /* 아래 여백 (선택) */
 }
 
 .transport-select button {
@@ -232,5 +234,122 @@
 
 .map-page-scroll-fix {
   overflow: hidden;
-  height: 100vh; /* 또는 필요 시 auto 조정 */
+  height: 100vh;
+  /* 또는 필요 시 auto 조정 */
+}
+
+
+/* ================================================== 반응형 */
+@media (max-width: 768px) {
+
+  /* 카테고리 */
+  .category-top-bar {
+    padding: 4px 6px;
+    font-size: 0.9rem;
+  }
+
+  .category-top-bar-button {
+    min-width: 60px;
+    font-size: 0.8rem;
+  }
+
+  .map-area {
+    height: 60vh;
+  }
+
+  .location-box {
+    position: absolute;
+    top: 100px;
+    /* 오른쪽 아래 고정 */
+    left: 18px;
+    top: 440px;
+    width: 180px;
+    /* 적당한 크기 설정 */
+    background-color: rgba(255, 248, 220, 1.0);
+    /* 배경색과 투명도 설정 (배경색 #fff8dc, 80% opacity) */
+    border-radius: 10px;
+    padding: 0 5px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    z-index: 9;
+    /* 우선순위 */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    /* 살짝 그림자 추가 */
+  }
+
+  .location-box h4 {
+    font-size: 12px;
+  }
+
+  .route-box {
+    font-size: 12px;
+    padding: 15px;
+  }
+
+  .right-box {
+    font-size: 12px;
+  }
+
+  .section-b-wrapper {
+    position: absolute;
+    /* 절대 위치 지정 */
+    top: 200px;
+    /* 아래에서 20px 떨어지게 */
+    left: 18px;
+    /* 오른쪽에서 20px 떨어지게 */
+    width: 190px;
+    /* 적당한 너비 설정 */
+    height: 200px;
+    /* 최대 높이 설정 */
+    background-color: rgba(255, 255, 255, 0.3);
+    /* 배경을 흰색으로 하고 80% 투명도 */
+    border-radius: 10px;
+    padding: 15px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    z-index: 1000;
+    /* 다른 요소들보다 우선 표시 */
+    overflow-y: auto;
+    /* 세로 스크롤 추가 */
+    box-sizing: border-box;
+    /* padding과 border가 width에 포함되도록 설정 */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    /* 그림자 추가 */
+  }
+
+  .map-page-scroll-fix {
+    overflow: hidden;
+    height: 100vh;
+    padding: 0px 0px;
+  }
+
+  .map-page {
+    margin-bottom: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  /*   
+  .category-top-bar {
+    padding: 3px 5px;
+    font-size: 0.8rem;
+    border-radius: 8px;
+  }
+
+  .category-top-bar-button {
+    min-width: 50px;
+    font-size: 0.7rem;
+  }
+
+  .map-area {
+    height: 55vh;
+  }
+
+
+
+  .right-box {
+    font-size: 11px;
+  }*/
+
 }

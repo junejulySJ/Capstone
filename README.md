@@ -47,8 +47,7 @@
            <img src="./Capstone/asset/Animation4.gif" width="250"/>
     </td>
     <td align="center">
-      (추가 예정)
-    </td>
+<img src="./Capstone/asset/Animation5.gif" width="250"/>    </td>
     <td align="center">
       (추가 예정)
     </td>

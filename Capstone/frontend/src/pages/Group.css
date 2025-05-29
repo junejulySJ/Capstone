@@ -104,3 +104,26 @@ font-weight: bold;
 .member-table td:last-child {
 text-align: left;
 }
+
+.schedule-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* 내부 요소 사이 여백 */
+  padding: 0.5rem 0;
+}
+
+.schedule-details, .comment-section {
+  padding: 0.5rem;
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+}
+
+.comment-list {
+  padding-left: 10px;
+}
+
+.comment-list li {
+  list-style: none;
+}

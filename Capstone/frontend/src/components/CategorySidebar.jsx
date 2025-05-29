@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
 import './CategorySidebar.css';
 
-const CategorySidebar = ({ places = [], onClose, onAddPlace, addedList = [] }) => {
+const CategorySidebar = ({ places = [], onClose, onAddPlace, addedList = [], className = '' }) => {
+  const [isOpen, setIsOpen] = useState(true); // ✅ 상태 정의
+  const toggleSidebar = () => setIsOpen(prev => !prev); // ✅ 토글 함수 정의
+
   return (
-    <div className="category-sidebar">
+    <div className={`category-sidebar ${className}`}>
       <div className="category-header">
         <h3>카테고리</h3>
         <button className="close-button" onClick={toggleSidebar}>
-          {isOpen ? '닫기' : '열기'} {/* 열기/닫기 버튼 텍스트 변경 */}
+          {isOpen ? '닫기' : '열기'}
         </button>
       </div>
-      {isOpen && ( // 사이드바가 열릴 때만 콘텐츠가 보이도록
+
+      {isOpen && (
         <div className="place-list">
           {places.length === 0 ? (
             <p>장소 정보를 불러오는 중입니다...</p>

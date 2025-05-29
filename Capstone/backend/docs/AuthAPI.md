@@ -10,7 +10,6 @@
 - [Comment API](CommentAPI.md) [(Example)](CommentAPIDetail.md)
 - [Group API](GroupAPI.md) [(Example)](GroupAPIDetail.md)
 - [GroupBoard API](GroupBoardAPI.md) [(Example)](GroupBoardAPIDetail.md)
-- [GroupComment API](GroupCommentAPI.md) [(Example)](GroupCommentAPIDetail.md)
 
 # Auth API
 

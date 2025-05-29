@@ -30,7 +30,7 @@ public class FriendshipService {
     public void createFriendship(String userId, FriendshipAddRequestDto friendshipAddRequestDto) {
         User fromUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
-        User toUser = userRepository.findById(friendshipAddRequestDto.getOpponentId())
+        User toUser = userRepository.findByUserNickAndUserEmail(friendshipAddRequestDto.getOpponentNick(), friendshipAddRequestDto.getOpponentEmail())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다"));
 
         Friendship friendshipFrom = Friendship.builder() //보내는 사람 측

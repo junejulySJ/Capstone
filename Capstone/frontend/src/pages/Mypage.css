@@ -293,6 +293,7 @@
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 15px;
+  margin-top: 20px;
 }
 
 /* 친구 카드 목록 전체 */
@@ -303,7 +304,7 @@
 }
 
 /* 친구 개별 카드 */
-.friend-card {
+.friend-card, .group-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -315,12 +316,12 @@
   transition: box-shadow 0.2s ease;
 }
 
-.friend-card:hover {
+.friend-card:hover, .group-card:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 /* 친구 아바타 + 이름 + 상태메시지 묶음 */
-.friend-info {
+.friend-info, .group-info {
   display: flex;
   align-items: center;
   gap: 16px;
@@ -413,7 +414,7 @@
   background-color: #fafafa;
 }
 
-.schedule-item button {
+.schedule-item button, .liked-posts-list button {
   background-color: #ef5350;
   color: white;
   border: none;
@@ -422,7 +423,7 @@
   cursor: pointer;
 }
 
-.schedule-item button:hover {
+.schedule-item button:hover, .liked-posts-list button:hover {
   background-color: #d32f2f;
 }
 

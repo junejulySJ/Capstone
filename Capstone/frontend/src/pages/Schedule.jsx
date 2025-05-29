@@ -47,6 +47,7 @@ const Schedule = () => {
   const [polylines, setPolylines] = useState([]);
   const [transferMarkers, setTransferMarkers] = useState();
   const [createScheduleError, setCreateScheduleError] = useState();
+  const [recommendMode, setRecommendMode] = useState("normal");
   const [selectedCategoryPlaces, setSelectedCategoryPlaces] = useState();
 
   useEffect(() => {
@@ -55,6 +56,13 @@ const Schedule = () => {
     }
   }, [user, navigate]);
 
+  useEffect(() => {
+    if (createScheduleError) {
+      const timer = setTimeout(() => setCreateScheduleError(""), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [createScheduleError]);
+  
   useEffect(() => {
   const container = document.getElementById('map');
   const map = new kakao.maps.Map(container, {
@@ -206,31 +214,51 @@ useEffect(() => {
     setShowCreateScheduleSection(false);
     setCreateScheduleLoading(true);
     try {
-      const res = await axios.post(`${API_BASE_URL}/schedules/create`,
-        {
-          "selectedPlace": scheduleItems.map((item, index) => (
-            {
-              contentId: item.contentId,
-              address: item.address,
-              name: item.name,
-              latitude: item.latitude,
-              longitude: item.longitude,
-              category: item.category,
-              stayMinutes: scheduleItemStayMinutes[index]
-            }
-          )),
-          "scheduleStartTime": scheduleStartTime,
-          "scheduleEndTime": scheduleEndTime,
-          "transport": transport,
-          "additionalRecommendation": additionalRecommendation,
-          "totalPlaceCount": totalPlaceCount,
-          "theme": theme,
-          "stayMinutesMean": stayMinutesMean,
-          "pointCoordinate": {
-            "latitude": end.latitude,
-            "longitude": end.longitude
-        }
-      }, { withCredentials: true });
+      let body;
+
+if (recommendMode === "ai") {
+  body = {
+    selectedPlace: scheduleItems.slice(0, 1),
+    scheduleStartTime,
+    scheduleEndTime,
+    transport,
+    additionalRecommendation: true,
+    aiRecommendation: true,
+    totalPlaceCount,
+    theme,
+    stayMinutesMean,
+    pointCoordinate: {
+      latitude: end.latitude,
+      longitude: end.longitude
+    }
+  };
+} else {
+  body = {
+    selectedPlace: scheduleItems.map((item, index) => ({
+      contentId: item.contentId,
+      address: item.address,
+      name: item.name,
+      latitude: item.latitude,
+      longitude: item.longitude,
+      category: item.category,
+      stayMinutes: scheduleItemStayMinutes[index]
+    })),
+    scheduleStartTime,
+    scheduleEndTime,
+    transport,
+    additionalRecommendation,
+    totalPlaceCount,
+    theme,
+    stayMinutesMean,
+    pointCoordinate: {
+      latitude: end.latitude,
+      longitude: end.longitude
+    }
+  };
+}
+
+const res = await axios.post(`${API_BASE_URL}/schedules/create`, body, { withCredentials: true });
+
       const result = res.data;
       setScheduleItems(result.places);
 
@@ -394,7 +422,32 @@ useEffect(() => {
                   <option value="car">자동차</option>
                   <option value="transit">대중교통</option>
                   </select></li>
-                <li>추가 추천 여부: <input type="checkbox" name="additionalRecommendation" checked={additionalRecommendation} onChange={(e) => setAdditionalRecommendation(e.target.checked)} /></li>
+                  <li>
+  추천 방식 선택:
+  <label style={{ marginLeft: '10px' }}>
+    <input
+      type="radio"
+      name="recommend"
+      value="normal"
+      checked={recommendMode === 'normal'}
+      onChange={() => setRecommendMode('normal')}
+    />
+    일반 추천
+  </label>
+  <label style={{ marginLeft: '20px' }}>
+    <input
+      type="radio"
+      name="recommend"
+      value="ai"
+      checked={recommendMode === 'ai'}
+      onChange={() => setRecommendMode('ai')}
+    />
+    AI 추천
+  </label>
+</li>
+<li>
+  추가 추천 여부: <input type="checkbox" name="additionalRecommendation" checked={additionalRecommendation} onChange={(e) => setAdditionalRecommendation(e.target.checked)} />
+</li>
                 {additionalRecommendation && (
                   <>
                     <li>총 장소 수(선택한 장소 + 추천 받을 장소): <input type="number" name="totalPlaceCount" value={totalPlaceCount} min={scheduleItems.length} max={7} onChange={(e) => setTotalPlaceCount(e.target.value)} /></li>

@@ -16,5 +16,8 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Intege
     @Query("SELECT gm.group FROM GroupMember gm WHERE gm.user.userId = :userId")
     List<Group> findGroupsByUserId(@Param("userId") String userId);
 
+    List<GroupMember> findAllByUser_UserId(String userId);
+    List<GroupMember> findAllByGroup_GroupNo(Integer groupNo);
+
     void deleteByGroupGroupNoAndUserUserId(Integer groupNo, String userId);
 }

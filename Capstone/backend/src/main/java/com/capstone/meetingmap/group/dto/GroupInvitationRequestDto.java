@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 public class GroupInvitationRequestDto {
-    @NotBlank(message = "초대받을 회원 닉네임은 반드시 입력해야 합니다")
+    @NotBlank(message = "초대받을 회원 이름은 반드시 입력해야 합니다")
     private String userNick;
 
     @NotBlank(message = "초대받을 회원 이메일은 반드시 입력해야 합니다")

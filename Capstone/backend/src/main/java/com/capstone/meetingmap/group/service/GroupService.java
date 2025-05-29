@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -79,9 +80,13 @@ public class GroupService {
 
     // 소속되어있는 전체 그룹 멤버 조회
     public List<UserGroupResponseDto> getAllGroupMembers(String userId) {
-        List<GroupMember> groupMemberList = groupMemberRepository.findAll();
+        List<GroupMember> groupMemberAllList = new ArrayList<>();
+        List<GroupMember> groupMemberList = groupMemberRepository.findAllByUser_UserId(userId);
+        for (GroupMember groupMember : groupMemberList) {
+            groupMemberAllList.addAll(groupMemberRepository.findAllByGroup_GroupNo(groupMember.getGroup().getGroupNo()));
+        }
 
-        return groupMemberList.stream()
+        return groupMemberAllList.stream()
                 .map(groupMember -> UserGroupResponseDto.fromEntity(groupMember.getUser(), groupMember.getGroup()))
                 .collect(Collectors.toList());
     }

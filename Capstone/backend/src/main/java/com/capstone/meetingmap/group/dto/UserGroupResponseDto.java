@@ -20,6 +20,7 @@ public class UserGroupResponseDto {
     private Integer userType;
     private Integer groupNo;
     private String groupTitle;
+    private String groupCreatedUserId;
 
     //엔티티를 dto로 변환
     public static UserGroupResponseDto fromEntity(User user, Group group) {
@@ -32,6 +33,7 @@ public class UserGroupResponseDto {
                 .userType(user.getUserRole().getUserType())
                 .groupNo(group.getGroupNo())
                 .groupTitle(group.getGroupTitle())
+                .groupCreatedUserId(group.getGroupCreatedUser().getUserId())
                 .build();
     }
 }

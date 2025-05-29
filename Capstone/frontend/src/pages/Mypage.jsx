@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './Mypage.css';
 import { getPostsFromLocal, removePostFromLocal } from '../utils/storage';
 import { members } from '../data/members';
@@ -17,7 +17,7 @@ const mockUser = {
 const Mypage = () => {
   const { user, setUser } = useAppContext();
   const [view, setView] = useState('home');
-  const [avatar, setAvatar] = useState(""); // 상태로 관리
+  const [avatar, setAvatar] = useState(null); // 상태로 관리
   const [address, setAddress] = useState("");
   const [nick, setNick] = useState("");
   const [passwd, setPasswd] = useState("");
@@ -30,8 +30,10 @@ const Mypage = () => {
   const [newFriend, setNewFriend] = useState({ name: '', email: '' });
   const [friendReceived, setFriendReceived] = useState([]);
   const [groupInvitations, setGroupInvitations] = useState([]);
+  const [openScheduleNo, setOpenScheduleNo] = useState(null);
 
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchTerm, setSearchTerm] = useState('');
   const [friends, setFriends] = useState([]);
   const [newSchedule, setNewSchedule] = useState({ title: '', date: '' });
@@ -45,39 +47,15 @@ const Mypage = () => {
     fetchSavedPosts();
     fetchSchedules();
     fetchFriends();
-
-    setGroupInvitations([
-      {
-        "invitationNo": 4,
-        "groupNo": 2,
-        "groupTitle": "testgroup",
-        "senderId": "user1",
-        "senderNick": "사용자1",
-        "receiverId": "user4",
-        "status": "WAITING",
-        "invitedDate": "2025-05-29T13:17:33"
-    }
-  ])
-
-    setFriendReceived([
-    {
-        "friendshipNo": 20,
-        "userId": "user5",
-        "opponentId": "user1",
-        "opponentNick": "사용자1",
-        "opponentImg": "https://capstone-meetingmap.s3.eu-north-1.amazonaws.com/8c0405c9-6369-4dec-ae70-4e197217fbb4_ai-generated-9510467_640.jpg",
-        "status": "WAITING",
-        "counterpartFriendshipNo": 19,
-        "from": false
-    }
-])
+    fetchFriendReceived();
+    fetchGroupInvitations();
   }, []);
 
   useEffect(() => {
     if (user === null) {
-      navigate("/login"); // 로그인 페이지로 이동
+      navigate('/login', { state: { from: location.pathname } }); // 로그인 페이지로 이동
     }
-  }, [user, navigate]);
+  }, [user, navigate, location.pathname]);
 
   // user가 바뀔 때 avatar 초기화
   useEffect(() => {
@@ -95,14 +73,7 @@ const Mypage = () => {
       const res = await axios.get(`${API_BASE_URL}/user/boards`, { withCredentials: true });
       setMyPosts(res.data); // 서버 응답 구조에 맞게 조정
     } catch (err) {
-      if (err.response?.data?.message) {
-        if (err.response.data.message === "로그인이 필요합니다.")
-          navigate("/login");
-        else
-          alert(err.response.data.message);
-      } else {
-        console.error('내 게시글 불러오기 실패:', err);
-      }
+      handleError('내 게시글 불러오기 실패:', err);
     }
   };
 
@@ -111,14 +82,7 @@ const Mypage = () => {
       const res = await axios.get(`${API_BASE_URL}/user/boards/liked`, { withCredentials: true });
       setLikedPosts(res.data); // 서버 응답 구조에 맞게 조정
     } catch (err) {
-      if (err.response?.data?.message) {
-        if (err.response.data.message === "로그인이 필요합니다.")
-          navigate("/login");
-        else
-          alert(err.response.data.message);
-      } else {
-        console.error('좋아요한 게시글 불러오기 실패:', err);
-      }
+      handleError('좋아요한 게시글 불러오기 실패:', err);
     }
   };
 
@@ -127,14 +91,7 @@ const Mypage = () => {
       const res = await axios.get(`${API_BASE_URL}/user/boards/scraped`, { withCredentials: true });
       setSavedPosts(res.data); // 서버 응답 구조에 맞게 조정
     } catch (err) {
-      if (err.response?.data?.message) {
-        if (err.response.data.message === "로그인이 필요합니다.")
-          navigate("/login");
-        else
-          alert(err.response.data.message);
-      } else {
-        console.error('저장한 게시글 불러오기 실패:', err);
-      }
+      handleError('저장한 게시글 불러오기 실패:', err);
     }
   };
 
@@ -143,14 +100,7 @@ const Mypage = () => {
       const res = await axios.get(`${API_BASE_URL}/schedules`, { withCredentials: true });
       setSchedules(res.data); // 서버 응답 구조에 맞게 조정
     } catch (err) {
-      if (err.response?.data?.message) {
-        if (err.response.data.message === "로그인이 필요합니다.")
-          navigate("/login");
-        else
-          alert(err.response.data.message);
-      } else {
-        console.error('일정 불러오기 실패:', err);
-      }
+      handleError('일정 불러오기 실패:', err);
     }
   };
 
@@ -159,16 +109,38 @@ const Mypage = () => {
       const res = await axios.get(`${API_BASE_URL}/user/friends`, { withCredentials: true });
       setFriends(res.data); // 서버 응답 구조에 맞게 조정
     } catch (err) {
-      if (err.response?.data?.message) {
+      handleError('친구 불러오기 실패:', err);
+    }
+  };
+
+  const fetchFriendReceived = async () => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/user/friends/received`, { withCredentials: true });
+      setFriendReceived(res.data); // 서버 응답 구조에 맞게 조정
+    } catch (err) {
+      handleError('받은 친구 요청 불러오기 실패:', err);
+    }
+  };
+
+  const fetchGroupInvitations = async () => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/groups/invitations`, { withCredentials: true });
+      setGroupInvitations(res.data); // 서버 응답 구조에 맞게 조정
+    } catch (err) {
+      handleError('받은 그룹 초대 불러오기 실패:', err);
+    }
+  };
+
+  const handleError = (msg, err) => {
+    if (err.response?.data?.message) {
         if (err.response.data.message === "로그인이 필요합니다.")
-          navigate("/login");
+          navigate("/login", { state: { from: location.pathname } }); // 로그인 페이지로 이동
         else
           alert(err.response.data.message);
       } else {
-        console.error('친구 불러오기 실패:', err);
+        console.error(msg, err);
       }
-    }
-  };
+  }
 
   const handleAvatarChange = async (e) => {
     const formData = new FormData();
@@ -188,14 +160,7 @@ const Mypage = () => {
         const newUserData = res.data;
         setUser(newUserData);
       } catch (err) {
-        if (err.response?.data?.message) {
-          if (err.response.data.message === "로그인이 필요합니다.")
-            navigate("/login");
-          else
-            alert(err.response.data.message);
-        } else {
-          console.error('회원 수정 API 오류:', err);
-        }
+        handleError('회원 수정 실패:', err);
       }
     }
   };
@@ -225,17 +190,7 @@ const Mypage = () => {
       setUser(newUserData);
       alert("프로필 수정 성공!");
     } catch (err) {
-      if (err.response?.data?.message) {
-        if (err.response.data.message === "로그인이 필요합니다.")
-          navigate("/login");
-        else
-          if (err.response.data.message === "로그인이 필요합니다.")
-            navigate("/login");
-          else
-            alert(err.response.data.message);
-      } else {
-        console.error('회원 수정 API 오류:', err);
-      }
+      handleError('회원 수정 실패:', err);
     }
   };
 
@@ -246,14 +201,7 @@ const Mypage = () => {
       }, { withCredentials: true });
       alert("비밀번호 변경 완료");
     } catch (err) {
-      if (err.response?.data?.message) {
-        if (err.response.data.message === "로그인이 필요합니다.")
-          navigate("/login");
-        else
-          alert(err.response.data.message);
-      } else {
-        console.error('비밀번호 변경 API 오류:', err);
-      }
+      handleError('비밀번호 변경 실패:', err);
     }
   }
 
@@ -283,14 +231,7 @@ const Mypage = () => {
         setEmailNotificationAgree(newValue);
       }
     } catch (err) {
-      if (err.response?.data?.message) {
-        if (err.response.data.message === "로그인이 필요합니다.")
-          navigate("/login");
-        else
-          alert(err.response.data.message);
-      } else {
-        console.error('설정 변경 API 오류:', err);
-      }
+      handleError('설정 변경 실패:', err);
     }
   }
 
@@ -324,14 +265,7 @@ const Mypage = () => {
         setUser(null);
         navigate('/');
       } catch (err) {
-        if (err.response?.data?.message) {
-          if (err.response.data.message === "로그인이 필요합니다.")
-            navigate("/login");
-          else
-            alert(err.response.data.message);
-        } else {
-          console.error('탈퇴 API 오류:', err);
-        }
+        handleError('회원 탈퇴 실패:', err);
       }
     }
   };
@@ -345,42 +279,44 @@ const Mypage = () => {
   };
 
   const handleDeleteLiked = async (postId) => {
-    if (window.confirm('정말 삭제하시겠습니까?')) {
+    if (window.confirm('해당 글의 좋아요를 취소하시겠습니까?')) {
       try {
-        await axios.delete(`${API_BASE_URL}/boards/${postId}`, {
+        await axios.post(`${API_BASE_URL}/boards/${postId}/like`, null, {
           withCredentials: true
         });
         setLikedPosts(likedPosts.filter(post => post.boardNo !== postId));
       } catch (err) {
-        if (err.response?.data?.message) {
-          if (err.response.data.message === "로그인이 필요합니다.")
-            navigate("/login");
-          else
-            alert(err.response.data.message);
-        } else {
-          console.error('게시글 삭제 API 오류:', err);
-        }
+        handleError('좋아요 취소 실패:', err);
       }
     }
   };
 
   const handleDeleteSaved = async (postId) => {
-    if (window.confirm('정말 삭제하시겠습니까?')) {
+    if (window.confirm('해당 글의 스크랩을 취소하시겠습니까?')) {
       try {
-        await axios.delete(`${API_BASE_URL}/boards/${postId}`, {
+        await axios.post(`${API_BASE_URL}/boards/${postId}/scrap`, null, {
           withCredentials: true
         });
         setSavedPosts(savedPosts.filter(post => post.boardNo !== postId));
       } catch (err) {
-        if (err.response?.data?.message) {
-          if (err.response.data.message === "로그인이 필요합니다.")
-            navigate("/login");
-          else
-            alert(err.response.data.message);
-        } else {
-          console.error('게시글 삭제 API 오류:', err);
-        }
+        handleError('스크랩 취소 실패:', err);
       }
+    }
+  };
+
+  const handleAddFriend = async () => {
+    if (!newFriend.name || !newFriend.email) {
+      alert('이름, 이메일을 입력해주세요.');
+      return;
+    }
+    try {
+      await axios.post(`${API_BASE_URL}/user/friends/add`, {
+        opponentNick: newFriend.name,
+        opponentEmail: newFriend.email
+      }, { withCredentials: true });
+      alert("친구 추가 요청을 보냈습니다.")
+    } catch (err) {
+      handleError(err, "친구 추가 실패");
     }
   };
 
@@ -395,16 +331,13 @@ const Mypage = () => {
         });
         setFriends(friends.filter(friend => friend.friendshipNo !== id));
       } catch (err) {
-        if (err.response?.data?.message) {
-          if (err.response.data.message === "로그인이 필요합니다.")
-            navigate("/login");
-          else
-            alert(err.response.data.message);
-        } else {
-          console.error('친구 삭제 API 오류:', err);
-        }
+        handleError('친구 삭제 실패:', err);
       }
     }
+  };
+
+  const toggleSchedule = (scheduleNo) => {
+    setOpenScheduleNo(prev => (prev === scheduleNo ? null : scheduleNo));
   };
 
   const handleAddSchedule = (e) => {
@@ -420,14 +353,43 @@ const Mypage = () => {
       updated.splice(index, 1);
       setSchedules(updated);
     } catch (err) {
-      if (err.response?.data?.message) {
-        if (err.response.data.message === "로그인이 필요합니다.")
-          navigate("/login");
-        else
-          alert(err.response.data.message);
-      } else {
-        console.error('스케줄 삭제 API 오류:', err);
-      }
+      handleError('스케줄 삭제 실패:', err);
+    }
+  };
+
+  const handleAcceptFriend = async (friendshipNo, index) => {
+    try {
+      await axios.post(`${API_BASE_URL}/user/friends/approve`, {
+        friendshipNo
+      }, { withCredentials: true });
+      const updated = [...friendReceived];
+      updated.splice(index, 1);
+      setFriendReceived(updated);
+      fetchFriends();
+    } catch (err) {
+      handleError('친구 요청 수락 실패:', err);
+    }
+  };
+
+  const handleAcceptInvitation = async (invitationNo, index) => {
+    try {
+      await axios.post(`${API_BASE_URL}/groups/invitations/${invitationNo}/accept`, null, { withCredentials: true });
+      const updated = [...groupInvitations];
+      updated.splice(index, 1);
+      setGroupInvitations(updated);
+    } catch (err) {
+      handleError('그룹 초대 수락 실패:', err);
+    }
+  };
+
+  const handleRejectInvitation = async (invitationNo, index) => {
+    try {
+      await axios.post(`${API_BASE_URL}/groups/invitations/${invitationNo}/reject`, null, { withCredentials: true });
+      const updated = [...groupInvitations];
+      updated.splice(index, 1);
+      setGroupInvitations(updated);
+    } catch (err) {
+      handleError('그룹 초대 거절 실패:', err);
     }
   };
 
@@ -436,7 +398,7 @@ const Mypage = () => {
       <aside className="mypage-sidebar">
         <div className="profile-section">
           <div className="avatar-wrapper">
-            {avatar === null
+            {avatar !== null
               ? <img src={avatar} alt="프로필 사진" className="profile-avatar" />
               : <img src="/images/default-pro.png" alt="프로필 사진" className="profile-avatar" />}
             <label htmlFor="avatar-upload" className="avatar-upload-btn">📷
@@ -450,8 +412,8 @@ const Mypage = () => {
             <li onClick={() => setView('posts')}>내 게시물</li>
             <li onClick={() => setView('liked')}>좋아요/저장한 글</li>
             <li onClick={() => setView('friends')}>친구목록</li>
-            <li onClick={() => setView('friendReceived')}>받은 친구요청</li>
-            <li onClick={() => setView('groups')}>그룹</li>
+            <li onClick={() => setView('friendReceived')}>받은 친구 요청</li>
+            <li onClick={() => setView('groups')}>받은 그룹 초대</li>
             <li onClick={() => setView('schedules')}>일정</li>
             <li onClick={() => setView('settings')}>설정</li>
           </ul>
@@ -469,12 +431,12 @@ const Mypage = () => {
             <h2>내 게시물</h2>
             <div className="post-list">
               {myPosts.map((post) => (
-                <div key={post.boardNo} className="post-card" onClick={() => navigate(`/board?postId=${post.boardNo}`)}>
+                <div key={post.boardNo} className="post-card" onClick={() => navigate(`/boards/${post.boardNo}`)}>
                   {post.thumbnailUrl ? <img src={post.thumbnailUrl} alt={post.boardTitle} className="post-thumb" /> : <></>}
                   <div className="post-info">
-                    <h3>{post.boardTitle}</h3>
-                    <p>{post.categoryName} · {timeAgo(post.boardUpdateDate)}</p>
-                    <p>조회수 {post.boardViewCount} · 좋아요 {post.boardLike}</p>
+                    <h3 style={{margin: 0}}>{post.boardTitle}</h3>
+                    <p style={{margin: 0}}>{post.categoryName} · {timeAgo(post.boardUpdateDate)}</p>
+                    <p style={{margin: 0}}>조회수 {post.boardViewCount} · 좋아요 {post.boardLike}</p>
                   </div>
                 </div>
               ))}
@@ -494,11 +456,11 @@ const Mypage = () => {
                 <ul className="liked-posts-list">
                   {likedPosts.map((post) => (
                     <li key={post.boardNo} className="liked-post-item">
-                      {post.thumbnailUrl ? <img src={post.thumbnailUrl} alt={post.boardTitle} /> : <></>}
+                      {post.thumbnailUrl ? <img src={post.thumbnailUrl} alt={post.boardTitle} className="post-thumb" /> : <></>}
                       <div>
-                        <h3>{post.boardTitle}</h3>
-                        <p>{post.categoryName} · {timeAgo(post.boardUpdateDate)}</p>
-                        <button onClick={() => handleDeleteLiked(post.boardNo)}>삭제</button>
+                        <h3 style={{margin: 0}}>{post.boardTitle}</h3>
+                        <p style={{margin: 0}}>{post.categoryName} · {timeAgo(post.boardUpdateDate)}</p>
+                        <button onClick={() => handleDeleteLiked(post.boardNo)}>취소</button>
                       </div>
                     </li>
                   ))}
@@ -515,11 +477,11 @@ const Mypage = () => {
                 <ul className="liked-posts-list">
                   {savedPosts.map((post) => (
                     <li key={post.boardNo} className="liked-post-item">
-                      {post.thumbnailUrl ? <img src={post.thumbnailUrl} alt={post.boardTitle} /> : <></>}
+                      {post.thumbnailUrl ? <img src={post.thumbnailUrl} alt={post.boardTitle} className="post-thumb" /> : <></>}
                       <div>
-                        <h3>{post.boardTitle}</h3>
-                        <p>{post.categoryName} · {timeAgo(post.boardUpdateDate)}</p>
-                        <button onClick={() => handleDeleteSaved(post.boardNo)}>삭제</button>
+                        <h3 style={{margin: 0}}>{post.boardTitle}</h3>
+                        <p style={{margin: 0}}>{post.categoryName} · {timeAgo(post.boardUpdateDate)}</p>
+                        <button onClick={() => handleDeleteSaved(post.boardNo)}>취소</button>
                       </div>
                     </li>
                   ))}
@@ -547,7 +509,7 @@ const Mypage = () => {
                   value={newFriend.email}
                   onChange={(e) => setNewFriend({ ...newFriend, email: e.target.value })}
                 />
-                <button>친구 요청</button>
+                <button onClick={handleAddFriend}>친구 요청</button>
               </div>
 
             {/* 검색창 */}
@@ -589,13 +551,16 @@ const Mypage = () => {
 
             {/* 받은 친구 요청 목록 */}
             <ul className="friend-list">
-              {friendReceived.map((item, index) => (
-                <li key={index} className="friend-item">
-                  <div>
-                    <strong>상대방: {item.opponentNick}</strong>
+              {friendReceived.map((friend, index) => (
+                <div key={index} className="friend-card">
+                  <div className="friend-info">
+                    {friend.opponentImg
+                        ? <img src={friend.opponentImg} alt="프로필" className="friend-avatar" />
+                        : <img src="/images/default-pro.png" alt="프로필" className="friend-avatar" />}
+                    <strong>{friend.opponentNick} 의 친구 요청</strong>
                   </div>
-                  <button>수락</button>
-                </li>
+                  <button onClick={() => handleAcceptFriend(friend.friendshipNo, index)}>수락</button>
+                </div>
               ))}
             </ul>
           </div>
@@ -603,18 +568,18 @@ const Mypage = () => {
 
         {view === 'groups' && (
           <div className="p-4">
-            <h2 className="text-xl font-semibold mb-4">그룹 초대 관리</h2>
+            <h2 className="text-xl font-semibold mb-4">받은 그룹 초대 관리</h2>
 
             {/* 그룹 초대 목록 */}
             <ul className="group-list">
-              {groupInvitations.map((item, index) => (
-                <li key={index} className="group-item">
-                  <div>
-                    <strong>그룹명: {item.groupTitle}</strong>
-                    <strong>초대자: {item.senderId}</strong>
+              {groupInvitations.map((group, index) => (
+                <li key={index} className="group-card">
+                  <div className="group-info">
+                    <strong>{group.groupTitle}</strong>
+                    <strong>{group.senderNick}이(가) 초대함</strong>
+                    <button onClick={() => handleAcceptInvitation(group.invitationNo, index)}>수락</button>
+                    <button onClick={() => handleRejectInvitation(group.invitationNo, index)}>거절</button>
                   </div>
-                  <button>수락</button>
-                  <button>거절</button>
                 </li>
               ))}
             </ul>
@@ -645,16 +610,34 @@ const Mypage = () => {
 
             {/* 일정 목록 */}
             <ul className="schedule-list">
-              {schedules.map((item, index) => (
-                <li key={index} className="schedule-item">
+              {schedules.map((item, index) => {
+                const isOpen = item.scheduleNo === openScheduleNo;
+                return (
+                <li key={index} className="schedule-item" onClick={() => toggleSchedule(item.scheduleNo)}>
                   <div>
                     <strong>{formatScheduleDate(item.details[0].scheduleStartTime)}</strong> ~
                     <strong> {formatScheduleDate2(item.details[item.details.length - 1].scheduleEndTime)}</strong>
                   </div>
                   <div>{item.scheduleName}</div>
                   <button onClick={() => handleDeleteSchedule(index)}>삭제</button>
+                  {isOpen && (
+                    <>
+                      <div className="schedule-details">
+                        <h3>세부 내용</h3>
+                        {item.details.map((d) => (
+                          <div style={{"padding-bottom": "10px"}}>
+                            <div>
+                              <strong>{formatScheduleDate2(d.scheduleStartTime)}</strong> ~
+                              <strong> {formatScheduleDate2(d.scheduleEndTime)}</strong>
+                            </div>
+                            <div>{d.scheduleContent}</div>
+                          </div>
+                      ))}
+                      </div>
+                    </>
+                  )}
                 </li>
-              ))}
+              )})}
             </ul>
           </div>
         )}

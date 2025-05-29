@@ -15,6 +15,7 @@ export default function KakaoLogin() {
     // URLSearchParams로 쿼리 파라미터 추출
     const queryParams = new URLSearchParams(location.search);
     const code = queryParams.get("code"); // 'code' 파라미터 추출
+    const state = queryParams.get("state") || "/";  // state 파라미터 받기, 없으면 "/"로 기본 지정
 
     if (code) {
       // 카카오 코드 서버로 전송
@@ -29,7 +30,7 @@ export default function KakaoLogin() {
                         })
                         .then((response2) => {
                           setUser(response2.data);
-                          navigate("/");
+                          navigate(state);  // state 값으로 이동!
                         })
                         .catch((error) => {
                           console.error("사용자 조회에 실패했습니다.", error);

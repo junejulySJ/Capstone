@@ -91,6 +91,7 @@
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
+  margin-top: 15px;
 }
 
 .action-btn {
@@ -107,7 +108,11 @@
   padding: 15px;
   border-radius: 8px;
   background-color: #fafafa;
+  height: 50vh;       /* ✅ 뷰포트 절반 높이로 설정 */
+  overflow-y: auto;   /* ✅ 내부 스크롤 가능하게 */
+  box-sizing: border-box;
 }
+
 
 .section-box ul {
   list-style: none;
@@ -153,12 +158,13 @@
 }
 
 .schedule-route-box {
-  max-height: 220px;     /* ✅ 원하는 높이로 조절 (예시) */
+  max-height: 170px; 
+  max-width: 1610px;
   overflow-y: auto;      /* ✅ 넘치면 스크롤 */
   padding: 10px;
   background-color: #eef5ff;
   border-radius: 8px;
-}
+  border: solid 3px gray !important;}
 
 .schedule-map-wrapper {
   position: relative;
@@ -191,5 +197,24 @@
   border-radius: 10px;
   box-shadow: -2px 0 6px rgba(0, 0, 0, 0.1);
   padding: 20px;
+}
+
+.schedule-category-style {
+  border: 2px solid #888;
+  background-color: #fefefe;
+  padding: 20px;
+  height: 390px !important;
+  width: 425px !important;
+  overflow-y: auto;         /* ✅ 내부 스크롤 가능하도록 설정 */
+  box-sizing: border-box;     /* ✅ padding 포함 높이 계산 */
+  border-radius: 12px;
+}
+
+
+.schedule-category-style .place-item {
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  margin-bottom: 16px;
+  padding: 12px;
 }
 

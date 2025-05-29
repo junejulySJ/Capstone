@@ -32,6 +32,8 @@ export const categoryDetailCodes = {
 
 const Map = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [mapObj, setMapObj] = useState(null);
   const [departure, setDeparture] = useState(null);
   const [destination, setDestination] = useState(null);
@@ -43,7 +45,6 @@ const Map = () => {
   const [categoryMarkers, setCategoryMarkers] = useState([]);
   const [selectedPlaces, setSelectedPlaces] = useState([]);
   const [addedList, setAddedList] = useState([]);
-  const location = useLocation();
   const [sort, setSort] = useState();
   const [search, setSearch] = useState();
   const [departures, setDepartures] = useState([]);
@@ -51,14 +52,27 @@ const Map = () => {
   const [end, setEnd] = useState();
   const [middlePoint, setMiddlePoint] = useState();
   const [transferMarkers, setTransferMarkers] = useState();
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const handleRemovePlace = (indexToRemove) => {
+    setAddedList(prev => prev.filter((_, i) => i !== indexToRemove));
+  };
+  
 
+  // 카카오 맵 객체 초기화
   useEffect(() => {
-    const container = document.getElementById('map');
-    const map = new kakao.maps.Map(container, {
-      center: new kakao.maps.LatLng(37.554722, 126.970833),
-      level: 5,
-    });
-    setMapObj(map);
+    const interval = setInterval(() => {
+      if (window.kakao && window.kakao.maps) {
+        clearInterval(interval);
+        const container = document.getElementById('map');
+        const map = new window.kakao.maps.Map(container, {
+          center: new window.kakao.maps.LatLng(37.554722, 126.970833),
+          level: 5,
+        });
+        setMapObj(map);
+      }
+    }, 100);
+
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -106,6 +120,7 @@ const Map = () => {
 
 
 useEffect(() => {
+  if (!mapObj) return;
   const fetchData = async () => {
     if (!search || !sort) return;
     if (search === 'random-place') return; // 랜덤일 땐 건너뜀
@@ -327,16 +342,25 @@ useEffect(() => {
     setAddedList([...addedList, place]);
   };
 
+  // 홈으로 이동
+  const handleHeaderClick = () => {
+    navigate('/'); // 홈으로 이동
+  };
+
   return (
-    <div className="map-page">
+<div className="map-page map-page-scroll-fix">
+<header className="map-header">
+        <h1 className="map-header-text" onClick={handleHeaderClick}>MeetingMap</h1>
+      </header>
+
+      <div className="map-container-wrapper">
+        <div id="map" className="map-area"></div>
+
       <div className="category-top-bar">
         {categoryList.map(cat => (
           <button key={cat.code} onClick={() => handleCategoryClick(cat.code)}>{cat.name}</button>
         ))}
       </div>
-
-      <div className="map-container-wrapper">
-        <div id="map" className="map-area"></div>
 
         {showSidebar && (
           <CategorySidebar
@@ -347,7 +371,28 @@ useEffect(() => {
           />
         )}
 
-<div className="route-box" style={{ gridArea: 'route-box' }}>
+        <div className="location-box">
+        {Array.isArray(start) ? (
+          <>
+            <h4>출발지:</h4>
+            <ul>
+              {start.map((s, index) => (
+                <li key={index}>{s.name}</li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <h4>출발지: {start?.name || '없음'}</h4>
+        )}
+
+        {middlePoint && (
+          <h4>중간지점: {middlePoint.address}</h4>
+        )}
+
+        {end && <h4>도착지: {end.name}</h4>}
+      </div>
+
+        <div className="route-box" style={{ gridArea: 'route-box' }}>
           <div className="transport-select">
             <button onClick={() => setTransportMode('car')}>🚗 차량</button>
             <button onClick={() => setTransportMode('transit')}>🚌 대중교통</button>
@@ -360,8 +405,9 @@ useEffect(() => {
             onSelect={handleRouteClick}
           />
         </div>
-        <div className="right-box" style={{ gridArea: 'right-box' }}>
-        <div className="schedule-button-wrapper">
+
+        <div className="section-b-wrapper">
+          <h3>📝 선택한 장소 목록</h3>
         <button
           className="schedule-create-button"
           onClick={() => {
@@ -390,44 +436,33 @@ useEffect(() => {
         >
           📅 스케줄 생성하기
         </button>
-      </div>
-
-      <div className="section-b-wrapper">
-        <h3>📝 선택한 장소 목록</h3>
         {addedList.length === 0 ? (
-          <p>선택한 장소가 없습니다.</p>
-        ) : (
-          <ul>
-            {addedList.map((place, index) => (
-              <li key={index}>{place.name} ({place.address})</li>
-            ))}
-          </ul>
-        )}
-      </div>
-</div>
-        <div className="location-box">
-        {Array.isArray(start) ? (
-          <>
-            <h4>출발지:</h4>
+            <p>선택한 장소가 없습니다.</p>
+          ) : (
             <ul>
-              {start.map((s, index) => (
-                <li key={index}>{s.name}</li>
-              ))}
+              {addedList.map((place, index) => (
+  <li key={index}>
+    {place.name} ({place.address})
+    <button
+      onClick={() => handleRemovePlace(index)}
+      style={{
+        marginLeft: '8px',
+        background: 'transparent',
+        border: 'none',
+        color: 'red',
+        cursor: 'pointer',
+        fontSize: '16px'
+      }}
+    >
+      ❌
+    </button>
+  </li>
+))}
+
             </ul>
-          </>
-        ) : (
-          <h4>출발지: {start?.name || '없음'}</h4>
-        )}
-
-        {middlePoint && (
-          <h4>중간지점: {middlePoint.address}</h4>
-        )}
-
-        {end && <h4>도착지: {end.name}</h4>}
+          )}
+        </div>
       </div>
-      </div>
-
-
     </div>
   );
 };

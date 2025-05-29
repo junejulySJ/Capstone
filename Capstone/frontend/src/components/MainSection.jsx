@@ -303,53 +303,53 @@ export default function MainSection() {
           <h2>#오늘의 추천</h2>
           <div className="card-row">
             {topPosts.map((post) => (
-  <div
-    key={post.id}
-    className="recommend-card"
-    onClick={() => navigate(`/board?postId=${post.id}`)}
-    style={{ cursor: 'pointer' }}
-  >
-    <img src={`/images/${post.image}`} alt={post.title} className="card-image" />
-    <div className="card-content">
-      <h3>{post.title}</h3>
-      <p>{post.description}</p>
-    </div>
-  </div>
-))}
+              <div
+                key={post.id}
+                className="recommend-card"
+                onClick={() => navigate(`/board?postId=${post.id}`)}
+                style={{ cursor: 'pointer' }}
+              >
+                <img src={`/images/${post.image}`} alt={post.title} className="card-image" />
+                <div className="card-content">
+                  <h3>{post.title}</h3>
+                  <p>{post.description}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
         <div className="recommend-right">
-  <h2>#랜덤 장소 추천</h2>
-  <div className="card-grid">
-    <div
-      className="recommend-card big-card"
-      onClick={handleRandomPlaceClick}  // ✅ 클릭 이벤트 연결
-      style={{
-        backgroundImage: `url(${placeBackgrounds[randomPlace] || ''})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        position: 'relative',
-        overflow: 'hidden',
-        cursor: 'pointer'  // UX 향상: 커서 포인터
-      }}
-    >
-      <div className="overlay"></div>
-      <div className="card-content">
-        <h3>{randomPlace}</h3>
-        <button
-          className="action-btn"
-          onClick={(e) => {
-            e.stopPropagation();  // ✅ 카드 클릭과 버튼 클릭 분리
-            setRandomPlace(randomPlaces[Math.floor(Math.random() * randomPlaces.length)]);
-          }}
-        >
-          다시 추천받기
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
+          <h2>#랜덤 장소 추천</h2>
+          <div className="card-grid">
+            <div
+              className="recommend-card big-card"
+              onClick={handleRandomPlaceClick}  // ✅ 클릭 이벤트 연결
+              style={{
+                backgroundImage: `url(${placeBackgrounds[randomPlace] || ''})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                position: 'relative',
+                overflow: 'hidden',
+                cursor: 'pointer'  // UX 향상: 커서 포인터
+              }}
+            >
+              <div className="overlay"></div>
+              <div className="card-content">
+                <h3>{randomPlace}</h3>
+                <button
+                  className="action-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();  // ✅ 카드 클릭과 버튼 클릭 분리
+                    setRandomPlace(randomPlaces[Math.floor(Math.random() * randomPlaces.length)]);
+                  }}
+                >
+                  다시 추천받기
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
 
       </section>
     </div>

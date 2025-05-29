@@ -27,6 +27,9 @@ const Mypage = () => {
   const [myPosts, setMyPosts] = useState([]);
   const [likedPosts, setLikedPosts] = useState([]);
   const [savedPosts, setSavedPosts] = useState([]);
+  const [newFriend, setNewFriend] = useState({ name: '', email: '' });
+  const [friendReceived, setFriendReceived] = useState([]);
+  const [groupInvitations, setGroupInvitations] = useState([]);
 
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
@@ -42,6 +45,32 @@ const Mypage = () => {
     fetchSavedPosts();
     fetchSchedules();
     fetchFriends();
+
+    setGroupInvitations([
+      {
+        "invitationNo": 4,
+        "groupNo": 2,
+        "groupTitle": "testgroup",
+        "senderId": "user1",
+        "senderNick": "사용자1",
+        "receiverId": "user4",
+        "status": "WAITING",
+        "invitedDate": "2025-05-29T13:17:33"
+    }
+  ])
+
+    setFriendReceived([
+    {
+        "friendshipNo": 20,
+        "userId": "user5",
+        "opponentId": "user1",
+        "opponentNick": "사용자1",
+        "opponentImg": "https://capstone-meetingmap.s3.eu-north-1.amazonaws.com/8c0405c9-6369-4dec-ae70-4e197217fbb4_ai-generated-9510467_640.jpg",
+        "status": "WAITING",
+        "counterpartFriendshipNo": 19,
+        "from": false
+    }
+])
   }, []);
 
   useEffect(() => {
@@ -421,6 +450,8 @@ const Mypage = () => {
             <li onClick={() => setView('posts')}>내 게시물</li>
             <li onClick={() => setView('liked')}>좋아요/저장한 글</li>
             <li onClick={() => setView('friends')}>친구목록</li>
+            <li onClick={() => setView('friendReceived')}>받은 친구요청</li>
+            <li onClick={() => setView('groups')}>그룹</li>
             <li onClick={() => setView('schedules')}>일정</li>
             <li onClick={() => setView('settings')}>설정</li>
           </ul>
@@ -503,6 +534,22 @@ const Mypage = () => {
           <div className="p-4">
             <h2 className="text-xl font-semibold mb-4">친구 목록</h2>
 
+            <div className="add-member-form">
+                <input
+                  type="text"
+                  placeholder="이름"
+                  value={newFriend.name}
+                  onChange={(e) => setNewFriend({ ...newFriend, name: e.target.value })}
+                />
+                <input
+                  type="email"
+                  placeholder="이메일"
+                  value={newFriend.email}
+                  onChange={(e) => setNewFriend({ ...newFriend, email: e.target.value })}
+                />
+                <button>친구 요청</button>
+              </div>
+
             {/* 검색창 */}
             <input
               type="text"
@@ -533,6 +580,44 @@ const Mypage = () => {
 
                 ))}
             </div>
+          </div>
+        )}
+
+        {view === 'friendReceived' && (
+          <div className="p-4">
+            <h2 className="text-xl font-semibold mb-4">받은 친구 요청 관리</h2>
+
+            {/* 받은 친구 요청 목록 */}
+            <ul className="friend-list">
+              {friendReceived.map((item, index) => (
+                <li key={index} className="friend-item">
+                  <div>
+                    <strong>상대방: {item.opponentNick}</strong>
+                  </div>
+                  <button>수락</button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {view === 'groups' && (
+          <div className="p-4">
+            <h2 className="text-xl font-semibold mb-4">그룹 초대 관리</h2>
+
+            {/* 그룹 초대 목록 */}
+            <ul className="group-list">
+              {groupInvitations.map((item, index) => (
+                <li key={index} className="group-item">
+                  <div>
+                    <strong>그룹명: {item.groupTitle}</strong>
+                    <strong>초대자: {item.senderId}</strong>
+                  </div>
+                  <button>수락</button>
+                  <button>거절</button>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
 

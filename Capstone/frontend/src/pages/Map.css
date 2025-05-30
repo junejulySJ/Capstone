@@ -65,7 +65,7 @@
 }
 
 .category-top-bar-button:hover {
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(0, 0, 0, 0.9);
 }
 
 /* ✅ 선택된 버튼 스타일 */
@@ -107,7 +107,7 @@
   right: 18px;
   width: 250px;
   /* 적당한 크기 설정 */
-  background-color: rgba(255, 248, 220, 0.7);
+  background-color: rgba(255, 248, 220, 0.9);
   /* 배경색과 투명도 설정 (배경색 #fff8dc, 80% opacity) */
   border-radius: 10px;
   padding: 15px;
@@ -115,7 +115,7 @@
   border: 1px solid #ddd;
   z-index: 1000;
   /* 우선순위 */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.9);
   /* 살짝 그림자 추가 */
 }
 
@@ -148,11 +148,11 @@
   padding: 20px;
   width: 600px;        /* 고정된 너비 */
   height: 200px;       /* 고정된 높이 */
-  background-color: rgba(255, 255, 255, 0.5);  /* 투명한 배경 */
+  background-color: rgba(255, 255, 255, 0.9);  /* 투명한 배경 */
   border-radius: 10px;
   font-size: 14px;
   border: 1px solid #ccc;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* 그림자 추가 */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.9); /* 그림자 추가 */
   z-index: 1000;       /* 다른 요소들보다 위에 표시 */
   overflow-y: auto;    /* 세로 스크롤 추가 */
 }
@@ -208,7 +208,7 @@
   /* 적당한 너비 설정 */
   height: 200px;
   /* 최대 높이 설정 */
-  background-color: rgba(255, 255, 255, 0.6);
+  background-color: rgba(255, 255, 255, 0.9);
   /* 배경을 흰색으로 하고 80% 투명도 */
   border-radius: 10px;
   padding: 15px;
@@ -220,7 +220,7 @@
   /* 세로 스크롤 추가 */
   box-sizing: border-box;
   /* padding과 border가 width에 포함되도록 설정 */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.9);
   /* 그림자 추가 */
 }
 
@@ -274,7 +274,7 @@
     top: 440px;
     width: 180px;
     /* 적당한 크기 설정 */
-    background-color: rgba(255, 248, 220, 0.5);
+    background-color: rgba(255, 248, 220, 0.9);
     /* 배경색과 투명도 설정 (배경색 #fff8dc, 80% opacity) */
     border-radius: 10px;
     padding: 0 5px;
@@ -282,7 +282,7 @@
     border: 1px solid #ddd;
     z-index: 9;
     /* 우선순위 */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.9);
     /* 살짝 그림자 추가 */
   }
 
@@ -310,7 +310,7 @@
     /* 적당한 너비 설정 */
     height: 200px;
     /* 최대 높이 설정 */
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.9);
     /* 배경을 흰색으로 하고 80% 투명도 */
     border-radius: 10px;
     padding: 15px;
@@ -322,7 +322,7 @@
     /* 세로 스크롤 추가 */
     box-sizing: border-box;
     /* padding과 border가 width에 포함되도록 설정 */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.9);
     /* 그림자 추가 */
   }
 

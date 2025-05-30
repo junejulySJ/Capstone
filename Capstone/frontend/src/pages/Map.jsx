@@ -60,22 +60,20 @@ const Map = () => {
 
   // 카카오 맵 객체 초기화
   useEffect(() => {
-  const timeout = setTimeout(() => {
-    if (window.kakao && window.kakao.maps) {
-      const container = document.getElementById('map');
-      if (!container) return;
+    const interval = setInterval(() => {
+      if (window.kakao && window.kakao.maps) {
+        clearInterval(interval);
+        const container = document.getElementById('map');
+        const map = new window.kakao.maps.Map(container, {
+          center: new window.kakao.maps.LatLng(37.554722, 126.970833),
+          level: 5,
+        });
+        setMapObj(map);
+      }
+    }, 100);
 
-      const map = new window.kakao.maps.Map(container, {
-        center: new window.kakao.maps.LatLng(37.554722, 126.970833),
-        level: 5,
-      });
-      setMapObj(map);
-    }
-  }, 200); // ✅ DOM 렌더 완료 후 약간의 지연
-
-  return () => clearTimeout(timeout);
-}, []);
-
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -92,85 +90,6 @@ const Map = () => {
     setDepartures(departures);
   }, [location.search]);
 
-<<<<<<< HEAD
-   useEffect(() => {
-  if (
-    mapObj &&
-    location.state?.fromRandomPlace &&
-    location.state?.selectedPlace
-  ) {
-    const { name, address, latitude, longitude, imageUrl } = location.state.selectedPlace;
-    const place = { name, address, latitude, longitude, imageUrl };
-
-    clearPolylines(polylines);
-    categoryMarkers.forEach(m => m.setMap(null));
-
-    const lat = parseFloat(place.latitude);
-    const lng = parseFloat(place.longitude);
-    
-    const marker = new kakao.maps.Marker({
-      map: mapObj,
-      position: new kakao.maps.LatLng(lat, lng),
-      title: place.name
-    });
-
-    mapObj.setCenter(new kakao.maps.LatLng(lat, lng));
-    setCategoryMarkers([marker]);
-    setSelectedPlaces([place]);
-    setShowSidebar(true);
-  }
- }, [mapObj, location.state]);
-
-
-useEffect(() => {
-  if (!mapObj) return;
-  const fetchData = async () => {
-    if (!search || !sort) return;
-    if (search === 'random-place') return; // 랜덤일 땐 건너뜀
-
-    const allPlaces = [];
-    const markers = [];
-
-    // ——— 여기서 2번 마커를 추가하고 싶다면 ———
-    // (1) 하드코딩 좌표를 쓸 수도 있고…
-    const secondLat = 37.5665;
-    const secondLng = 126.9780;
-    const marker2 = new kakao.maps.Marker({
-      map: mapObj,
-      position: new kakao.maps.LatLng(secondLat, secondLng),
-      title: '두 번째 마커'
-    });
-    markers.push(marker2);
-    // ————————————————————————————————
-
-    try {
-      const res = await axios.get(
-        `${API_BASE_URL}/map?search=${search}&sort=${sort}` +
-        `${departure ? `&start=${departure}` : ''}` +
-        `${destination ? `&end=${destination}` : ''}` +
-        `${departures.length ? `&${departures.map(d=>`name=${d}`).join('&')}` : ''}`
-      );
-      const items = res.data.list || [];
-
-      for (const place of items) {
-        if (!place.longitude || !place.latitude) continue;
-        const lat = parseFloat(place.latitude);
-        const lng = parseFloat(place.longitude);
-        const marker = new kakao.maps.Marker({
-          map: mapObj,
-          position: new kakao.maps.LatLng(lat, lng),
-          title: place.name
-        });
-        markers.push(marker);
-        allPlaces.push(place);
-      }
-
-      setCategoryMarkers(markers);
-      setSelectedPlaces(allPlaces.slice(0, 50));
-      setShowSidebar(true);
-    } catch (err) {
-      console.error('전체 요청 실패:', err);
-=======
   useEffect(() => {
     if (
       mapObj &&
@@ -193,7 +112,6 @@ useEffect(() => {
       setCategoryMarkers([marker]);
       setSelectedPlaces([place]);
       setShowSidebar(true);
->>>>>>> fe5303765b1fdab8c6dc2a3d48583083e4085833
     }
   }, [mapObj, location.state]);
 

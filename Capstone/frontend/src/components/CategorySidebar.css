@@ -4,7 +4,7 @@
   top: 10px;
   left: 10px;
   z-index: 10;
-  background-color: rgba(255, 255, 255, 0.3); /* 투명도를 0.6으로 변경 */
+  background-color: rgba(255, 255, 255, 0.9); /* 투명도를 0.6으로 변경 */
   width: 370px;
   max-height: 758px;
   /* Optional: limit the height */
@@ -186,7 +186,7 @@
     margin: 5px 8px;  /* 아이템 간 간격 줄이기 */
     padding: 6px 8px;  /* 아이템 패딩 줄이기 */
     border-radius: 8px;
-    background-color: rgba(249, 249, 249, 0.7);
+    background-color: rgba(249, 249, 249, 0.9);
     border: 1px solid #ddd;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     display: flex;

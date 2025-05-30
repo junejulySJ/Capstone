@@ -20,7 +20,8 @@ const Schedule = () => {
   const [estimatedTime, setEstimatedTime] = useState('');
   const [showCreateSection, setShowCreateSection] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(false);
-  
+  const [isRouteBoxCollapsed, setIsRouteBoxCollapsed] = useState(false);
+
   const { addedList = [] } = location.state || {};
   const [scheduleItems, setScheduleItems] = useState(() => addedList);
   const { end = [] } = location.state || {};
@@ -363,21 +364,69 @@ const res = await axios.post(`${API_BASE_URL}/schedules/create`, body, { withCre
     )}
   </div>
 </div>
-        {showCreateScheduleSection && (
-          <div className="route-box schedule-route-box">
-            <div className="transport-select">
-              <button onClick={() => setTransportMode('car')}>🚗 차량</button>
-              <button onClick={() => setTransportMode('transit')}>🚌 대중교통</button>
-              <button onClick={() => setTransportMode('walk')}>🚶 도보</button>
-            </div>
-            <RouteSummary
-              routes={routeList}
-              transportMode={transportMode}
-              selectedIdx={selectedRouteIdx}
-              onSelect={handleRouteClick}
-            />
+{showCreateScheduleSection && (
+  <>
+    {/* route-box 전체 토글 */}
+    {!isRouteBoxCollapsed ? (
+      <div className="route-box schedule-route-box" style={{
+        padding: '10px',
+        border: '1px solid #ccc',
+        borderRadius: '10px',
+        backgroundColor: '#fff',
+        marginTop: '10px'
+      }}>
+        <div style={{ textAlign: 'right' }}>
+          <button
+            onClick={() => setIsRouteBoxCollapsed(true)}
+            style={{
+              backgroundColor: '#eee',
+              border: '1px solid #bbb',
+              borderRadius: '5px',
+              padding: '4px 8px',
+              fontSize: '14px',
+              cursor: 'pointer',
+            }}
+          >
+            접기 ⬆️
+          </button>
+        </div>
+
+        <div style={{ marginTop: '10px' }}>
+          <div className="transport-select">
+            <button onClick={() => setTransportMode('car')}>🚗 차량</button>
+            <button onClick={() => setTransportMode('transit')}>🚌 대중교통</button>
+            <button onClick={() => setTransportMode('walk')}>🚶 도보</button>
           </div>
-        )}
+          <RouteSummary
+            routes={routeList}
+            transportMode={transportMode}
+            selectedIdx={selectedRouteIdx}
+            onSelect={handleRouteClick}
+          />
+        </div>
+      </div>
+    ) : (
+      // 접혔을 때는 route-box 대신 이 버튼만 위치에 출력
+      <div style={{ marginTop: '10px', textAlign: 'right' }}>
+        <button
+          onClick={() => setIsRouteBoxCollapsed(false)}
+          style={{
+            backgroundColor: '#eee',
+            border: '1px solid #bbb',
+            borderRadius: '5px',
+            padding: '4px 8px',
+            fontSize: '14px',
+            cursor: 'pointer',
+          }}
+        >
+          펼치기 ⬇️
+        </button>
+      </div>
+    )}
+  </>
+)}
+
+
 
         <div className="button-row">
           <button onClick={() => setShowCreateSection((prev) => !prev)} className="action-btn">

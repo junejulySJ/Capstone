@@ -339,9 +339,6 @@ const Map = () => {
 
   return (
     <div className="map-page map-page-scroll-fix">
-      <header className="map-header">
-        <h1 className="map-header-text" onClick={handleHeaderClick}>MeetingMap</h1>
-      </header>
 
       <div className="map-container-wrapper">
         <div id="map" className="map-area"></div>
@@ -382,7 +379,7 @@ const Map = () => {
           {end && <h4>도착지: {end.name}</h4>}
         </div>
 
-        <div className="route-box" style={{ gridArea: 'route-box' }}>
+        <div className="route-box" style={{ gridArea: 'route-box', width: "100%" }}>
           <div className="transport-select">
             <button onClick={() => setTransportMode('car')}>🚗 차량</button>
             <button onClick={() => setTransportMode('transit')}>🚌 대중교통</button>

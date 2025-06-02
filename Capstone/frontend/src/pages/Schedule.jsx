@@ -169,6 +169,19 @@ useEffect(() => {
     }
   };
 
+  const handleSaveSchedule = async () => {
+    try {
+      await axios.post(`${API_BASE_URL}/schedules`, {
+        scheduleName,
+        scheduleAbout,
+        details: createdSchedule
+      }, { withCredentials: true });
+      alert("스케줄 저장 완료");
+    } catch (err) {
+      console.error('스케줄 저장 실패:', err);
+    }
+  }
+
   const handleEstimate = () => {
     setEstimatedTime('차량: 35분 | 대중교통: 45분');
   };
@@ -219,7 +232,15 @@ useEffect(() => {
 
 if (recommendMode === "ai") {
   body = {
-    selectedPlace: scheduleItems.slice(0, 1),
+     selectedPlace: scheduleItems.map((item, index) => ({
+      contentId: item.contentId,
+      address: item.address,
+      name: item.name,
+      latitude: item.latitude,
+      longitude: item.longitude,
+      category: item.category,
+      stayMinutes: scheduleItemStayMinutes[index]
+    })),
     scheduleStartTime,
     scheduleEndTime,
     transport,
@@ -369,11 +390,7 @@ const res = await axios.post(`${API_BASE_URL}/schedules/create`, body, { withCre
     {/* route-box 전체 토글 */}
     {!isRouteBoxCollapsed ? (
       <div className="route-box schedule-route-box" style={{
-        padding: '10px',
-        border: '1px solid #ccc',
-        borderRadius: '10px',
-        backgroundColor: '#fff',
-        marginTop: '10px'
+
       }}>
         <div style={{ textAlign: 'right' }}>
           <button
@@ -529,7 +546,7 @@ const res = await axios.post(`${API_BASE_URL}/schedules/create`, body, { withCre
                 <li key={index}>🔹 {new Date(item.scheduleStartTime).toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit', hour12: true })} ~ {new Date(item.scheduleEndTime).toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit', hour12: true })} - {item.scheduleContent}</li>
               ))}
             </ul>
-            <button>스케줄 저장</button>
+            <button onClick={handleSaveSchedule}>스케줄 저장</button>
           </div>
         )}
           </div>

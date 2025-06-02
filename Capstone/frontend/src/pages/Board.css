@@ -346,12 +346,15 @@
     height: auto;
   }
 
+
+
   .board-left-menu {
     width: 100%;
     padding-top: 2rem;
     margin-right: 0;
     border-right: none;
     padding-bottom: 0;
+    height: 200px;
   }
   
 

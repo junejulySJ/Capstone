@@ -1,44 +1,77 @@
+/* 기존 스타일은 유지하고, 카카오 로그인 버튼을 로그인 버튼 아래에 동일한 간격/크기로 배치 */
+
 .login-container {
-  max-width: 400px;
-  margin: 80px auto;
-  padding: 2rem;
-  background-color: #c3b2b2;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
 .login-form {
+  background-color: #c2b0ac;
+  padding: 40px;
+  border-radius: 12px;
+  width: 350px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  align-items: center;
 }
 
-.login-form input {
-  padding: 0.5rem;
-  font-size: 1rem;
+.login-form h2 {
+  margin-bottom: 24px;
+  color: #222;
+}
+
+.login-form label {
+  align-self: flex-start;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.login-form input[type="text"],
+.login-form input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 16px;
   border: 1px solid #ccc;
-  border-radius: 6px;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.input-with-toggle {
+  position: relative;
+  width: 100%;
+}
+
+.input-with-toggle .eye-icon {
+  position: absolute;
+  top: 40%;
+  right: 10px;
+  transform: translateY(-50%);
+  cursor: pointer;
 }
 
 .login-form button {
-  padding: 0.75rem;
-  font-size: 1rem;
-  background-color: #2c7a7b;
+  width: 100%;
+  padding: 12px;
+  background-color: #3b7c7c;
   color: white;
   border: none;
   border-radius: 6px;
+  font-size: 16px;
   cursor: pointer;
+  margin-bottom: 12px;
 }
 
-.error {
-  color: red;
-  font-size: 0.9rem;
+.login-form button:hover {
+  background-color: #336666;
 }
 
 .register-link {
-  margin-top: 1rem;
-  text-align: center;
-  color: #2c7a7b;
+  margin-top: 8px;
+  color: #3b7c7c;
   cursor: pointer;
-  font-weight: bold;
+  text-decoration: underline;
 }
+

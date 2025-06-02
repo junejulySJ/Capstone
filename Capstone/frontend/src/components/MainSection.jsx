@@ -6,22 +6,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './MainSection.css';
-
-const API_BASE_URL = 'http://localhost:8080';
+import dummyPosts from '../data/dummyPosts';
+import { API_BASE_URL } from '../constants';
 
 const images = [
   '/images/bg1.jpg',
   '/images/bg2.jpg',
   '/images/bg3.jpg',
   '/images/bg4.jpg'
-];
-
-const samplePosts = [
-  { id: 1, title: '서울 핫플 탐방기', views: 150, likes: 30 },
-  { id: 2, title: '부산 해운대 맛집 추천', views: 120, likes: 40 },
-  { id: 3, title: '제주도 힐링 여행 후기', views: 300, likes: 80 },
-  { id: 4, title: '대구 시내 야경 명소', views: 90, likes: 20 },
-  { id: 5, title: '강릉 카페 투어', views: 200, likes: 50 },
 ];
 
 const randomPlaces = [
@@ -51,8 +43,10 @@ export default function MainSection() {
   const [randomPlace, setRandomPlace] = useState('');
   const [suggestions, setSuggestions] = useState({});
   const [focusedInput, setFocusedInput] = useState(null);
+  const [topPosts, setTopPosts] = useState([]);
   const navigate = useNavigate();
   const timeoutRef = useRef(null);
+  
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -65,11 +59,20 @@ export default function MainSection() {
     const random = randomPlaces[Math.floor(Math.random() * randomPlaces.length)];
     setRandomPlace(random);
   }, []);
+  useEffect(() => {
+    const updatePosts = () => {
+      const shuffled = [...dummyPosts].sort(() => 0.5 - Math.random());
+      setTopPosts(shuffled.slice(0, 3));
+    };
+    updatePosts(); // 최초 1회
+    const interval = setInterval(updatePosts, 5000); // 이후 5초마다
+    return () => clearInterval(interval);
+  }, []);
 
   const fetchSuggestions = async (query, index = null) => {
     if (!query.trim()) return;
     try {
-      const res = await axios.get(`${API_BASE_URL}/api/map/autocomplete?name=${query}`);
+      const res = await axios.get(`${API_BASE_URL}/map/autocomplete?name=${query}`);
       const key = index !== null ? index : 'single';
       const data = res.data.slice(0, 10); // 최대 10개 제한
       setSuggestions((prev) => ({ ...prev, [key]: data }));
@@ -151,15 +154,56 @@ export default function MainSection() {
     }
   };
 
-  const topPosts = [...samplePosts].sort((a, b) => (b.views + b.likes * 2) - (a.views + a.likes * 2)).slice(0, 3);
+  const handleRandomPlaceClick = async () => {
+    try {
+      // 1) 자동완성 API 호출 ('/map/autocomplete' 경로 확인)
+      const res = await axios.get(
+        `${API_BASE_URL}/map/autocomplete?name=${encodeURIComponent(randomPlace)}`
+      );
+      if (!res.data || res.data.length === 0) {
+        return alert('장소 정보를 찾을 수 없습니다.');
+      }
+      // 2) 첫 번째 추천 결과를 선택
+      const place = res.data[0];
 
-  return (
-    <div className="page-container">
+      const imageUrl = placeBackgrounds[randomPlace];
+
+      // 3) Map 페이지로 이동하면서 state 에 전체 place 객체 전달
+      navigate('/map?search=random-place', {
+        state: {
+          fromRandomPlace: true,
+          selectedPlace: {
+            name: place.placeName,
+            address: place.address_name || place.road_address_name,
+            latitude: place.y,
+            longitude: place.x,
+            imageUrl
+          }
+        }
+      });
+    } catch (err) {
+      console.error('장소 조회 실패:', err);
+      alert('장소 정보를 불러오는 데 실패했습니다.');
+    }
+  };
+
+
+  //const topPosts = [...dummyPosts].sort((a, b) => (b.views + b.likes * 2) - (a.views + a.likes * 2)).slice(0, 3);
+
+  return (  
+  <div className="page-container">
       <header className="header">
         <h1 className="logo-text">MeetingMap</h1>
       </header>
 
-      <section className="image-slider" style={{ backgroundImage: `url(${images[currentImage]})` }}>
+      <section className="image-slider">
+        {images.map((image, index) => (
+          <div
+            key={index}
+            className={`slider-background ${index === currentImage ? 'visible' : ''}`}
+            style={{ backgroundImage: `url(${image})` }}
+          />
+        ))}
         <div className="main-box">
           <p className="subtitle">Enjoy your journey!</p>
 
@@ -259,11 +303,16 @@ export default function MainSection() {
           <h2>#오늘의 추천</h2>
           <div className="card-row">
             {topPosts.map((post) => (
-              <div key={post.id} className="recommend-card">
-                <img src={`/images/sample${post.id}.jpg`} alt={post.title} className="card-image" />
+              <div
+                key={post.id}
+                className="recommend-card"
+                onClick={() => navigate(`/board?postId=${post.id}`)}
+                style={{ cursor: 'pointer' }}
+              >
+                <img src={`/images/${post.image}`} alt={post.title} className="card-image" />
                 <div className="card-content">
                   <h3>{post.title}</h3>
-                  <p>조회수 {post.views} | 좋아요 {post.likes}</p>
+                  <p>{post.description}</p>
                 </div>
               </div>
             ))}
@@ -275,22 +324,33 @@ export default function MainSection() {
           <div className="card-grid">
             <div
               className="recommend-card big-card"
+              onClick={handleRandomPlaceClick}  // ✅ 클릭 이벤트 연결
               style={{
                 backgroundImage: `url(${placeBackgrounds[randomPlace] || ''})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 position: 'relative',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                cursor: 'pointer'  // UX 향상: 커서 포인터
               }}
             >
               <div className="overlay"></div>
               <div className="card-content">
                 <h3>{randomPlace}</h3>
-                <button className="action-btn" onClick={() => setRandomPlace(randomPlaces[Math.floor(Math.random() * randomPlaces.length)])}>다시 추천받기</button>
+                <button
+                  className="action-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();  // ✅ 카드 클릭과 버튼 클릭 분리
+                    setRandomPlace(randomPlaces[Math.floor(Math.random() * randomPlaces.length)]);
+                  }}
+                >
+                  다시 추천받기
+                </button>
               </div>
             </div>
           </div>
         </div>
+
       </section>
     </div>
   );

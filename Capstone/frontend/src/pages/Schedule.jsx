@@ -1,28 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Schedule.css';
 import CategorySidebar from '../components/CategorySidebar';
-import { themeSchedules } from '../data/scheduleDummy';
 import RouteSummary from '../components/RouteSummary';
 import { drawPolyline, drawTransitPlan, clearPolylines } from '../components/RouteDrawer';
 import { categoryList, categoryDetailCodes } from './Map';
 import { API_BASE_URL} from '../constants.js'
+import { useAppContext } from '../AppContext'
 
 const { kakao } = window;
 
 const Schedule = () => {
+  const navigate = useNavigate();
+  const { user, setUser } = useAppContext();
   const location = useLocation();
   const [mapObj, setMapObj] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [estimatedTime, setEstimatedTime] = useState('');
   const [showCreateSection, setShowCreateSection] = useState(false);
-  const [showRecommendSection, setShowRecommendSection] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(false);
-  const [selectedTheme, setSelectedTheme] = useState('date');
-  
-  const departures = location.state?.departures || [];
-  const destinationCoord = location.state?.destinationCoord || null;
+  const [isRouteBoxCollapsed, setIsRouteBoxCollapsed] = useState(false);
 
   const { addedList = [] } = location.state || {};
   const [scheduleItems, setScheduleItems] = useState(() => addedList);
@@ -50,17 +48,45 @@ const Schedule = () => {
   const [polylines, setPolylines] = useState([]);
   const [transferMarkers, setTransferMarkers] = useState();
   const [createScheduleError, setCreateScheduleError] = useState();
+  const [recommendMode, setRecommendMode] = useState("normal");
   const [selectedCategoryPlaces, setSelectedCategoryPlaces] = useState();
 
+  useEffect(() => {
+    if (user === null) {
+      navigate("/login"); // 로그인 페이지로 이동
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
-    const container = document.getElementById('map');
-    const map = new kakao.maps.Map(container, {
-      center: new kakao.maps.LatLng(37.554722, 126.970833),
-      level: 5,
-    });
-    setMapObj(map);
-  }, []);
+    if (createScheduleError) {
+      const timer = setTimeout(() => setCreateScheduleError(""), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [createScheduleError]);
+  
+  useEffect(() => {
+  const container = document.getElementById('map');
+  const map = new kakao.maps.Map(container, {
+    center: new kakao.maps.LatLng(37.554722, 126.970833), // 서울역
+    level: 5,
+  });
+  setMapObj(map);
+}, []);
+
+useEffect(() => {
+  if (!mapObj || !scheduleItems || scheduleItems.length === 0) return;
+
+  const shouldUseRandomCenter = location.state?.fromRandomPlace === true;
+
+  if (shouldUseRandomCenter) {
+    const centerLatLng = new kakao.maps.LatLng(
+      parseFloat(scheduleItems[0].latitude),
+      parseFloat(scheduleItems[0].longitude)
+    );
+    mapObj.setCenter(centerLatLng);
+  }
+}, [mapObj, scheduleItems, location.state]);
+
 
   useEffect(() => {
     // 장소들 마커 출력
@@ -143,6 +169,19 @@ const Schedule = () => {
     }
   };
 
+  const handleSaveSchedule = async () => {
+    try {
+      await axios.post(`${API_BASE_URL}/schedules`, {
+        scheduleName,
+        scheduleAbout,
+        details: createdSchedule
+      }, { withCredentials: true });
+      alert("스케줄 저장 완료");
+    } catch (err) {
+      console.error('스케줄 저장 실패:', err);
+    }
+  }
+
   const handleEstimate = () => {
     setEstimatedTime('차량: 35분 | 대중교통: 45분');
   };
@@ -189,31 +228,59 @@ const Schedule = () => {
     setShowCreateScheduleSection(false);
     setCreateScheduleLoading(true);
     try {
-      const res = await axios.post(`${API_BASE_URL}/schedules/create`,
-        {
-          "selectedPlace": scheduleItems.map((item, index) => (
-            {
-              contentId: item.contentId,
-              address: item.address,
-              name: item.name,
-              latitude: item.latitude,
-              longitude: item.longitude,
-              category: item.category,
-              stayMinutes: scheduleItemStayMinutes[index]
-            }
-          )),
-          "scheduleStartTime": scheduleStartTime,
-          "scheduleEndTime": scheduleEndTime,
-          "transport": transport,
-          "additionalRecommendation": additionalRecommendation,
-          "totalPlaceCount": totalPlaceCount,
-          "theme": theme,
-          "stayMinutesMean": stayMinutesMean,
-          "pointCoordinate": {
-            "latitude": end.latitude,
-            "longitude": end.longitude
-        }
-      });
+      let body;
+
+if (recommendMode === "ai") {
+  body = {
+     selectedPlace: scheduleItems.map((item, index) => ({
+      contentId: item.contentId,
+      address: item.address,
+      name: item.name,
+      latitude: item.latitude,
+      longitude: item.longitude,
+      category: item.category,
+      stayMinutes: scheduleItemStayMinutes[index]
+    })),
+    scheduleStartTime,
+    scheduleEndTime,
+    transport,
+    additionalRecommendation: true,
+    aiRecommendation: true,
+    totalPlaceCount,
+    theme,
+    stayMinutesMean,
+    pointCoordinate: {
+      latitude: end.latitude,
+      longitude: end.longitude
+    }
+  };
+} else {
+  body = {
+    selectedPlace: scheduleItems.map((item, index) => ({
+      contentId: item.contentId,
+      address: item.address,
+      name: item.name,
+      latitude: item.latitude,
+      longitude: item.longitude,
+      category: item.category,
+      stayMinutes: scheduleItemStayMinutes[index]
+    })),
+    scheduleStartTime,
+    scheduleEndTime,
+    transport,
+    additionalRecommendation,
+    totalPlaceCount,
+    theme,
+    stayMinutesMean,
+    pointCoordinate: {
+      latitude: end.latitude,
+      longitude: end.longitude
+    }
+  };
+}
+
+const res = await axios.post(`${API_BASE_URL}/schedules/create`, body, { withCredentials: true });
+
       const result = res.data;
       setScheduleItems(result.places);
 
@@ -278,48 +345,117 @@ const Schedule = () => {
   return (
     <div className="schedule-wrapper">
       {sidebarVisible && (
-        <CategorySidebar
-          category={selectedCategory}
-          places={selectedCategoryPlaces}
-          onClose={() => setSidebarVisible(false)}
-          onAddPlace={addToSchedule}
-        />
+        <div className="schedule-category-panel">
+       <CategorySidebar
+  category={selectedCategory}
+  places={selectedCategoryPlaces}
+  onClose={() => setSidebarVisible(false)}
+  onAddPlace={addToSchedule}
+  className="schedule-category-style" // ⭐ 추가
+/>
+
+          </div>
       )}
 
       <div className="schedule-container">
         <h2 className="schedule-title">Schedule</h2>
-        <p className="schedule-sub">카카오맵 기반 지도 화면 완성 및 딥정 추가 기능이 구현될 예정입니다.</p>
+        <div className="category-icons">
+          {categoryList.map((cat) => (
+            <button
+              key={cat.code}
+              className={`category-btn ${selectedCategory === cat.code ? 'active' : ''}`}
+              onClick={() => toggleSidebar(cat)}>
+              {cat.name}
+            </button>
+          ))}
+        </div>
+        <p className="schedule-sub"></p>
 
+        <div className="schedule-map-wrapper">
         <div id="map" className="map-placeholder"></div>
 
-        {showCreateScheduleSection && (
-          <div className="route-box">
-            <div className="transport-select">
-              <button onClick={() => setTransportMode('car')}>🚗 차량</button>
-              <button onClick={() => setTransportMode('transit')}>🚌 대중교통</button>
-              <button onClick={() => setTransportMode('walk')}>🚶 도보</button>
-            </div>
-            <RouteSummary
-              routes={routeList}
-              transportMode={transportMode}
-              selectedIdx={selectedRouteIdx}
-              onSelect={handleRouteClick}
-            />
+        <div className="schedule-location-box">
+    {scheduleItems.length === 0 ? (
+      <p>출발지: 없음</p>
+    ) : (
+      <>
+        <p><strong>출발지:</strong> {scheduleItems[0]?.name}</p>
+        <p><strong>도착지:</strong> {scheduleItems[scheduleItems.length - 1]?.name}</p>
+      </>
+    )}
+  </div>
+</div>
+{showCreateScheduleSection && (
+  <>
+    {/* route-box 전체 토글 */}
+    {!isRouteBoxCollapsed ? (
+      <div className="route-box schedule-route-box" style={{
+
+      }}>
+        <div style={{ textAlign: 'right' }}>
+          <button
+            onClick={() => setIsRouteBoxCollapsed(true)}
+            style={{
+              backgroundColor: '#eee',
+              border: '1px solid #bbb',
+              borderRadius: '5px',
+              padding: '4px 8px',
+              fontSize: '14px',
+              cursor: 'pointer',
+            }}
+          >
+            접기 ⬆️
+          </button>
+        </div>
+
+        <div style={{ marginTop: '10px' }}>
+          <div className="transport-select">
+            <button onClick={() => setTransportMode('car')}>🚗 차량</button>
+            <button onClick={() => setTransportMode('transit')}>🚌 대중교통</button>
+            <button onClick={() => setTransportMode('walk')}>🚶 도보</button>
           </div>
-        )}
+          <RouteSummary
+            routes={routeList}
+            transportMode={transportMode}
+            selectedIdx={selectedRouteIdx}
+            onSelect={handleRouteClick}
+          />
+        </div>
+      </div>
+    ) : (
+      // 접혔을 때는 route-box 대신 이 버튼만 위치에 출력
+      <div style={{ marginTop: '10px', textAlign: 'right' }}>
+        <button
+          onClick={() => setIsRouteBoxCollapsed(false)}
+          style={{
+            backgroundColor: '#eee',
+            border: '1px solid #bbb',
+            borderRadius: '5px',
+            padding: '4px 8px',
+            fontSize: '14px',
+            cursor: 'pointer',
+          }}
+        >
+          펼치기 ⬇️
+        </button>
+      </div>
+    )}
+  </>
+)}
+
+
 
         <div className="button-row">
           <button onClick={() => setShowCreateSection((prev) => !prev)} className="action-btn">
-            Create Schedule
-          </button>
-          <button onClick={() => setShowRecommendSection((prev) => !prev)} className="action-btn">
-            Recommended Schedules
+            스케줄 생성하기
           </button>
           <button onClick={() => handleCreateSchedule()} className="action-btn">
             일정 생성
           </button>
         </div>
 
+        {(showCreateSection || (showCreateScheduleSection && createdSchedule)) && (
+  <div className="schedule-bottom-row">
         {showCreateSection && (
           <div className="section-box">
             <h3>일정 만들기</h3>
@@ -352,7 +488,32 @@ const Schedule = () => {
                   <option value="car">자동차</option>
                   <option value="transit">대중교통</option>
                   </select></li>
-                <li>추가 추천 여부: <input type="checkbox" name="additionalRecommendation" checked={additionalRecommendation} onChange={(e) => setAdditionalRecommendation(e.target.checked)} /></li>
+                  <li>
+  추천 방식 선택:
+  <label style={{ marginLeft: '10px' }}>
+    <input
+      type="radio"
+      name="recommend"
+      value="normal"
+      checked={recommendMode === 'normal'}
+      onChange={() => setRecommendMode('normal')}
+    />
+    일반 추천
+  </label>
+  <label style={{ marginLeft: '20px' }}>
+    <input
+      type="radio"
+      name="recommend"
+      value="ai"
+      checked={recommendMode === 'ai'}
+      onChange={() => setRecommendMode('ai')}
+    />
+    AI 추천
+  </label>
+</li>
+<li>
+  추가 추천 여부: <input type="checkbox" name="additionalRecommendation" checked={additionalRecommendation} onChange={(e) => setAdditionalRecommendation(e.target.checked)} />
+</li>
                 {additionalRecommendation && (
                   <>
                     <li>총 장소 수(선택한 장소 + 추천 받을 장소): <input type="number" name="totalPlaceCount" value={totalPlaceCount} min={scheduleItems.length} max={7} onChange={(e) => setTotalPlaceCount(e.target.value)} /></li>
@@ -372,26 +533,6 @@ const Schedule = () => {
           </div>
         )}
 
-        {showRecommendSection && (
-          <div className="section-box">
-            <h3>추천 스케줄</h3>
-            <div className="theme-buttons">
-              {Object.keys(themeSchedules).map((theme) => (
-                <button
-                  key={theme}
-                  className={`theme-btn ${selectedTheme === theme ? 'active' : ''}`}
-                  onClick={() => setSelectedTheme(theme)}>
-                  {theme}
-                </button>
-              ))}
-            </div>
-            <ul>
-              {themeSchedules[selectedTheme].map((item, index) => (
-                <li key={index}>🔹 {item.time} - {item.activity}</li>
-              ))}
-            </ul>
-          </div>
-        )}
         {createScheduleLoading && <p>일정 생성 중...</p>}
         {createScheduleError && <p>{createScheduleError}</p>}
         {showCreateScheduleSection && createdSchedule && (
@@ -405,26 +546,11 @@ const Schedule = () => {
                 <li key={index}>🔹 {new Date(item.scheduleStartTime).toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit', hour12: true })} ~ {new Date(item.scheduleEndTime).toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit', hour12: true })} - {item.scheduleContent}</li>
               ))}
             </ul>
-            <button>스케줄 저장</button>
+            <button onClick={handleSaveSchedule}>스케줄 저장</button>
           </div>
         )}
-
-        <div className="category-icons">
-          {categoryList.map((cat) => (
-            <button
-              key={cat.code}
-              className={`category-btn ${selectedCategory === cat.code ? 'active' : ''}`}
-              onClick={() => toggleSidebar(cat)}>
-              {cat.name}
-            </button>
-          ))}
-        </div>
-
-        <div className="input-group">
-          <label>출력 장소</label>
-          <button onClick={handleEstimate}>예상 시간 계산</button>
-          <div className="estimated-time">{estimatedTime}</div>
-        </div>
+          </div>
+          )}
 
       </div>
     </div>

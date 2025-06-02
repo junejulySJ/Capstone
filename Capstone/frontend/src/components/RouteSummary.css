@@ -17,15 +17,25 @@
   }
   
   .route-button {
-    padding: 0.4rem 0.8rem;
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    white-space: nowrap;
-    transition: background 0.2s;
+    flex: 1 1 calc(33.333% - 8px); /* ✅ 3개씩 균등 너비 (gap 고려) */
+    max-width: calc(33.333% - 8px); /* ✅ 반응형 제한 */
+    box-sizing: border-box;
+    padding: 0.6rem 0.8rem;
+    text-align: left;
   }
+  
+  .route-button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: space-between; /* ✅ 좌우 정렬 */
+    align-items: stretch; /* ✅ 버튼 높이 맞춤 */
+  }
+  
+  .route-button-group.spaced {
+    margin-top: 20px;
+  }
+  
   
   .route-button:hover {
     background-color: #e6f0ff;

@@ -1,4 +1,4 @@
-/* App.css 또는 Sidebar.css */
+/* 본문 좌측 상단 햄버거 버튼 (App.js에서 렌더링) */
 .hamburger {
   position: fixed;
   top: 16px;
@@ -7,6 +7,7 @@
   background: none;
   border: none;
   cursor: pointer;
+  display: flex;
   z-index: 1001;
 }
 
@@ -20,14 +21,16 @@
   z-index: 1000;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
-  width: 200px;
+  width: 230px;
   transform: translateX(-100%);
 }
 
+/* 사이드바가 열렸을 때 */
 .sidebar.open {
   transform: translateX(0);
 }
 
+/* 메뉴 링크 레이아웃 */
 .sidebar-links {
   display: flex;
   flex-direction: column;
@@ -35,13 +38,21 @@
   padding: 80px 24px;
 }
 
+/* 메뉴 항목 링크 스타일 */
 .sidebar-links a {
   text-decoration: none;
   font-size: 16px;
   color: black;
 }
 
+/* 로그인/회원가입 강조 색상 */
 .auth-link {
   color: #a88fbf;
   font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .hamburger {
+    display: none !important;
+  }
 }

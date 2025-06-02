@@ -5,7 +5,7 @@ import './Map.css';
 import CategorySidebar from '../components/CategorySidebar';
 import RouteSummary from '../components/RouteSummary';
 import { drawPolyline, drawTransitPlan, clearPolylines } from '../components/RouteDrawer';
-import { API_BASE_URL} from '../constants.js'
+import { API_BASE_URL } from '../constants.js'
 
 const { kakao } = window;
 
@@ -32,6 +32,8 @@ export const categoryDetailCodes = {
 
 const Map = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [mapObj, setMapObj] = useState(null);
   const [departure, setDeparture] = useState(null);
   const [destination, setDestination] = useState(null);
@@ -43,7 +45,6 @@ const Map = () => {
   const [categoryMarkers, setCategoryMarkers] = useState([]);
   const [selectedPlaces, setSelectedPlaces] = useState([]);
   const [addedList, setAddedList] = useState([]);
-  const location = useLocation();
   const [sort, setSort] = useState();
   const [search, setSearch] = useState();
   const [departures, setDepartures] = useState([]);
@@ -51,14 +52,27 @@ const Map = () => {
   const [end, setEnd] = useState();
   const [middlePoint, setMiddlePoint] = useState();
   const [transferMarkers, setTransferMarkers] = useState();
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const handleRemovePlace = (indexToRemove) => {
+    setAddedList(prev => prev.filter((_, i) => i !== indexToRemove));
+  };
 
+
+  // 카카오 맵 객체 초기화
   useEffect(() => {
-    const container = document.getElementById('map');
-    const map = new kakao.maps.Map(container, {
-      center: new kakao.maps.LatLng(37.554722, 126.970833),
-      level: 5,
-    });
-    setMapObj(map);
+    const interval = setInterval(() => {
+      if (window.kakao && window.kakao.maps) {
+        clearInterval(interval);
+        const container = document.getElementById('map');
+        const map = new window.kakao.maps.Map(container, {
+          center: new window.kakao.maps.LatLng(37.554722, 126.970833),
+          level: 5,
+        });
+        setMapObj(map);
+      }
+    }, 100);
+
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -77,14 +91,45 @@ const Map = () => {
   }, [location.search]);
 
   useEffect(() => {
+    if (
+      mapObj &&
+      location.state?.fromRandomPlace &&
+      location.state?.selectedPlace
+    ) {
+      const place = location.state.selectedPlace;
+      clearPolylines(polylines);
+      categoryMarkers.forEach(m => m.setMap(null));
+
+      const lat = parseFloat(place.latitude);
+      const lng = parseFloat(place.longitude);
+      const marker = new kakao.maps.Marker({
+        map: mapObj,
+        position: new kakao.maps.LatLng(lat, lng),
+        title: place.name
+      });
+
+      mapObj.setCenter(new kakao.maps.LatLng(lat, lng));
+      setCategoryMarkers([marker]);
+      setSelectedPlaces([place]);
+      setShowSidebar(true);
+    }
+  }, [mapObj, location.state]);
+
+
+  useEffect(() => {
+    if (!mapObj) return;
     const fetchData = async () => {
+      if (!search || !sort) return;
+      if (search === 'random-place') return; // ❌ 랜덤 추천일 땐 이 fetch 막기
+
       const allPlaces = [];
       const markers = [];
 
-      if (!search || !sort) return;
-
       try {
-        const res = await axios.get(`${API_BASE_URL}/map?search=${search}&sort=${sort}${(departure ? `&start=${departure}` : ``)}${(destination ? `&end=${destination}` : ``)}${(departures.length ? `&${departures.map((d) => (`name=${d}`)).join('&')}` : ``)}`);
+        const res = await axios.get(
+          `${API_BASE_URL}/map?search=${search}&sort=${sort}${departure ? `&start=${departure}` : ''}${destination ? `&end=${destination}` : ''}${departures.length ? `&${departures.map((d) => `name=${d}`).join('&')}` : ''}`
+        );
+
         const start = res.data?.start || null;
         const end = res.data?.end || null;
         const middlePoint = res.data?.middlePoint || null;
@@ -98,27 +143,26 @@ const Map = () => {
           const marker = new kakao.maps.Marker({
             map: mapObj,
             position: new kakao.maps.LatLng(lat, lng),
-            title: place.name
+            title: place.name,
           });
           markers.push(marker);
         }
 
         allPlaces.push(...items);
-
         setStart(start);
         setEnd(end);
         setMiddlePoint(middlePoint);
         setCategoryMarkers(markers);
+        setSelectedPlaces(allPlaces.slice(0, 50));
+        setShowSidebar(true);
       } catch (err) {
-        console.error(`❌ 전체 요청 실패:`, err);
+        console.error('❌ 전체 요청 실패:', err);
       }
-
-      setSelectedPlaces(allPlaces.slice(0, 50));
-      setShowSidebar(true);
     };
 
     fetchData();
-  }, [departure, destination, departures, sort, mapObj, search])
+  }, [departure, destination, departures, sort, mapObj, search]);
+
 
   useEffect(() => {
     if (!mapObj || (!start && !end)) return;
@@ -144,8 +188,20 @@ const Map = () => {
       const startPosition = new kakao.maps.LatLng(start.latitude, start.longitude);
       const endPosition = new kakao.maps.LatLng(end.latitude, end.longitude);
 
-      new kakao.maps.Marker({ map: mapObj, position: startPosition });
-      new kakao.maps.Marker({ map: mapObj, position: endPosition });
+      // 출발지: 초록색, 도착지: 빨간색, 1.3배 크기
+      const startImage = new kakao.maps.MarkerImage(
+        'https://cdn-icons-png.flaticon.com/512/447/447031.png',
+        new kakao.maps.Size(33, 44)
+      );
+
+      const endImage = new kakao.maps.MarkerImage(
+        'https://cdn-icons-png.flaticon.com/512/684/684908.png',
+        new kakao.maps.Size(33, 44)
+      );
+
+      new kakao.maps.Marker({ map: mapObj, position: startPosition, title: start.name, image: startImage });
+      new kakao.maps.Marker({ map: mapObj, position: endPosition, title: end.name, image: endImage });
+
 
       bounds.extend(startPosition);
       bounds.extend(endPosition);
@@ -276,16 +332,22 @@ const Map = () => {
     setAddedList([...addedList, place]);
   };
 
+  // 홈으로 이동
+  const handleHeaderClick = () => {
+    navigate('/'); // 홈으로 이동
+  };
+
   return (
-    <div className="map-page">
-      <div className="category-top-bar">
-        {categoryList.map(cat => (
-          <button key={cat.code} onClick={() => handleCategoryClick(cat.code)}>{cat.name}</button>
-        ))}
-      </div>
+    <div className="map-page map-page-scroll-fix">
 
       <div className="map-container-wrapper">
         <div id="map" className="map-area"></div>
+
+        <div className="category-top-bar">
+          {categoryList.map(cat => (
+            <button key={cat.code} className='category-top-bar-button' onClick={() => handleCategoryClick(cat.code)}>{cat.name}</button>
+          ))}
+        </div>
 
         {showSidebar && (
           <CategorySidebar
@@ -296,7 +358,28 @@ const Map = () => {
           />
         )}
 
-        <div className="route-box">
+        <div className="location-box">
+          {Array.isArray(start) ? (
+            <>
+              <h4>출발지:</h4>
+              <ul>
+                {start.map((s, index) => (
+                  <li key={index}>{s.name}</li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <h4>출발지: {start?.name || '없음'}</h4>
+          )}
+
+          {middlePoint && (
+            <h4>중간지점: {middlePoint.address}</h4>
+          )}
+
+          {end && <h4>도착지: {end.name}</h4>}
+        </div>
+
+        <div className="route-box" style={{ gridArea: 'route-box', width: "100%" }}>
           <div className="transport-select">
             <button onClick={() => setTransportMode('car')}>🚗 차량</button>
             <button onClick={() => setTransportMode('transit')}>🚌 대중교통</button>
@@ -310,70 +393,62 @@ const Map = () => {
           />
         </div>
 
-        <div className="location-box">
-        {Array.isArray(start) ? (
-          <>
-            <h4>출발지:</h4>
+        <div className="section-b-wrapper">
+          <h3>📝 선택한 장소 목록</h3>
+          <button
+            className="schedule-create-button"
+            onClick={() => {
+              if (end) {
+                navigate('/schedule', {
+                  state: {
+                    addedList,
+                    end: {
+                      latitude: end.latitude,
+                      longitude: end.longitude
+                    }
+                  }
+                });
+              } else {
+                navigate('/schedule', {
+                  state: {
+                    addedList,
+                    end: {
+                      latitude: middlePoint.latitude,
+                      longitude: middlePoint.longitude
+                    }
+                  }
+                });
+              }
+            }}
+          >
+            📅 스케줄 생성하기
+          </button>
+          {addedList.length === 0 ? (
+            <p>선택한 장소가 없습니다.</p>
+          ) : (
             <ul>
-              {start.map((s, index) => (
-                <li key={index}>{s.name}</li>
+              {addedList.map((place, index) => (
+                <li key={index}>
+                  {place.name} ({place.address})
+                  <button
+                    onClick={() => handleRemovePlace(index)}
+                    style={{
+                      marginLeft: '8px',
+                      background: 'transparent',
+                      border: 'none',
+                      color: 'red',
+                      cursor: 'pointer',
+                      fontSize: '16px'
+                    }}
+                  >
+                    ❌
+                  </button>
+                </li>
               ))}
+
             </ul>
-          </>
-        ) : (
-          <h4>출발지: {start?.name || '없음'}</h4>
-        )}
-
-        {middlePoint && (
-          <h4>중간지점: {middlePoint.address}</h4>
-        )}
-
-        {end && <h4>도착지: {end.name}</h4>}
-      </div>
-      </div>
-
-      <div className="schedule-button-wrapper">
-        <button
-          className="schedule-create-button"
-          onClick={() => {
-            if (end) {
-              navigate('/schedule', {
-                state: {
-                  addedList, 
-                  end: {
-                    latitude: end.latitude,
-                    longitude: end.longitude
-                  }
-                }
-              });
-            } else {
-              navigate('/schedule', {
-                state: {
-                  addedList, 
-                  end: {
-                    latitude: middlePoint.latitude,
-                    longitude: middlePoint.longitude
-                  }
-                }
-              });
-            }
-          }}
-        >
-          📅 스케줄 생성하기
-        </button>
-      </div>
-
-      <div className="section-b-wrapper">
-        <h3>📝 선택한 장소 목록</h3>
-        {addedList.length === 0 ? (
-          <p>선택한 장소가 없습니다.</p>
-        ) : (
-          <ul>
-            {addedList.map((place, index) => (
-              <li key={index}>{place.name} ({place.address})</li>
-            ))}
-          </ul>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

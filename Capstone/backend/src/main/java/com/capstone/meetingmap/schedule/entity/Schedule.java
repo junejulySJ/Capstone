@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,7 +23,7 @@ public class Schedule extends ScheduleTime {
     private String scheduleAbout;
 
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ScheduleDetail> details;
+    private List<ScheduleDetail> details = new ArrayList<>();
 
     @ManyToOne(fetch= FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false) //회원아이디 외래키
@@ -32,7 +33,7 @@ public class Schedule extends ScheduleTime {
     public Schedule(String scheduleName, String scheduleAbout, List<ScheduleDetail> details, User user) {
         this.scheduleName = scheduleName;
         this.scheduleAbout = scheduleAbout;
-        this.details = details;
+        this.details = (details != null) ? details : new ArrayList<>();
         this.user = user;
     }
 
@@ -40,12 +41,10 @@ public class Schedule extends ScheduleTime {
         this.scheduleName = scheduleName;
         this.scheduleAbout = scheduleAbout;
 
-        this.details.clear();
         this.details.addAll(details);
     }
 
     public void addDetails(List<ScheduleDetail> details) {
-        this.details.clear();
         for (ScheduleDetail detail : details) {
             this.details.add(detail);
             detail.setSchedule(this);

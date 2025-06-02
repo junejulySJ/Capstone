@@ -21,7 +21,6 @@ public class ScheduleDetailRequestDto {
     private BigDecimal longitude;
     private LocalDateTime scheduleStartTime;
     private LocalDateTime scheduleEndTime;
-    private Integer scheduleNo; // 외래키
 
     //dto를 엔티티로 변환
     public ScheduleDetail toEntity(Schedule schedule) {

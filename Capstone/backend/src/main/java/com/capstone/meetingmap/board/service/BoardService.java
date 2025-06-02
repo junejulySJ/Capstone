@@ -141,10 +141,12 @@ public class BoardService {
 
         Board board = boardRepository.save(boardRequestDto.toEntity(category, user, schedule));
 
-        try {
-            boardFileService.saveFiles(board, files);
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "이미지를 저장하는데 실패했습니다");
+        if (files != null && !files.isEmpty()) {
+            try {
+                boardFileService.saveFiles(board, files);
+            } catch (IOException e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "이미지를 저장하는데 실패했습니다");
+            }
         }
 
         return board.getBoardNo();

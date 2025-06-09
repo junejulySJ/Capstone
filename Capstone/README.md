@@ -46,32 +46,32 @@
     <th>메인페이지</th>
   </tr>
   <tr>
-    <td><img src="./Capstone/asset/Animation5.gif" width="100%" height="300px"/></td>
-    <td><img src="./Capstone/asset/Animation4.gif" width="100%" height="300px"/></td>
+    <td><img src="asset/Animation5.gif" width="100%" height="300px"/></td>
+    <td><img src="asset/Animation4.gif" width="100%" height="300px"/></td>
   </tr>
   <tr>
     <th>지도 출력(출발지-도착지)</th>
     <th>지도 출력(다중 입력 후 중간지점)</th>
   </tr>
   <tr>
-    <td><img src="./Capstone/asset/Animation1.gif" width="100%" height="300px"/></td>
-    <td><img src="./Capstone/asset/Animation2.gif" width="100%" height="300px"/></td>
+    <td><img src="asset/Animation1.gif" width="100%" height="300px"/></td>
+    <td><img src="asset/Animation2.gif" width="100%" height="300px"/></td>
   </tr>
   <tr>
     <th>스케줄 생성</th>
     <th>게시판+글쓰기</th>
   </tr>
   <tr>
-    <td><img src="./Capstone/asset/Animation9.gif" width="100%" height="300px"/></td>
-    <td><img src="./Capstone/asset/Animation10.gif" width="100%" height="300px"/></td>
+    <td><img src="asset/Animation9.gif" width="100%" height="300px"/></td>
+    <td><img src="asset/Animation10.gif" width="100%" height="300px"/></td>
   </tr>
   <tr>
     <th>마이페이지</th>
     <th>Group</th>
   </tr>
   <tr>
-    <td><img src="./Capstone/asset/Animation11.gif" width="100%" height="300px"/></td>
-    <td><img src="./Capstone/asset/Animation12.gif" width="100%" height="300px"/></td>
+    <td><img src="asset/Animation11.gif" width="100%" height="300px"/></td>
+    <td><img src="asset/Animation12.gif" width="100%" height="300px"/></td>
   </tr>
 </table>
 

@@ -46,7 +46,7 @@
     <th>메인페이지</th>
   </tr>
   <tr>
-    <td><img src="./asset/Animation5.gif" width="100%" height="300px"/></td>
+    <td><img src="./Capstone/asset/Animation5.gif" width="100%" height="300px"/></td>
     <td><img src="./Capstone/asset/Animation4.gif" width="100%" height="300px"/></td>
   </tr>
   <tr>
